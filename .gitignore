@@ -1,0 +1,12 @@
+.Rhistory
+.RData
+.Rproj.user
+.png
+.html
+.txt
+.csv
+.eps
+
+# ignore all files in any directory
+data/
+figures/
