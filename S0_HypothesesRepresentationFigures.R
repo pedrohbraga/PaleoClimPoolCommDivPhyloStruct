@@ -1,4 +1,4 @@
-# Hypothesis and prediction representation
+# Hypotheses and prediction representation
 
 Hypothesis.1.alt <- data.frame(SamplingPool = factor(rep(c("Broad scale",
                                                            "Regional scale",
