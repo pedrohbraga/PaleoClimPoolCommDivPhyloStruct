@@ -2,7 +2,8 @@
 #### Code to prepare reproducible HTML tables with the results obtained in this project  ####
 #                                                                                           #
 # Author: Pedro Henrique Pereira Braga                                                      #
-# Last Update: "2019-06-20 17:00:30 EST"                                                    #
+# Last Update: "2019-06-20 17:00:30 EST"
+#
 #                                                                                           #
 #############################################################################################
 
