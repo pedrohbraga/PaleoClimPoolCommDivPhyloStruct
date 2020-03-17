@@ -27,11 +27,12 @@ needed.libraries <- required.libraries[!(required.libraries %in% installed.packa
 if(length(needed.libraries)) install.packages(needed.libraries)
 
 # Load all required libraries at once
-lapply(required.libraries, require, character.only = TRUE)
+lapply(required.libraries, 
+       require, 
+       character.only = TRUE)
 
 ### Install and load packages not available in CRAN
 
-source("https://bioconductor.org/biocLite.R")
 ## try http:// if https:// URLs are not supported
 ## you may need to upgrade: biocLite("BiocUpgrade") 
 
