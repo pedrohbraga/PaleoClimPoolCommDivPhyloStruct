@@ -21,8 +21,6 @@
 #                                                                               # 
 #################################################################################
 
-
-
 length(tip.rates$lambda.avg)
 length(tip.rates$mu.avg)
 
@@ -150,15 +148,85 @@ head(CWM.Div.MPD.Chiroptera.Comm)
 
 dim(CWM.Div.MPD.Chiroptera.Comm)
 
-#####
+write.csv(CWM.Div.MPD.Chiroptera.Comm, "data/matrices/CWM.Div.MPD.Chiroptera.Comm.csv")
 
-install.packages("dglm")
-dglm.NRI.netDiv<- dglm::dglm(NRI ~ netDiv_CWM_std_tw, data = CWM.Div.MPD.Chiroptera.Comm)
 
-summary(lm(NRI ~ netDiv_CWM_std_tw + I(netDiv_CWM_std_tw^2), data = CWM.Div.MPD.Chiroptera.Comm))
+# CWM.Div.MPD.Chiroptera.Comm <- read.csv(data/matrices/CWM.Div.MPD.Chiroptera.Comm.csv", h = T)
+
+##################################################################
+### Representation and analyses for net diversification rates ####
+##################################################################
+
+# Looking a normal linear model
+
+lm.NRI.netDiv_CWM_std_tw <- lm(NRI ~ netDiv_CWM_std_tw, 
+                               data = CWM.Div.MPD.Chiroptera.Comm %>%
+                                 filter(SamplingPool == "Global sampling"))
+
+layout(matrix(1:4, 
+              nrow = 2, 
+              ncol = 2, 
+              byrow = TRUE))
+
+plot(lm.NRI.netDiv_CWM_std_tw, which=1)
+plot(lm.NRI.netDiv_CWM_std_tw, which=2)
+plot(lm.NRI.netDiv_CWM_std_tw, which=3)
+plot(lm.NRI.netDiv_CWM_std_tw, which=5)
+
+dev.off()
+
+# Diagnostic plots show a clear violation of linear assumptions
+
+# Looking a normal linear model
+
+quad.lm.NRI.netDiv_CWM_std_tw <- lm(NRI ~ netDiv_CWM_std_tw + I(netDiv_CWM_std_tw^2), 
+                                    data = CWM.Div.MPD.Chiroptera.Comm %>%
+                                      filter(SamplingPool == "Global sampling"))
+
+layout(matrix(1:4, 
+              nrow = 2, 
+              ncol = 2, 
+              byrow = TRUE))
+
+plot(quad.lm.NRI.netDiv_CWM_std_tw, which=1)
+plot(quad.lm.NRI.netDiv_CWM_std_tw, which=2)
+plot(quad.lm.NRI.netDiv_CWM_std_tw, which=3)
+plot(quad.lm.NRI.netDiv_CWM_std_tw, which=5)
+
+dev.off()
+
+# Diagnostic plots show a clear violation of linear assumptions
+
+# Stepping up to a double-generalized linear model appraoch that consists of
+# three parts: a model for the variance, a GLM for the mean and a GLM for the
+# disperson
+
+dglm.NRI.netDiv<- dglm::dglm(NRI ~ netDiv_CWM_std_tw + I(netDiv_CWM_std_tw^2), 
+                             data = CWM.Div.MPD.Chiroptera.Comm %>%
+                               filter(SamplingPool == "Global sampling"),
+                             dformula = ~netDiv_CWM_std_tw,
+                             # dlink = "identity",
+                             method = "reml")
+# Summarize the mean model as for a glm
+summary.glm(dglm.NRI.netDiv)
+
+# Summarize the dispersion model as for a glm
+summary(dglm.NRI.netDiv$dispersion.fit)
+
+# Examine goodness of fit of dispersion model by plotting residuals
+plot(fitted(dglm.NRI.netDiv$dispersion.fit),
+     residuals(dglm.NRI.netDiv$dispersion.fit))
+
+dglm.Pvalues <- function(dglm.fit){
+  P.disp = anova.dglm(dglm.fit)$Adj.P[2]
+  P.mean = summary(dglm.fit)$coef[2,4]
+  list(P.mean=P.mean, P.disp=P.disp)
+}
 
 anova(dglm.NRI.netDiv)
+
 summary.glm(dglm.NRI.netDiv)
+
 summary(dglm.NRI.netDiv$dispersion.fit)
 
 #####
@@ -167,14 +235,18 @@ summary(dglm.NRI.netDiv$dispersion.fit)
 
 ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
          filter(SamplingPool == "Global sampling"), 
-       aes(x = netDiv_CWM, 
+       aes(x = netDiv_CWM_std_tw, 
            y = NRI)) +
   geom_point(alpha = 0.7, 
              size = 1.4, 
              aes(colour = factor(ID_Realm))) +
-  stat_smooth(method = "loess", 
-              colour = "black") +
-  #stat_smooth(method = "lm", formula= (y ~ poly(x, 2)), se = TRUE, colour = "black") +
+  #  stat_smooth(method = "gam",
+  #               formula = y ~ poly(x, 2), 
+  #              se = TRUE,
+  #              colour = "black") +
+  #  stat_smooth(method = "lm", formula= (y ~ poly(x, 2)), se = TRUE, colour = "black") +
+  #  stat_smooth(method = "loess", 
+  #              formula = y ~ poly(x, 2), size = 1) +
   scale_color_viridis(option="D", 
                       begin = 0,
                       end = 1,
@@ -191,9 +263,41 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
         legend.box = "horizontal") + 
   guides(colour = guide_legend(nrow = 1))
 
-loess.NRI.netDiv <- loess(NRI ~ netDiv_CWM_std_tw, 
-                          data = CWM.Div.MPD.Chiroptera.Comm %>%
-                            filter(SamplingPool == "Global sampling"))
+
+## Attempting with a locally estimated scatterplot smoothing (loess)
+
+loess.NRI.netDiv_CWM_std_tw <- loess(NRI ~ netDiv_CWM_std_tw, 
+                                     data = CWM.Div.MPD.Chiroptera.Comm %>%
+                                       filter(SamplingPool == "Global sampling"), 
+                                     span = 0.50)
+
+loess.NRI.netDiv_CWM_std_tw.fit <- augment(loess.NRI.netDiv_CWM_std_tw)
+
+# get smoothed output
+smoothed.loess.NRI.netDiv_CWM_std_tw <- predict(loess.NRI.netDiv_CWM_std_tw) 
+
+ggplot(loess.NRI.netDiv_CWM_std_tw.fit, 
+       aes(netDiv_CWM_std_tw, NRI)) +
+  geom_point() +
+  geom_line(aes(y = .fitted), 
+            color = "red")
+
+ggplot(data = loess.NRI.netDiv_CWM_std_tw.fit, 
+       aes(x = netDiv_CWM_std_tw, 
+           y = NRI)) +
+  geom_point(alpha = 0.7, 
+             size = 1.4) +
+  geom_line(aes(y = .fitted), 
+            color = "red") +
+  labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
+  theme_classic() +
+  theme(legend.position = "bottom", 
+        legend.direction = "horizontal",
+        legend.key.size = unit(0.5, "cm"),
+        legend.text = element_text(size = 9),
+        legend.title = element_text(face = "bold", size = 9),
+        legend.box = "horizontal") + 
+  guides(colour = guide_legend(nrow = 1))
 
 # 
 

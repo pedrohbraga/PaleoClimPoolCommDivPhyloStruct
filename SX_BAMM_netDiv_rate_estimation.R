@@ -247,19 +247,49 @@ plotRateThroughTime(edata,
 # evolutionary process at the root of the tree.
 
 cst <- cumulativeShiftProbsTree(edata)
-plot.phylo(cst)
+
+# The marginal shift probability tree is a copy of the target phylogeny, but
+# where each branch length is equal to the branch-specific marginal probability
+# that a rate-shift occurred on the focal branch. For example, a branch length
+# of 0.333 implies that 1/3 of all samples from the posterior had a rate shift
+# on the focal branch.
+
+plot.phylo(cst,
+           show.tip.label = F)
 
 edgecols <- rep('black', 
                 length(Chiroptera.FaurSven.tree.ultra.cw$edge.length))
 
-# And this should plot your tree (mytree) such that all branches with cumulative
+# And this should plot your tree such that all branches with cumulative
 # shift probabilities of 0.95 or higher are identified in red.
 
 is_highprobshift <- cst$edge.length >= 0.95
-edgecols[ is_highprobshift ] <- "red"
+edgecols[is_highprobshift] <- "red"
 
 plot.phylo(Chiroptera.FaurSven.tree.ultra.cw, 
-           edge.color = edgecols)
+           edge.color = edgecols,
+           show.tip.label = F)
+
+# computing the marginal shift probs tree:
+mst <- marginalShiftProbsTree(edata)
+
+#compare the two types of shift trees side-by-side:
+plot.new()
+
+par(mfrow=c(1,3))
+
+plot.phylo(mst, 
+           no.margin=TRUE, 
+           show.tip.label=FALSE)
+
+plot.phylo(cst, no.margin=TRUE, 
+           show.tip.label=FALSE)
+
+plot.phylo(Chiroptera.FaurSven.tree.ultra.cw, 
+           edge.color = edgecols,
+           show.tip.label = F)
+
+dev.off()
 
 ####  Estimate individual tip-specific evolutionary rates #### 
 

@@ -39,7 +39,7 @@ CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
   
   standardize_w <- function(X, w){
     ones <- rep(1, length(w))
-    Xc <- X - ones %*% t(w) %*% X
+    Xc <- X - ones %*% t(w) %*% X # equations 6 and 7
     Xc / ones%*%sqrt(t(ones)%*%(Xc*Xc*w)) 
   } 
   
