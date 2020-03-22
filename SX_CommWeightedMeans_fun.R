@@ -119,5 +119,3 @@ CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
                                   CWM_std_tw = CWM_std_tw,
                                   CWM_std_w = CWM_std_w))
 }
-
-

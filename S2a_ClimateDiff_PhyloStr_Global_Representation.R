@@ -1,6 +1,4 @@
 # S2a_ClimateDiff_PhyloStr_Global_Representation
-#
-
 MPD.MNTD.diff.worldClimate.Global <- diff.worldClimate %>%
   left_join(cbind(filter(MPD.LatLong.Env.AllScales, 
                          SamplingPool == "Global sampling")[, c(1, 4:9, 29:35, 38)],
