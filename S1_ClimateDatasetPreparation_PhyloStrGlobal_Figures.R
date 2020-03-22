@@ -1,3 +1,12 @@
+######################################################################################
+### Climate dataset preparation and complementary analyses                      ######
+#                                                                                    #
+# Author: Pedro Henrique Pereira Braga                                               #
+# Last Update: "2019-01-28"                                                          #
+#                                                                                    # 
+######################################################################################
+
+
 # S1b_ClimateDatasetPreparation
 
 # Date: 2018-11-28
@@ -118,6 +127,7 @@ worldClimate <- as.data.frame(zoo::na.spline(worldClimate))
                               arr.ind=TRUE))))
 
 head(worldClimate); str(worldClimate)
+
 ################################################################################ 
 # Subset variables and explore the mean values through time and represent them #
 ################################################################################
@@ -300,8 +310,10 @@ MPD.MNTD.LatLong.diff.Env.Global$ID_Realm <- factor(MPD.MNTD.LatLong.diff.Env.Gl
 summary(lm(filter(MPD.LatLong.Env.AllScales, 
                   SamplingPool == "Global sampling")$mpd.obs.z ~ diff.AnnTemp.LGM_cur))
 
+# Richness and NTI
 plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NTI, na.rm = TRUE)
 
+# Richness and NRI
 plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NRI, na.rm = TRUE)
 
 ## AnnTemp plot #####

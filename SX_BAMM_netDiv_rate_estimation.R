@@ -3,7 +3,7 @@
 ### Bayesian Analyses for Macroevolutionary Mixtures                          ###
 #                                                                               #
 # Author: Pedro Henrique Pereira Braga                                          #
-# Last Update: "2020-03-17"                                                     #
+# Last Update: "2020-03-21"                                                     #
 #                                                                               # 
 #################################################################################
 
@@ -16,7 +16,7 @@
 # result in a minimized sum-of-squares distance between the patristic distance
 # of the output and input trees (method="nnls");
 
-Chiroptera.FaurSven.tree.ultra <- force.ultrametric(Chiroptera.FaurSven.tree)
+Chiroptera.FaurSven.tree.ultra <- Chiroptera.FaurSven.tree
 
 # Check if the tree is ultrametric:
 is.ultrametric(Chiroptera.FaurSven.tree.ultra)
@@ -34,18 +34,31 @@ sum(Chiroptera.FaurSven.tree.ultra$edge.length == 0)
 ## Force changes to the tree
 
 # For negative branches to be zero
-Chiroptera.FaurSven.tree.ultra$edge.length[Chiroptera.FaurSven.tree.ultra$edge.length<0] <- 0
+Chiroptera.FaurSven.tree.ultra$edge.length[Chiroptera.FaurSven.tree.ultra$edge.length < 0] <- 0
 
 # Force zero lengths to be a very small number
 Chiroptera.FaurSven.tree.ultra$edge.length[Chiroptera.FaurSven.tree.ultra$edge.length == 0] <- 0.000001
 
 # Alternative: convert zero lengths to 1/365
-# Chiroptera.FaurSven.tree.ultra$edge.length <- pmax(Chiroptera.FaurSven.tree.ultra$edge.length, 1/365)
+Chiroptera.FaurSven.tree.ultra$edge.length <- pmax(Chiroptera.FaurSven.tree.ultra$edge.length, 1/365)
+
+
+Chiroptera.FaurSven.tree.ultra <- force.ultrametric(Chiroptera.FaurSven.tree.ultra); is.ultrametric(Chiroptera.FaurSven.tree.ultra)
+
+# Count branches with negative lengths
+sum(Chiroptera.FaurSven.tree.ultra$edge.length < 0)
+
+# Count branches with lengths equal to zero
+sum(Chiroptera.FaurSven.tree.ultra$edge.length == 0)
+
 
 # Export tree
 write.tree(Chiroptera.FaurSven.tree.ultra, "data/BAMM/Chiroptera.FaurSven.tree.ultra.tree")
 
 # cat(readLines("data/BAMM/Chiroptera.FaurSven.tree.ultra.tree"))
+
+Chiroptera.FaurSven.tree.ultra <- read.tree("data/BAMM/Chiroptera.FaurSven.tree.ultra.tre")
+is.ultrametric(Chiroptera.FaurSven.tree.ultra)
 
 #### Preparing BAMM control file
 
@@ -61,35 +74,121 @@ write.tree(Chiroptera.FaurSven.tree.ultra, "data/BAMM/Chiroptera.FaurSven.tree.u
 (BAMMpriors <- setBAMMpriors(Chiroptera.FaurSven.tree.ultra,	
                              outfile = NULL))
 
+### Correcting for Sampling Fractions
+
+separateGenusSp <- stringr::str_split_fixed(Chiroptera.FaurSven.tree.ultra$tip.label, "_", 2)
+
+sppTable <- as.data.frame(matrix(nrow=length(Chiroptera.FaurSven.tree.ultra$tip.label),
+                                 ncol=2))
+sppTable[ , 1] <- Chiroptera.FaurSven.tree.ultra$tip.label
+sppTable[ , 2] <- separateGenusSp[, 1]
+
+ASM_MammalsData <- read.csv("/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/matrices/asm-all-species-2020-03-20.csv", 
+                            header = TRUE)
+
+# colnames(ASM_MammalsData)
+
+ASM_BatsData <- ASM_MammalsData %>%
+  filter(Linnean.Order == "Chiroptera") %>%
+  select(Genus, Species, Linnean.Family) %>%
+  droplevels()
+
+## Correct for nomenclature changes
+ASM_BatsData <- ASM_BatsData %>%
+  mutate(Genus = recode(Genus, 
+                        "Neoplatymops" = "Molossops",
+                        "Aeorestes" = "Lasiurus",
+                        "Dasypterus" = "Lasiurus",
+                        "Cabreramops" = "Molossops",
+                        "Cistugo" = "Myotis",
+                        "Desmalopex" = "Pteropus",
+                        "Doryrhina" = "Hipposideros",
+                        "Gardnerycteris" = "Mimon",
+                        "Hsunycteris" = "Lonchophylla",
+                        "Hypsugo" = "Pipistrellus",
+                        "Koopmania" = "Artibeus",
+                        "Macronycteris" = "Hipposideros",
+                        "Mirimiri" = "Pteralopex",
+                        "Parastrellus" = "Pipistrellus",
+                        "Perimyotis" = "Pipistrellus",
+                        "Rhyneptesicus" = "Eptesicus",
+                        "Stenonycteris" = "Rousettus",
+                        "Submyotodon" = "Myotis")) %>%
+  add_row(Genus = "Lissonycteris", 
+          Species = "angolensis", 
+          Linnean.Family = "Pteropodidae") %>%
+  filter(!(Genus %in% setdiff(unique(Genus), sppTable[ , 2]))) %>%
+  droplevels()
+
+(ASM_speciesRichnessGenus <- ASM_BatsData %>% 
+    group_by(Genus) %>% 
+    summarize(count=n()) %>%
+    deframe() 
+)
+
+(FaurSven_speciesRichnessGenus <- sppTable %>%
+    group_by(V2) %>% 
+    summarize(count=n()) %>%
+    deframe()
+)
+
+# setdiff(names(speciesRichnessGenus), sppTable[ , 2])
+# setdiff(sppTable[ , 2], names(speciesRichnessGenus))
+
+# Create a sampling fraction file
+samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra, 
+                                   cladeTable = sppTable, 
+                                   cladeRichness = ASM_speciesRichnessGenus,
+                                   globalSampling = 0.8,
+                                   writeToDisk = TRUE,
+                                   output = "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/samplingProbsBats.txt")
+
+# To output it to the drive
+samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra, 
+                                   cladeTable = sppTable, 
+                                   cladeRichness = ASM_speciesRichnessGenus,
+                                   globalSampling = 0.8,
+                                   writeToDisk = FALSE)
+#### Preparing BAMM control file
+
+# Estimate the prior block using BAMMtools::setBAMMpriors()
+
+# In a nutshell, et the main lambdaInit and muInit priors, setBAMMpriors first
+# estimates the rate of speciation for your full tree under a pure birth model
+# of diversification.  a reasonable prior distribution for the initial rate
+# parameters is an exponential distribution with a mean five times greater than
+# this pure birth value. For betaInitPrior and betaInitRootPrior,  rather than
+# fitting a pure-birth model, we find the maximum likelihood estimate of the
+# variance parameter under a Brownian motion model.
+(BAMMpriors <- setBAMMpriors(Chiroptera.FaurSven.tree.ultra,	
+                             outfile = NULL))
+
 ## Generate the control file
-generateControlFile("data/BAMM/chiroptera.divcontrol.txt", 
+generateControlFile("data/BAMM/SamplingCorrected/chiroptera.divcontrol.txt", 
                     type = "diversification", 
-                    params = list(treefile = "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/Chiroptera.FaurSven.tree.ultra.tre",
-                                  runInfoFilename = paste0(getwd(), "/data/BAMM/2/", "run_info.txt"),
-                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/2/", "sample_probs.txt"),
-                                  eventDataOutfile = paste0(getwd(), "/data/BAMM/2/", "event_data.txt"),
-                                  mcmcOutfile = paste0(getwd(), "/data/BAMM/2/", "mcmc_out.txt"),
-                                  chainSwapFileName = paste0(getwd(), "/data/BAMM/2/", "chain_swap.txt"),
-                                  globalSamplingFraction = "0.6754075", # pctg of total number of species sampled in the phylogeny 
-                                  # Set to 953/1411 = 0.6754075. Previously: 0.95
-                                  # Total number of species: https://mammaldiversity.org/#Y2hpcm9wdGVyYSZnbG9iYWxfc2VhcmNoPXRydWUmbG9vc2U9dHJ1ZQ
-                                  # For the future, specifies set clade-specific corrections for incomplete sampling (sampleProbsFilename)
+                    params = list(treefile = paste0(getwd(), "/data/BAMM/", "Chiroptera.FaurSven.tree.ultra.tre"),
+                                  runInfoFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "run_info.txt"),
+                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "sample_probs.txt"),
+                                  eventDataOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "event_data.txt"),
+                                  mcmcOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "mcmc_out.txt"),
+                                  chainSwapFileName = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "chain_swap.txt"),
+                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/", "samplingProbsBats.txt"),
                                   numberOfGenerations = "50000000",
                                   overwrite = "1", 
                                   lambdaInitPrior = as.numeric(BAMMpriors["lambdaInitPrior"]), 
                                   lambdaShiftPrior = as.numeric(BAMMpriors["lambdaShiftPrior"]), 
                                   muInitPrior = as.numeric(BAMMpriors["muInitPrior"]), 
-                                  numberOfChains = 38,
+                                  numberOfChains = 39,
                                   expectedNumberOfShifts = "1", # Results are similar for "1", "10" and "25"
                                   minCladeSizeForShift = 1) # Allow shifts to occur in all branches; thus for estimates for terminal branches, in which we are interested.
-                    )
+)
 
 #### Running the BAMM model in the shell ####
 
 # In the shell, run the following code. Note that it will take at least 24 hours under 38 cores and 2.2 GHz clock. 
 # I highly recommend the use of 'screen' if done remotely.
 
-# bamm -c /home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/chiroptera.divcontrol.txt
+# bamm -c /home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected/chiroptera.divcontrol.txt
 
 #### Extract the output from BAMM files #####
 
@@ -98,11 +197,11 @@ Chiroptera.FaurSven.tree.ultra.cw <- reorder(Chiroptera.FaurSven.tree.ultra, "cl
 
 ### Get the Event data ###
 edata <- getEventData(Chiroptera.FaurSven.tree.ultra.cw, 
-                      eventdata = "data/BAMM/event_data.txt", 
+                      eventdata = "data/BAMM/SamplingCorrected/event_data.txt", 
                       burnin = 0.1)
 
 ### Assess MCMC convergence ####
-mcmcout <- read.csv("data/BAMM/mcmc_out.txt", 
+mcmcout <- read.csv("data/BAMM/SamplingCorrected/mcmc_out.txt", 
                     header = TRUE)
 
 plot(mcmcout$logLik ~ mcmcout$generation)
@@ -152,9 +251,9 @@ plotPrior(mcmcout, expectedNumberOfShifts=1)
 # along the tree
 
 bamm.chiroptera <- plot.bammdata(edata, lwd=2, 
-                             labels = F, 
-                             legend = T, 
-                             cex = 0.5)
+                                 labels = F, 
+                                 legend = T, 
+                                 cex = 0.5)
 
 addBAMMshifts(edata, 
               cex=2)
