@@ -18,6 +18,7 @@ samplingProbsBats_tib <- FaurSven_speciesRichnessGenus_tib %>%
   left_join(ASM_speciesRichnessGenus_tib,
             by = c("V2" = "Genus")) %>%
   mutate(SamplingFraction = count_FaurSven/count_ASM) %>%
+  mutate(SamplingFraction = ifelse(SamplingFraction > 1, 1, SamplingFraction)) %>%
   as.data.frame()
 
 ## Generating a table 

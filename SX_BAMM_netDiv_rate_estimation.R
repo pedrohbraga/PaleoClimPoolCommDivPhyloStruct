@@ -136,19 +136,38 @@ ASM_BatsData <- ASM_BatsData %>%
 # setdiff(sppTable[ , 2], names(speciesRichnessGenus))
 
 # Create a sampling fraction file
-samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra, 
-                                   cladeTable = sppTable, 
-                                   cladeRichness = ASM_speciesRichnessGenus,
-                                   globalSampling = 0.8,
-                                   writeToDisk = TRUE,
-                                   output = "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/samplingProbsBats.txt")
 
-# To output it to the drive
+# samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra, 
+#                                    cladeTable = sppTable, 
+#                                    cladeRichness = ASM_speciesRichnessGenus,
+#                                    globalSampling = 0.8,
+#                                    writeToDisk = TRUE,
+#                                    output = "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/samplingProbsBats.txt")
+
 samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra, 
                                    cladeTable = sppTable, 
                                    cladeRichness = ASM_speciesRichnessGenus,
-                                   globalSampling = 0.8,
+                                   globalSampling = 0.7,
                                    writeToDisk = FALSE)
+
+samplingProbsBats[1, ]
+
+samplingProbsBats.core <- samplingProbsBats[-1, ] %>%
+  mutate(prob = as.numeric(prob)) %>%
+  mutate(prob = ifelse(prob > 1, 1, prob)) %>%
+  mutate(prob = round(prob, 6))
+
+rbind(samplingProbsBats[1, ],
+      samplingProbsBats.core)
+
+write.table(rbind(samplingProbsBats[1, ],
+                  samplingProbsBats.core), 
+            "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected_2/samplingProbsBats.txt",
+            quote = F, 
+            col.names = F, 
+            row.names = F, 
+            sep = "\t")
+
 #### Preparing BAMM control file
 
 # Estimate the prior block using BAMMtools::setBAMMpriors()
@@ -160,26 +179,28 @@ samplingProbsBats <- samplingProbs(Chiroptera.FaurSven.tree.ultra,
 # this pure birth value. For betaInitPrior and betaInitRootPrior,  rather than
 # fitting a pure-birth model, we find the maximum likelihood estimate of the
 # variance parameter under a Brownian motion model.
+
 (BAMMpriors <- setBAMMpriors(Chiroptera.FaurSven.tree.ultra,	
                              outfile = NULL))
 
 ## Generate the control file
-generateControlFile("data/BAMM/SamplingCorrected/chiroptera.divcontrol.txt", 
+generateControlFile("data/BAMM/SamplingCorrected_2/chiroptera.divcontrol.txt", 
                     type = "diversification", 
                     params = list(treefile = paste0(getwd(), "/data/BAMM/", "Chiroptera.FaurSven.tree.ultra.tre"),
-                                  runInfoFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "run_info.txt"),
-                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "sample_probs.txt"),
-                                  eventDataOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "event_data.txt"),
-                                  mcmcOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "mcmc_out.txt"),
-                                  chainSwapFileName = paste0(getwd(), "/data/BAMM/SamplingCorrected/", "chain_swap.txt"),
-                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/", "samplingProbsBats.txt"),
+                                  runInfoFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "run_info.txt"),
+                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "sample_probs.txt"),
+                                  eventDataOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "event_data.txt"),
+                                  mcmcOutfile = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "mcmc_out.txt"),
+                                  chainSwapFileName = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "chain_swap.txt"),
                                   numberOfGenerations = "50000000",
+                                  useGlobalSamplingProbability = 0, 
+                                  sampleProbsFilename = paste0(getwd(), "/data/BAMM/SamplingCorrected_2/", "samplingProbsBats.txt"),
                                   overwrite = "1", 
                                   lambdaInitPrior = as.numeric(BAMMpriors["lambdaInitPrior"]), 
                                   lambdaShiftPrior = as.numeric(BAMMpriors["lambdaShiftPrior"]), 
                                   muInitPrior = as.numeric(BAMMpriors["muInitPrior"]), 
                                   numberOfChains = 39,
-                                  expectedNumberOfShifts = "1", # Results are similar for "1", "10" and "25"
+                                  expectedNumberOfShifts = "1", # Results were similar for "1", "10" and "25"
                                   minCladeSizeForShift = 1) # Allow shifts to occur in all branches; thus for estimates for terminal branches, in which we are interested.
 )
 
@@ -188,7 +209,7 @@ generateControlFile("data/BAMM/SamplingCorrected/chiroptera.divcontrol.txt",
 # In the shell, run the following code. Note that it will take at least 24 hours under 38 cores and 2.2 GHz clock. 
 # I highly recommend the use of 'screen' if done remotely.
 
-# bamm -c /home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected/chiroptera.divcontrol.txt
+# bamm -c /home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected_2/chiroptera.divcontrol.txt
 
 #### Extract the output from BAMM files #####
 
@@ -197,11 +218,11 @@ Chiroptera.FaurSven.tree.ultra.cw <- reorder(Chiroptera.FaurSven.tree.ultra, "cl
 
 ### Get the Event data ###
 edata <- getEventData(Chiroptera.FaurSven.tree.ultra.cw, 
-                      eventdata = "data/BAMM/SamplingCorrected/event_data.txt", 
+                      eventdata = "data/BAMM/SamplingCorrected_2/event_data.txt", 
                       burnin = 0.1)
 
 ### Assess MCMC convergence ####
-mcmcout <- read.csv("data/BAMM/SamplingCorrected/mcmc_out.txt", 
+mcmcout <- read.csv("data/BAMM/SamplingCorrected_2/mcmc_out.txt", 
                     header = TRUE)
 
 plot(mcmcout$logLik ~ mcmcout$generation)
@@ -242,10 +263,11 @@ shift_probs <- summary(edata)
 
 (bfmat <- computeBayesFactors(mcmcout, 
                               expectedNumberOfShifts = 1, 
-                              burnin=0.1))
+                              burnin = 0.1))
 
 # Visualize the prior and posterior simultaneously
-plotPrior(mcmcout, expectedNumberOfShifts=1)
+plotPrior(mcmcout, 
+          expectedNumberOfShifts = 1)
 
 ### Visualize mean model-averaged diversificaton rates
 # along the tree
@@ -259,10 +281,14 @@ addBAMMshifts(edata,
               cex=2)
 
 
-
 ## Bayesian credible sets of shift configurations
 
 # Identify the 95% credible set of distinct shift configurations
+# the 6 most likely scenario's within the 95% credible scenarios
+# F value is the relative probability, F values from all scenarios add up to F=1
+pdf("BAMM_css.pdf", 
+    width = 7, height = 10)
+
 css <- credibleShiftSet(edata, 
                         expectedNumberOfShifts = 1, 
                         threshold = 5, 
@@ -273,17 +299,31 @@ summary(css)
 
 # Generate phylorate plots for each of the N shift configurations with the
 # highest posterior probabilities
-plot.credibleshiftset(css)
-
+BAMMtools:::plot.credibleshiftset(css, 
+                                  plotmax = 6, 
+                                  pal = "temperature", 
+                                  legend = T)
 dev.off()
 
 ### Finding the single best shift configuration ####
 
 # Alternative 1: Obtain the one with the maximum a posteriori (MAP) probability
+# best scenario plot, dimensions in inches
+pdf("BAMM_best.pdf", 
+    width = 7, height = 10)
+
 best <- getBestShiftConfiguration(edata, 
-                                  expectedNumberOfShifts=25)
-plot.bammdata(best, lwd = 2)
-addBAMMshifts(best, cex=2.5)
+                                  expectedNumberOfShifts = 1, 
+                                  threshold = 5)
+
+BAMMtools:::plot.bammdata(best, 
+                          lwd = 1, 
+                          breaksmethod = 'quantile', 
+                          pal = "temperature", 
+                          legend = T)
+addBAMMshifts(best, cex = 1)
+
+dev.off()
 
 # Alternative 2: extract the shift configuration that maximizes the marginal
 # probability of rate shifts along individual branches
@@ -370,14 +410,17 @@ plot.phylo(Chiroptera.FaurSven.tree.ultra.cw,
            show.tip.label = F)
 
 # computing the marginal shift probs tree:
-mst <- marginalShiftProbsTree(edata)
+pdf("BAMM_margprobs.pdf", 
+    width = 7, height = 10)
+
+marg_probs <- marginalShiftProbsTree(edata)
 
 #compare the two types of shift trees side-by-side:
 plot.new()
 
 par(mfrow=c(1,3))
 
-plot.phylo(mst, 
+plot.phylo(marg_probs, 
            no.margin=TRUE, 
            show.tip.label=FALSE)
 
