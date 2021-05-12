@@ -155,17 +155,17 @@ MNTD.LatLong.Env.Plate <- NULL
 for(j in droplevels(as.factor(ls(SubRegion.Plate.Comm.Phylo)[!ls(SubRegion.Plate.Comm.Phylo) %in% "Antarctic"])[14:32])){
   if(length(SubRegion.Plate.Comm.Phylo[[j]]$Phylo$tip.label) > 1){
     # Calculate mntd values for each community
-  SES.MNTD.Chiroptera.Plate <- sf.ses.mntd(SubRegion.Plate.Comm.Phylo[[j]]$Comm,
-                                           cophenetic(SubRegion.Plate.Comm.Phylo[[j]]$Phylo), # Convert phylogeny to distance matrix
-                                           abundance.weighted = FALSE, 
-                                           runs = 999, cores = 40)
-  
-  MNTD.LatLong.Env.SubRegion.Plate <- data.frame(cbind(regions.LatLong[(rownames(regions.LatLong) %in% row.names(SubRegion.Plate.Comm.Phylo[[j]]$Comm)), ], 
-                                                       current.Env[(rownames(current.Env) %in% row.names(SubRegion.Plate.Comm.Phylo[[j]]$Comm)), ],
-                                                       SES.MNTD.Chiroptera.Plate,
-                                                       SamplingPool = rep("Plate sampling", nrow(SES.MNTD.Chiroptera.Plate))))
-  
-  MNTD.LatLong.Env.Plate <- rbind(MNTD.LatLong.Env.Plate, MNTD.LatLong.Env.SubRegion.Plate)
+    SES.MNTD.Chiroptera.Plate <- sf.ses.mntd(SubRegion.Plate.Comm.Phylo[[j]]$Comm,
+                                             cophenetic(SubRegion.Plate.Comm.Phylo[[j]]$Phylo), # Convert phylogeny to distance matrix
+                                             abundance.weighted = FALSE, 
+                                             runs = 999, cores = 40)
+    
+    MNTD.LatLong.Env.SubRegion.Plate <- data.frame(cbind(regions.LatLong[(rownames(regions.LatLong) %in% row.names(SubRegion.Plate.Comm.Phylo[[j]]$Comm)), ], 
+                                                         current.Env[(rownames(current.Env) %in% row.names(SubRegion.Plate.Comm.Phylo[[j]]$Comm)), ],
+                                                         SES.MNTD.Chiroptera.Plate,
+                                                         SamplingPool = rep("Plate sampling", nrow(SES.MNTD.Chiroptera.Plate))))
+    
+    MNTD.LatLong.Env.Plate <- rbind(MNTD.LatLong.Env.Plate, MNTD.LatLong.Env.SubRegion.Plate)
   }
 }
 
@@ -294,18 +294,18 @@ MNTD.LatLong.Env.AllScales$ID_Realm <- factor(MNTD.LatLong.Env.AllScales$ID_Real
                                                        'Australasian'))
 
 MNTD.LatLong.Env.AllScales$SamplingPool <-  factor(MNTD.LatLong.Env.AllScales$SamplingPool,  
-                                                   levels=c("Global sampling",
-                                                            "Hemispheric sampling",
-                                                            "Realm sampling",
-                                                            "Plate sampling",
-                                                            "Biome sampling",
-                                                            "Ecoregion sampling"))
+                                                   levels = c("Global sampling",
+                                                              "Hemispheric sampling",
+                                                              "Realm sampling",
+                                                              "Plate sampling",
+                                                              "Biome sampling",
+                                                              "Ecoregion sampling"))
 # Save dataset
 
 write.table(MNTD.LatLong.Env.AllScales, 
             "MNTD.LatLong.Env.AllScales.50K.FaurSven.3.txt")
 
-# MNTD.LatLong.Env.AllScales <- read.table("MNTD.LatLong.Env.AllScales.50K.FaurSven.txt", h = T)
+# MNTD.LatLong.Env.AllScales <- read.table("MNTD.LatLong.Env.AllScales.50K.FaurSven.3.txt", h = T)
 
 dim(MNTD.LatLong.Env.World); dim(MPD.LatLong.Env.World)
 dim(MNTD.LatLong.Env.NW.OW); dim(MPD.LatLong.Env.NW.OW)

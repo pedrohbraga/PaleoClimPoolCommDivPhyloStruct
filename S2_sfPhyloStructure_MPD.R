@@ -302,7 +302,7 @@ MPD.LatLong.Env.AllScales$SamplingPool <-  factor(MPD.LatLong.Env.AllScales$Samp
 write.table(MPD.LatLong.Env.AllScales, 
             "MPD.LatLong.Env.AllScales.50K.FaurSven.3.txt")
 
-# MPD.LatLong.Env.AllScales <- read.table("MPD.LatLong.Env.AllScales.50K.FaurSven.txt", h = T)
+# MPD.LatLong.Env.AllScales <- read.table("MPD.LatLong.Env.AllScales.50K.FaurSven.3.txt", h = T)
 
 #################
 

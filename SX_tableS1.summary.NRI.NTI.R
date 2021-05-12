@@ -9,6 +9,7 @@
 
 library(knitr)
 library(kableExtra)
+library(dplyr)
 
 # Merge both NRI and NTI data
 
