@@ -1,3 +1,14 @@
+#################################################################################
+###            ###
+###                         ###
+#                                                                               #
+# Author: Pedro Henrique Pereira Braga                                          #
+# Last Update: "2020-05-13"                                                     #
+#                                                                               # 
+#################################################################################
+
+
+
 # Load world projection grid shapefile
 polygonGrid_world_50km <- st_read("data/grids/world_grid_prev_50km.shp")
 

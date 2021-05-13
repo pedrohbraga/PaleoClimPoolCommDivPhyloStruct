@@ -41,6 +41,7 @@ kable(samplingProbsBats_tib,
 
 
 # Create a table using knitr::kable
+
 kable(samplingProbsBats[-1, -1] %>%
         mutate(prob = round(as.numeric(prob), 4)*100) %>%
         mutate(prob = paste(prob, "%", sep = " ")), 
