@@ -426,11 +426,34 @@ plot(summary(rq.poly.4.NRI.netDiv_CWM_std_tw,
 
 install.packages("Qtools")
 
-Qtools::GOFTest(rq.poly.4.NRI.netDiv_CWM_std_tw, 
+gof.rq.poly.4.NRI.netDiv_CWM_std_tw <- Qtools::GOFTest(rq.poly.4.NRI.netDiv_CWM_std_tw, 
                 type = "cusum", 
                 alpha = 0.05, 
-                B = 100, 
+                B = 10, 
                 seed = 31432)
+
+
+## Polynomial quantile regression fit
+
+rq.poly.5.NRI.netDiv_CWM_std_tw <- rq(NRI ~ poly(netDiv_CWM_std_tw, 5), 
+                                      tau = q10,
+                                      method = "sfn",
+                                      data = prebinning_test)
+
+plot(rq.poly.5.NRI.netDiv_CWM_std_tw, ylim = c(-1, 19))
+
+plot(summary(rq.poly.5.NRI.netDiv_CWM_std_tw,
+             se = "nid")#,
+     #     main = c("Intercept", 
+     #              expression("Net Diversification Rate"[CWM[STD[tw]]]))
+)
+
+gof.rq.poly.5.NRI.netDiv_CWM_std_tw <- Qtools::GOFTest(rq.poly.5.NRI.netDiv_CWM_std_tw, 
+                                                       type = "cusum", 
+                                                       alpha = 0.05, 
+                                                       B = 100, 
+                                                       seed = 31432)
+
 
 # Accounting for groups
 
@@ -639,7 +662,7 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
                       discrete = TRUE,
                       name="Realm") +
   geom_quantile(quantiles = q10, 
-                formula= y ~ poly(x, 4), colour="red") +
+                formula= y ~ poly(x, 5), colour="red") +
   labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
   theme_classic() +
   theme(legend.position = "bottom", 
