@@ -53,7 +53,7 @@ Hypothesis.1.alt <- data.frame(SamplingPool = factor(rep(c("Broad scale",
 )
 
 
-ggsave(filename = "Hypothesis.1.alt.png", 
+ggsave(filename = "figures/Hypothesis.1.alt.png", 
        dpi = 300, 
        width = 4.5, height = 5, 
        units = "in")
@@ -108,7 +108,7 @@ Hypothesis.1.null <- data.frame(SamplingPool = factor(rep(c("Broad scale",
 )
 
 
-ggsave(filename = "Hypothesis.1.null.plot.png", 
+ggsave(filename = "figures/Hypothesis.1.null.plot.png", 
        dpi = 300, 
        width = 4.5, height = 5, 
        units = "in")
@@ -150,10 +150,57 @@ ggplot(data = Hypothesis.2.alt, aes(x = ClimaticStability.exp, y = PhyloStructur
         legend.position = "right"
   )
 
-ggsave(filename = "Hypothesis.2.alt.png", 
+ggsave(filename = "figures/Hypothesis.2.alt.png", 
        dpi = 300, 
        width = 5, height = 5, 
        units = "in")
+
+##
+
+##
+
+Hypothesis.3.alt <- data.frame(PhyloStructure = 1:2000)
+
+Hypothesis.3.alt$ClimaticStability.alt = 2 + 5*Hypothesis.3.alt$PhyloStructure + rnorm(2000, sd = 20)
+
+Hypothesis.3.alt$ClimaticStability.exp = Hypothesis.3.alt$PhyloStructure^2
+
+ggplot(data = Hypothesis.3.alt, aes(x = ClimaticStability.exp, y = PhyloStructure)) +
+  stat_smooth(method="glm", se = FALSE,
+              colour = "black",
+              method.args=list(family=gaussian(link="log")))+
+  # theme_minimal() +
+  theme_classic() +
+  #    geom_hline(yintercept = 0, alpha = 0.4) +
+  labs(x = "Local Diversification Rates",
+       y = "Phylogenetic Structure") +
+  theme(strip.background=element_rect(fill = "white",
+                                      linetype = NULL,
+                                      color = "white"),
+        strip.text=element_text(color = "black",
+                                face = "bold",
+                                size = 15),
+        axis.text.x=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_text(size = 16, 
+                                  face="bold"),
+        axis.title.x = element_text(size = 16, 
+                                    face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "right"
+  )
+
+ggsave(filename = "figures/Hypothesis.3.alt.png", 
+       dpi = 300, 
+       width = 5, height = 5, 
+       units = "in")
+
+##
+
+
 
 ##
 

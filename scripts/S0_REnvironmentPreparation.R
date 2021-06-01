@@ -15,15 +15,18 @@ required.libraries <- c("ade4","subniche",
                         "geiger", "hisse",
                         "lme4", "spgwr", "dglm", "coda",
                         "devtools", "rgeos", "dplyr", "gtable", "grid", "readxl",
-                        "sp","raster", "rgdal", "maptools", "splancs",
+                        "sf", "lwgeom", "sp","raster", "maptools", "splancs",
                         "ggplot2", "ggtree",  "viridis", "magrittr",
                         "rasterVis", "gridExtra", "PhyloMeasures",
-                        "tidyverse", "wesanderson", "mosaic", "velox",
-                        "broom", "tidyr", "MKmisc",
+                        "tidyverse", "wesanderson", "mosaic",
+                        "broom", "tidyr",
                         "BiocManager", "ggpubr",
                         "kableExtra", "knitr",
-                        "BAMMtools", "coda"
+                        "BAMMtools", "coda",
+                        "rgdal", "tidyverse", "rbin", 
+                        "quantreg", "WRTDStidal"
 )
+
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
 
 if(length(needed.libraries)) install.packages(needed.libraries)
@@ -173,9 +176,9 @@ theme_map <- function(...) {
       # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
       panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
       panel.grid.minor = element_blank(),
-      plot.background = element_rect(fill = "#f5f5f2", color = NA), 
-      panel.background = element_rect(fill = "#f5f5f2", color = NA), 
-      legend.background = element_rect(fill = "#f5f5f2", color = NA),
+      plot.background = element_blank(), 
+      panel.background = element_blank(), 
+      legend.background = element_blank(),
       panel.border = element_blank(),
       ...
     )

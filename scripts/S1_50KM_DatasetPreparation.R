@@ -3,8 +3,8 @@
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2019-01-30 15:29:30 EST"                                             #
-#
-# Alert: this script needs to be updated to integrate sf and exclude bioclim parts 
+#                                                                                    #
+# Alert: this script needs to be updated to integrate sf and exclude bioclim parts   #
 ######################################################################################
 
 #############################
