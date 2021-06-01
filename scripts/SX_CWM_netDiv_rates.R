@@ -12,12 +12,12 @@
 # species. We computed weights for each species as the inverse of the number of #
 # grid cells in which the species was found                                     #
 #                                                                               #
-# 2. lambda.CWM.Chiroptera.Comm, mu.CWM.Chiroptera.Comm,
+# 2. lambda.CWM.Chiroptera.Comm, mu.CWM.Chiroptera.Comm,                  
 # netdiv.CWM.Chiroptera.Comm:
 # 
 # 
 # Author: Pedro Henrique Pereira Braga                                          #
-# Last Update: "2021-05-13"                                                     #
+# Last Update: "2021-05-26"                                                     #
 #                                                                               # 
 #################################################################################
 
@@ -243,12 +243,13 @@ dev.off()
 # three parts: a model for the variance, a GLM for the mean and a GLM for the
 # disperson
 
-dglm.NRI.netDiv<- dglm::dglm(NRI ~ netDiv_CWM_std_tw + I(netDiv_CWM_std_tw^2), 
-                             data = CWM.Div.MPD.Chiroptera.Comm %>%
-                               filter(SamplingPool == "Global sampling"),
-                             dformula = ~netDiv_CWM_std_tw,
-                             # dlink = "identity",
-                             method = "reml")
+dglm.NRI.netDiv <- dglm::dglm(NRI ~ netDiv_CWM_std_tw, 
+                              data = CWM.Div.MPD.Chiroptera.Comm %>%
+                                filter(SamplingPool == "Global sampling"),
+                              dformula = ~netDiv_CWM_std_tw,
+                              family = quasi(link = "identity", variance = "constant"),
+                              method = "reml")
+
 # Summarize the mean model as for a glm
 summary.glm(dglm.NRI.netDiv)
 
@@ -320,6 +321,7 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
   #  stat_smooth(method = "lm", formula= (y ~ poly(x, 2)), se = TRUE, colour = "black") +
   #  stat_smooth(method = "loess", 
   #              formula = y ~ poly(x, 2), size = 1)
+  facet_grid(. ~ ID_Realm) +
   scale_color_viridis(option="D", 
                       begin = 0,
                       end = 1,
@@ -368,6 +370,7 @@ ggplot(data = loess.NRI.netDiv_CWM_std_tw.fit,
              size = 1.4) +
   geom_line(aes(y = .fitted), 
             color = "red") +
+  # facet_grid(. ~ ID_Realm) +
   labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
   theme_classic() +
   theme(legend.position = "bottom", 
@@ -381,6 +384,8 @@ ggplot(data = loess.NRI.netDiv_CWM_std_tw.fit,
 
 # Quantile regression -----------------------------------------------------
 
+# Preparing dataset
+
 prebinning_test <- CWM.Div.MPD.Chiroptera.Comm %>%
   filter(SamplingPool == "Global sampling") %>%
   dplyr::select(c(ID, ID_Realm, netDiv_CWM_std_tw, NRI)) %>%
@@ -389,10 +394,12 @@ prebinning_test <- CWM.Div.MPD.Chiroptera.Comm %>%
 
 (q10 <- seq(0.05, 0.95, by = 0.1))
 
+(q7 <- seq(0.05, 0.95, by = 0.15))
+
 ## Standard quantile regression fit
 
-rq.NRI.netDiv_CWM_std_tw <- rq(NRI ~ netDiv_CWM_std_tw, 
-                               tau = q10,
+rq.NRI.netDiv_CWM_std_tw <- rq(NRI ~ netDiv_CWM_std_tw*ID_Realm, 
+                               tau = q7,
                                method = "sfn",
                                data = prebinning_test)
 
@@ -409,86 +416,110 @@ plot(summary(rq.NRI.netDiv_CWM_std_tw,
      main = c("Intercept", 
               expression("Net Diversification Rate"[CWM[STD[tw]]])))
 
-## Polynomial quantile regression fit
+## Polynomial quantile regression fit ----------------------
+
+# Worldwide model
 
 rq.poly.4.NRI.netDiv_CWM_std_tw <- rq(NRI ~ poly(netDiv_CWM_std_tw, 4), 
-                                      tau = q10,
-                                      method = "sfn",
+                                      tau = q7,
+                                      # method = "conquer",
                                       data = prebinning_test)
+
+
+# Overlay quantile model estimates on the data
+
+summary.boot.rq.poly.4.NRI.netDiv_CWM_std_tw <- summary(rq.poly.4.NRI.netDiv_CWM_std_tw,
+                                                        se = "boot",
+                                                        R = 100)
+
+summary.boot.rq.poly.4.NRI.netDiv_CWM_std_tw
+
+plot.summary.boot.rq.poly.4.NRI.netDiv_CWM_std_tw <- plot(summary.boot.rq.poly.4.NRI.netDiv_CWM_std_tw #,
+                                                          # main = c("Intercept", 
+                                                          # expression("Net Diversification Rate"[CWM[STD[tw]]]))
+)
 
 plot(rq.poly.4.NRI.netDiv_CWM_std_tw)
 
-plot(summary(rq.poly.4.NRI.netDiv_CWM_std_tw,
-             se = "nid")#,
-     #     main = c("Intercept", 
-     #              expression("Net Diversification Rate"[CWM[STD[tw]]]))
-)
-
-install.packages("Qtools")
-
-gof.rq.poly.4.NRI.netDiv_CWM_std_tw <- Qtools::GOFTest(rq.poly.4.NRI.netDiv_CWM_std_tw, 
-                type = "cusum", 
-                alpha = 0.05, 
-                B = 10, 
-                seed = 31432)
+visreg::visreg(rq.poly.4.NRI.netDiv_CWM_std_tw, 
+               "netDiv_CWM_std_tw", 
+               overlay = TRUE, 
+               collapse = TRUE)
 
 
-## Polynomial quantile regression fit
+# Using geom_quantile()
 
-rq.poly.5.NRI.netDiv_CWM_std_tw <- rq(NRI ~ poly(netDiv_CWM_std_tw, 5), 
-                                      tau = q10,
-                                      method = "sfn",
-                                      data = prebinning_test)
-
-plot(rq.poly.5.NRI.netDiv_CWM_std_tw, ylim = c(-1, 19))
-
-plot(summary(rq.poly.5.NRI.netDiv_CWM_std_tw,
-             se = "nid")#,
-     #     main = c("Intercept", 
-     #              expression("Net Diversification Rate"[CWM[STD[tw]]]))
-)
-
-gof.rq.poly.5.NRI.netDiv_CWM_std_tw <- Qtools::GOFTest(rq.poly.5.NRI.netDiv_CWM_std_tw, 
-                                                       type = "cusum", 
-                                                       alpha = 0.05, 
-                                                       B = 100, 
-                                                       seed = 31432)
-
-
-# Accounting for groups
-
-rq.NRI.netDiv_CWM_std_tw.Realm <- rq(NRI ~ netDiv_CWM_std_tw + ID_Realm, 
-                                     tau = q10, 
-                                     method = "lasso",
-                                     data = prebinning_test)
-
-plot(rq.NRI.netDiv_CWM_std_tw.Realm)
-
-visreg::visreg(rq.NRI.netDiv_CWM_std_tw.Realm, "netDiv_CWM_std_tw", by="ID_Realm", overlay=TRUE)
-
-##
-
-library(qgam); library(MASS)
-if( suppressWarnings(require(RhpcBLASctl)) ){ blas_set_num_threads(10) } # Optional
-
-fit <- qgam(accel~s(times, k=10, bs="tp"), 
-            data = mcycle, 
-            qu = 0.8)
-
-xSeq <- data.frame(cbind("accel" = rep(0, 1e3), "times" = seq(2, 58, length.out = 1e3)))
-pred <- predict(fit, newdata = xSeq, se=TRUE)
-plot(mcycle$times, mcycle$accel, xlab = "Times", ylab = "Acceleration", ylim = c(-150, 80))
-lines(xSeq$times, pred$fit, lwd = 1)
-lines(xSeq$times, pred$fit + 2*pred$se.fit, lwd = 1, col = 2)
-lines(xSeq$times, pred$fit - 2*pred$se.fit, lwd = 1, col = 2)   
+ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
+         filter(SamplingPool == "Global sampling")%>%
+         drop_na(ID_Realm), 
+       aes(x = netDiv_CWM_std_tw, 
+           y = NRI)) +
+  geom_point(alpha = 0.2, 
+             size = 1.4,
+             stroke = 0.01,
+             aes(colour = factor(ID_Realm))) +
+  scale_colour_viridis(option="D", 
+                      begin = 0,
+                      end = 1,
+                      direction = 1, 
+                      discrete = TRUE,
+                      name = "Realm") +
+  stat_quantile(quantiles = q10, 
+                formula = y ~ poly(x, 3), 
+                colour="darkblue"
+  ) +
+# facet_grid(. ~ ID_Realm,
+#  scales = "free") +
+  labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
+  theme_classic() +
+  theme(legend.position = "bottom", 
+        legend.direction = "horizontal",
+        legend.key.size = unit(0.5, "cm"),
+        legend.text = element_text(size = 9),
+        legend.title = element_text(face = "bold", size = 9),
+        legend.box = "horizontal") + 
+  guides(colour = guide_legend(nrow = 1))
 
 
-##
+ggsave(filename = "Fig.X.rq.poly.4.NRI.netDiv_CWM_std_tw.png", 
+       dpi = 300, 
+       width = 8.5 , height = 8.5, 
+       units = "in")
 
-qus <- seq(0.05, 0.95, length.out = 5)
+
+
+# per-Realm models
+
+# Neotropical
+
+rq.poly.4.NRI.netDiv_CWM_std_tw.NT <- rq(NRI ~ poly(netDiv_CWM_std_tw, 4), 
+                                                  tau = q10,
+                                                  # method = "conquer",
+                                                  data = prebinning_test %>%
+                                                    filter(ID_Realm == "Neotropical"))
+
+plot(rq.poly.4.NRI.netDiv_CWM_std_tw.NT)
+
+
+
+
+# Intercept-only model (not used)
+
+rq.poly.4.NRI.1 <- rq(NRI ~ 1, 
+                      tau = q10,
+                      # method = "conquer",
+                      data = prebinning_test)
+
+plot(rq.poly.4.NRI.1)
+
+
+# Quantile GAM framework ----------------------------------------
+
+qus <- seq(0.05, 0.95, 
+           length.out = 10)
 
 fit <- mqgam(NRI ~ s(netDiv_CWM_std_tw,  
-                     k = 10, 
+                     k = 20, 
                      bs = "tp"), 
              data = prebinning_test, 
              qu = q10)
@@ -496,14 +527,12 @@ fit <- mqgam(NRI ~ s(netDiv_CWM_std_tw,
 fitCycleM <- mgcViz::getViz(fit)
 plot(fitCycleM)
 
-xseq <- with(mcycle, seq(min(times), max(times), length.out = 100))
-preds <- sapply(fitCycleM, predict, newdata = data.frame(times = xseq))
-plot(mcycle, ylim = range(preds))
-for(ii in 1:5) lines(xseq, preds[ , ii], col = 2)
+#
 
-##
-
-plot(NRI ~ netDiv_CWM_std_tw, data = prebinning_test, col = "grey", ylab = "y")
+plot(NRI ~ netDiv_CWM_std_tw, 
+     data = prebinning_test, 
+     col = "grey", 
+     ylab = "y")
 
 lines(x, f + qgamma(0.95, 4, 1), lty = 2)
 lines(x, f + qgamma(0.5, 4, 1), lty = 2)
@@ -513,11 +542,11 @@ lines(prebinning_test$netDiv_CWM_std_tw, qdo(fit, qus[1], predict), col = 2)
 lines(prebinning_test$netDiv_CWM_std_tw, qdo(fit, qus[2], predict), col = 2)
 lines(prebinning_test$netDiv_CWM_std_tw, qdo(fit, qus[3], predict), col = 2)
 
-##
+#
 
-qus <- seq(0.05, 0.95, length.out = 10)
-
-form <- mqgam(NRI ~ s(netDiv_CWM_std_tw,  k = 10, bs = "ad"), 
+form <- mqgam(NRI ~ s(netDiv_CWM_std_tw,  
+                      k = 10, 
+                      bs = "ad"), 
               data = prebinning_test, 
               qu = qus)
 
@@ -525,7 +554,9 @@ set.seed(41241)
 
 sigSeq <- seq(4, 8, length.out = 16)
 
-closs <- tuneLearnFast(form = NRI ~ s(netDiv_CWM_std_tw,  k = 10, bs = "ad"), 
+closs <- tuneLearnFast(form = NRI ~ s(netDiv_CWM_std_tw,  
+                                      k = 10, 
+                                      bs = "ad"), 
                        data = prebinning_test, 
                        # lsig = sigSeq,  control = list("K" = 10), 
                        qu = qus,
@@ -538,6 +569,7 @@ cqcheckI(obj = fit,
          y = prebinning_test$NRI)
 
 # Fit using estimated sigmas
+
 fit <- mqgam(NRI ~ s(netDiv_CWM_std_tw,  k = 10, bs = "ad"), 
              data = prebinning_test, 
              qu = qus, 
@@ -556,7 +588,7 @@ for(iq in qus){
 fitCycleM <- mgcViz::getViz(form)
 plot(fitCycleM)
 
-single.fit <- qgam(NRI ~ s(netDiv_CWM_std_tw,  k = 10, bs = "ad") + ID_Realm, 
+single.fit <- qgam(NRI ~ s(netDiv_CWM_std_tw,  k = 20, bs = "ad") + ID_Realm, 
                    data = prebinning_test, 
                    qu = qus[5])
 
@@ -565,9 +597,9 @@ single.fit.getViz <- getViz(single.fit)
 check(single.fit.getViz)
 
 cqcheck(obj = single.fit, 
-      v = c("netDiv_CWM_std_tw"), 
-      X = prebinning_test, 
-      y = prebinning_test$NRI)
+        v = c("netDiv_CWM_std_tw"), 
+        X = prebinning_test, 
+        y = prebinning_test$NRI)
 
 print(plot(single.fit.getViz, 
            allTerms = TRUE, 
@@ -584,7 +616,7 @@ plot(prebinning_test[,3:4],
      ylim = range(preds),
      col = "grey", 
      xlab = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))
-     )
+)
 
 for(ii in 1:5) {
   lines(xseq, preds[ , ii], 
@@ -611,8 +643,12 @@ legend("top", c("truth", "fitted"), col = 2:1, lty = rep(1, 2))
 ###################################################
 ###################################################
 
-q10 <- seq(0.05, 0.95, by = 0.1)
-qs <- c(0.025,0.25,0.50, 0.75, 0.975)
+q10 <- seq(0.05, 0.95, 
+           by = 0.1)
+
+qs <- c(0.025, 0.25, 0.50, 0.75, 0.975)
+
+# Using geom_quantile()
 
 ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
          filter(SamplingPool == "Global sampling") %>%
@@ -630,6 +666,7 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
                       name="Realm") +
   geom_quantile(quantiles = q10, 
                 colour="red") +
+  facet_grid(. ~ ID_Realm) +
   labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
   theme_classic() +
   theme(legend.position = "bottom", 
@@ -640,7 +677,7 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
         legend.box = "horizontal") + 
   guides(colour = guide_legend(nrow = 1))
 
-##
+#
 
 ggsave(filename = "Fig.X.rq.NRI.netDiv_CWM_std_tw.png", 
        dpi = 300, 
@@ -648,39 +685,7 @@ ggsave(filename = "Fig.X.rq.NRI.netDiv_CWM_std_tw.png",
        units = "in")
 
 
-ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
-         filter(SamplingPool == "Global sampling"), 
-       aes(x = netDiv_CWM_std_tw, 
-           y = NRI)) +
-  geom_point(alpha = 0.7, 
-             size = 1.4, 
-             aes(colour = factor(ID_Realm))) +
-  scale_color_viridis(option="D", 
-                      begin = 0,
-                      end = 1,
-                      direction = 1, 
-                      discrete = TRUE,
-                      name="Realm") +
-  geom_quantile(quantiles = q10, 
-                formula= y ~ poly(x, 5), colour="red") +
-  labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
-  theme_classic() +
-  theme(legend.position = "bottom", 
-        legend.direction = "horizontal",
-        legend.key.size = unit(0.5, "cm"),
-        legend.text = element_text(size = 9),
-        legend.title = element_text(face = "bold", size = 9),
-        legend.box = "horizontal") + 
-  guides(colour = guide_legend(nrow = 1))
-
-
-ggsave(filename = "Fig.X.rq.poly.4.NRI.netDiv_CWM_std_tw.png", 
-       dpi = 300, 
-       width = 8.5 , height = 8.5, 
-       units = "in")
-
-
-##
+#
 
 ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
          filter(SamplingPool == "Global sampling"), 
@@ -696,8 +701,8 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
                       discrete = TRUE,
                       name="Realm") +
   geom_quantile(method = "rqss",
-                lambda = 0.08, 
-                quantiles = c(0.20, 0.5, 0.85), colour="red") +
+                lambda = 0.90, 
+                quantiles = q10, colour="red") +
   labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
   theme_classic() +
   theme(legend.position = "bottom", 
@@ -819,7 +824,7 @@ ggsave(filename = "Fig.X.binned.boxplot.perRealm.NRI.netDiv_CWM_std_tw.png",
        width = 9.5 , height = 6.5, 
        units = "in")
 
-# 
+# Arithmetic means ######
 
 ggplot(data = Div.MPD.Chiroptera.Comm, 
        aes(x = arithmeticMeans.netDiv, y = NRI)) +
@@ -1027,9 +1032,7 @@ summary.glm(dglm.NRI.netDiv)
 
 summary(dglm.NRI.netDiv$dispersion.fit)
 
-#####
-#####
-#####
+#
 
 ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
          filter(SamplingPool == "Global sampling"), 
