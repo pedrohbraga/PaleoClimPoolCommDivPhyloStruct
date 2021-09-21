@@ -204,7 +204,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
 
 
 (NTI.diff.AnnPrec.LGM_cur.Global.plot <- ggplot(MPD.MNTD.diff.worldClimate.Global, 
-                                                     aes(x = diff.AnnPrec.LGM_cur/10, 
+                                                     aes(x = diff.AnnPrec.LGM_cur, 
                                                          y = NTI,
                                                          group = factor(ID_Realm),
                                                          colour = factor(ID_Realm))) +
@@ -220,7 +220,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
                               scriptstyle("MAP"[Contemporary]-"MAP"[LGM])))),
         y = c(expression("NTI"["Global"]))) +
    scale_y_continuous(breaks = pretty(MPD.MNTD.diff.worldClimate.Global$NTI, n = 7)) +
-   #  scale_x_continuous(trans = "pseudo_log") +
+   scale_x_continuous(trans = "pseudo_log") +
    geom_hline(yintercept = 0, alpha = 0.5) +
    theme_classic() +
    theme(legend.position = "bottom", 

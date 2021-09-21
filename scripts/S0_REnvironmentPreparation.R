@@ -2,9 +2,30 @@
 #### Code to prepare your R environment for all the subsequent analyses done in this project ####
 #                                                                                               #
 # Author: Pedro Henrique Pereira Braga                                                          #
-# Last Update: "2019-01-30 15:29:30 EST"                                                        #
+# Last Update: "2021-09-21"                                                        #
 #                                                                                               #
 #################################################################################################
+
+# Begin with setting up non-CRAN packages
+
+## try http:// if https:// URLs are not supported
+## you may need to upgrade: biocLite("BiocUpgrade") 
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("ggtree")
+BiocManager::install("limma")
+
+## Install wesanderson colour palettes
+devtools::install_github("karthik/wesanderson")
+
+# Load ggtree and wesanderson
+library(ggtree); library(wesanderson)
+
+## Or the development version from GitHub
+# install.packages("devtools")
+devtools::install_github("stamats/MKmisc")
 
 # Check for needed packages, and install the missing ones
 required.libraries <- c("ade4","subniche",
@@ -19,7 +40,7 @@ required.libraries <- c("ade4","subniche",
                         "ggplot2", "ggtree",  "viridis", "magrittr",
                         "rasterVis", "gridExtra", "PhyloMeasures",
                         "tidyverse", "wesanderson", "mosaic",
-                        "broom", "tidyr",
+                        "broom", "tidyr", "scales",
                         "BiocManager", "ggpubr",
                         "kableExtra", "knitr",
                         "BAMMtools", "coda",
@@ -29,39 +50,19 @@ required.libraries <- c("ade4","subniche",
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
 
-if(length(needed.libraries)) install.packages(needed.libraries)
+if(length(needed.libraries)) install.packages(needed.libraries, Ncpus = 12)
 
 # Load all required libraries at once
+
 lapply(required.libraries, 
        require, 
        character.only = TRUE)
 
-### Install and load packages not available in CRAN
-
-## try http:// if https:// URLs are not supported
-## you may need to upgrade: biocLite("BiocUpgrade") 
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-
-BiocManager::install("ggtree")
-BiocManager::install("limma")
-
-## Install wesanderson color palettes
-devtools::install_github("karthik/wesanderson")
-
-# Load ggtree and wesanderson
-library(ggtree); library(wesanderson)
-
-## Or the development version from GitHub
-# install.packages("devtools")
-devtools::install_github("stamats/MKmisc")
-
 ##### Import utility functions #############################################
 
-source("SX_CommWeightedMeans_fun.R")
-source("SX_sf.ses.phylostr.R")
-source("SX_brokenStick.selection.R")
+source("scripts/SX_CommWeightedMeans_fun.R")
+source("scripts/SX_sf.ses.phylostr.R")
+source("scripts/SX_brokenStick.selection.R")
 
 ############################################################################
 ###### Utility function to create a hexagonal or square polygon grid #######
@@ -127,9 +128,10 @@ make_grid_sf <- function(x, type, cell_width, cell_area, clip = TRUE, propCover 
 }
 
 
-##############
-##############
-##############
+#############################################################################################
+#### Function to match (and subset) species between phylogenetic and community data sets ####
+#### Modified from the picante package                                                   ####   
+#############################################################################################
 
 match.phylo.comm. <- function(phy, comm) {
   if (!(is.data.frame(comm) | is.matrix(comm))) {
@@ -163,6 +165,8 @@ match.phylo.comm. <- function(phy, comm) {
 ####### Graphical parameters #######
 ####################################
 
+# General theme for the map
+
 theme_map <- function(...) {
   theme_minimal() +
     theme(
@@ -183,3 +187,4 @@ theme_map <- function(...) {
       ...
     )
 }
+

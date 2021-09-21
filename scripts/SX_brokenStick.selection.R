@@ -10,7 +10,7 @@ brokenStick.selection <- function(dudi.pca.object){
   bsm$p[1] <- 1/n
   
   for (i in 2:n){
-    bsm$p[i] = bsm$p[i-1] + (1/(n + 1 - i))
+    bsm$p[i] = bsm$p[i - 1] + (1/(n + 1 - i))
   }
   
   bsm$p <- 100*bsm$p/n
@@ -19,30 +19,33 @@ brokenStick.selection <- function(dudi.pca.object){
   
   plot.new()
   
-  par(mfrow = c(2,1))
+  par(mfrow = c(2, 1))
   
   barplot(ev, 
-          main="Eigenvalues", 
-          col="bisque", las=2)
+          main = "Eigenvalues", 
+          col = "bisque", las = 2)
   
   abline(h=mean(ev), 
          col="red")		# average eigenvalue
   
   legend("topright", 
-         "Average eigenvalue", 
-         lwd=1, col=2, bty="n")
-  
+         "Average Eigenvalue", 
+         lwd = 1, 
+         col = 2, 
+         bty = "n")
   
   brokenStick.matrix <- t(cbind(100*ev/sum(ev), bsm$p[n:1]))
-  brokenStick.kept <- length(which(brokenStick.matrix[1,] > brokenStick.matrix[2,]))
+  brokenStick.kept <- length(which(brokenStick.matrix[1, ] > brokenStick.matrix[2, ]))
   
   barplot(brokenStick.matrix, 
-          beside= TRUE, 
-          main = "% variance", col=c("bisque",2), las=2)
+          beside = TRUE,
+          main = "% variance", 
+          col = c("bisque", 2), 
+          las = 2)
   
   legend("topright", 
-         c("% eigenvalue", 
-           "Broken stick model"), 
+         c("% Eigenvalue", 
+           "Broken-stick model"), 
          pch= 15, 
          col= c("bisque", 2), 
          bty= "n")
