@@ -213,7 +213,7 @@ MPD.LatLong.Env.AllScales$ID_Biome_Acronym = factor(MPD.LatLong.Env.AllScales$ID
 
 # This is the Figure 2 in the manuscript
 
-ggsave(filename = "fig.NRI.NTI.Realm.boxplot.png", 
+ggsave(filename = "figures/fig.NRI.NTI.Realm.boxplot.png", 
        dpi = 300, 
        width = 18.5, height = 10, 
        units = "in")
@@ -368,5 +368,10 @@ for(ri in r){
                                                 rmmcp.NTI.SamplingPool.summary.ri)
 }
 
+# Write table with post-hoc tests
+
+kable(rmmcp.NRI.SamplingPool.summary.r)
+
 write.table(rmmcp.NRI.SamplingPool.summary.r)
+
 write.table(rmmcp.NTI.SamplingPool.summary.r)

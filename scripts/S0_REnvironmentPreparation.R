@@ -45,7 +45,8 @@ required.libraries <- c("ade4","subniche",
                         "kableExtra", "knitr",
                         "BAMMtools", "coda",
                         "rgdal", "tidyverse", "rbin", 
-                        "quantreg", "WRTDStidal"
+                        "quantreg", "WRTDStidal",
+                        "ggrepel"
 )
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]

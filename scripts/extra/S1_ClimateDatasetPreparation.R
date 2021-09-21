@@ -1,3 +1,5 @@
+# Decomissioned as velox does not exist anymore
+
 list.files("data/rasters")
 list.files("data/rasters")[1]
 

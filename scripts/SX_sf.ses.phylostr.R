@@ -1,10 +1,27 @@
-###############################################################
-### Modified functions to allow the computation in parallel ###
-###############################################################
+#################################################################################
+### Modification of the functions picante::ses.mpd() and picante::ses.mntd()  ###
+### to allow for parallel computation using SNOW/snowfall                     ###
+#                                                                               #
+# Description: This code presents the sf.ses.mpd() and sf.ses.mntd() functions  #
+# that are heavily-based in picante's ses.mpd() and ses.mntd() functions. It    #
+# implements parallel computation for the calculation of the mean pairwise      #
+# distances and mean nearest taxon distances using SNOW via the snowfall        # 
+# package. The current implementation only addresses the taxa.labels null model.#
+#                                                                               #
+# Note: Future modifications should include the other null models, as well as   #
+# improvements in speed supported by benchmarking.                              #
+#                                                                               #
+# Author: Pedro Henrique Pereira Braga                                          #
+# Last Update: "2021-07-02"                                                     #
+#                                                                               # 
+#################################################################################
 
-#### Mean pairwise distances (ses.MPD), heavily based on picante's original function
-sf.ses.mpd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores = 4){
-  dis <- as.matrix(dis) # coerce's the distance matrix to matrix
+sf.ses.mpd <- function(samp, dis, 
+                       abundance.weighted = FALSE, 
+                       runs = 999, 
+                       cores = 4){
+  
+  dis <- as.matrix(dis) # coerces the distance matrix to matrix
   
   # calculate the observed mean phylogenetic distance in each observing unit
   mpd.obs <- mpd(samp, dis, abundance.weighted = abundance.weighted) 
@@ -29,7 +46,8 @@ sf.ses.mpd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores 
                            sfCat(paste("Iteration ", i), sep="\n")
                            mpd(samp, taxaShuffle(dis),
                                abundance.weighted = abundance.weighted)
-                         }))
+                         })
+                )
   
   # 
   mpd.rand.mean <- sfApply(x = mpd.rand, margin = 2, fun = mean, 
@@ -60,12 +78,17 @@ sf.ses.mpd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores 
              row.names = row.names(samp))
 }
 
-sf.ses.mntd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores = 4){
+sf.ses.mntd <- function(samp, 
+                        dis, 
+                        abundance.weighted = FALSE, 
+                        runs = 999, 
+                        cores = 4){
   dis <- as.matrix(dis)
   mntd.obs <- mntd(samp, dis, abundance.weighted = abundance.weighted)
-  
-  ###
-  sfInit(parallel = TRUE, cpus = cores, slaveOutfile="logAnalysis.txt")
+
+  sfInit(parallel = TRUE, 
+         cpus = cores, 
+         slaveOutfile="logAnalysis.txt")
   
   sfLibrary(picante)
   sfLibrary(base)
@@ -91,9 +114,7 @@ sf.ses.mntd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores
                            fun = rank)[1, ]
   
   sfStop()
-  
-  ###
-  
+
   mntd.obs.z <- (mntd.obs - mntd.rand.mean)/mntd.rand.sd
   
   mntd.obs.rank <- ifelse(is.na(mntd.rand.mean), NA, mntd.obs.rank)
@@ -109,6 +130,7 @@ sf.ses.mntd <- function(samp, dis, abundance.weighted = FALSE, runs = 999, cores
              row.names = row.names(samp))
 }
 
+# Comparing time
 
-#system.time(sf.ses.mpd(phylocom$sample, cophenetic(phylocom$phylo), runs = 1000))
-#system.time(ses.mpd(phylocom$sample, cophenetic(phylocom$phylo), null.model= "taxa.labels", runs = 1000))
+# system.time(sf.ses.mpd(phylocom$sample, cophenetic(phylocom$phylo), runs = 1000))
+# system.time(ses.mpd(phylocom$sample, cophenetic(phylocom$phylo), null.model= "taxa.labels", runs = 1000))

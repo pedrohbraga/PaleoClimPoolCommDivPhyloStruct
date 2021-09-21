@@ -1,6 +1,7 @@
 #################################################################################
-###            ###
-###                         ###
+### Map representation of the globe-wise phylogenetic structure of bat        ###
+### communities across species sampling pools                                 ###
+##                                                                             ##
 #                                                                               #
 # Author: Pedro Henrique Pereira Braga                                          #
 # Last Update: "2020-05-13"                                                     #
@@ -67,7 +68,7 @@ ggplot(data = long.polygonGrid_world_50km_merged_sf) +
         strip.text.x = element_text(size = 10)
         )
 
-# Export figure
+# Export Figure 1
 
 ggsave(filename = "Figure.1.NRI.NTI.Sampling.maps.png", 
        dpi = 300, 
