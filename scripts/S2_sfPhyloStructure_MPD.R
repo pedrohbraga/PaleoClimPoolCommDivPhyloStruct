@@ -1,11 +1,30 @@
 ######################################################################################
-######## Code to compute the phylogenetic structure of communities with         ######  
-######## restriction to sampling pools (MPD only)                               ######
+#### Code to apply a null-model framework to compute the phylogenetic structure   ####
+#### of communities across a gradient of restrictive sampling pools               ####
+#                                                                                    #
+# Description: To assess how patterns of phylogenetic community structure change     #
+# as a function of spatial scale, we applied commonly used null-models to            #
+# estimate standardized effect sizes for both metrics (MPDSES and MNTDSES,           #
+# respectively) (Kembel et al., 2010). Each null-model simulated random              #
+# assemblages by permuting species names across the phylogeny tips 999 times for     #
+# a given species pool (i.e., the sampling pool in which species were sampled to     #
+# compose random assemblages): global (all species in the phylogeny), east-west      #
+# hemispherical (i.e., Old World and New World species pools), biogeographical       #
+# realms, tectonic plates, within-realm biomes, and within-realm                     #
+# terrestrial-ecoregion scales. NRI and NTI were obtained by multiplying minus       #
+# one to MPDSES and MNTDSES, respectively.                                           #
+#                                                                                    #
+# The framework used here uses the sf.ses.mpd() function, which modifies the         #
+# picante::ses.mpd() function to allow for parallel computation using SNOW           #
+# (snowfall).                                                                        #
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2019-01-28"                                                          #
 #                                                                                    # 
 ######################################################################################
+
+# Begin of the computation of SES.MPD values across the sampling pool
+# restriction gradient
 
 ########################
 ### Global sampling ####
@@ -13,7 +32,7 @@
 
 # Calculate mpd values for each community
 SES.MPD.Chiroptera.World <- sf.ses.mpd(Chiroptera.FaurSven.comm,
-                                       cophenetic(Chiroptera.FaurSven.tree), # Convert phylogeny to distance matrix
+                                       cophenetic(Chiroptera.FaurSven.tree), # phylogenetic distance matrix
                                        abundance.weighted = FALSE, 
                                        runs = 999, cores = 40)
 
@@ -24,7 +43,7 @@ MPD.LatLong.Env.World <- data.frame(cbind(regions.LatLong,
                                           SamplingPool = rep("Global sampling", nrow(regions.LatLong))))
 
 ##########################################
-#### New World and Old World Sampling ####
+#### New World and Old World sampling ####
 ##########################################
 
 # Defining the New world and the Old World
@@ -76,7 +95,7 @@ MPD.LatLong.Env.NW <- data.frame(cbind(regions.LatLong[(rownames(regions.LatLong
                                        current.Env[(rownames(current.Env) %in% row.names(Chiroptera.NW.Comm)), ],
                                        SES.MPD.Chiroptera.NW,
                                        SamplingPool = rep("Hemispheric sampling", nrow(SES.MPD.Chiroptera.NW))))
-# dim(MPD.LatLong.Env.NW)
+
 MPD.LatLong.Env.OW <- data.frame(cbind(regions.LatLong[(rownames(regions.LatLong) %in% row.names(Chiroptera.OW.Comm)), ], 
                                        current.Env[(rownames(current.Env) %in% row.names(Chiroptera.OW.Comm)), ],
                                        SES.MPD.Chiroptera.OW,
@@ -87,9 +106,9 @@ MPD.LatLong.Env.NW.OW <- rbind(MPD.LatLong.Env.NW, MPD.LatLong.Env.OW)
 
 # dim(MPD.LatLong.Env.NW.OW)
 
-##########################################
-############# Realm Sampling #############
-##########################################
+###########################
+### Realm sampling pool ###  
+###########################
 
 # Create a list
 SubRegion.Realm.Comm.Phylo <- list()
@@ -100,7 +119,7 @@ for(i in droplevels(unique(regions.LatLong$ID_Realm))) {
   SubRegion.Realm.Comm. <- Chiroptera.FaurSven.comm[rownames(Chiroptera.FaurSven.comm) %in% row.names(SubRegion.Realm.LatLong), ]
   SubRegion.Realm.Comm. <- SubRegion.Realm.Comm.[ , colSums(SubRegion.Realm.Comm.) >= 1]
   
-  ### Subset the datasets
+  ### Subset the data sets
   SubRegion.Realm.CommPhylo <- match.phylo.comm(Chiroptera.FaurSven.tree, SubRegion.Realm.Comm.)
   SubRegion.Realm.Comm.Phylo[[paste0(i)]] <- list(Comm = SubRegion.Realm.CommPhylo$comm,
                                                   Phylo = SubRegion.Realm.CommPhylo$phy)
@@ -124,9 +143,10 @@ for(j in as.factor(ls(SubRegion.Realm.Comm.Phylo)[!ls(SubRegion.Realm.Comm.Phylo
   
   MPD.LatLong.Env.Realm <- rbind(MPD.LatLong.Env.Realm, MPD.LatLong.Env.SubRegion.Realm)
 }
-##########################################
-############# Plate Sampling #############
-##########################################
+
+########################
+#### Plate Sampling ####
+########################
 
 # Create a list
 SubRegion.Plate.Comm.Phylo <- list()
@@ -148,7 +168,7 @@ SubRegion.Plate.Comm.Phylo["NA"] <- NULL
 
 MPD.LatLong.Env.Plate <- NULL
 
-#setdiff(as.factor(ls(SubRegion.Plate.Comm.Phylo)[!ls(SubRegion.Plate.Comm.Phylo) %in% "Antarctic"]),
+# setdiff(as.factor(ls(SubRegion.Plate.Comm.Phylo)[!ls(SubRegion.Plate.Comm.Phylo) %in% "Antarctic"]),
 #        unique(MPD.LatLong.Env.Plate$ID_PlateName))
 
 for(j in as.factor(ls(SubRegion.Plate.Comm.Phylo)[!ls(SubRegion.Plate.Comm.Phylo) %in% "Antarctic"])){
@@ -166,9 +186,9 @@ for(j in as.factor(ls(SubRegion.Plate.Comm.Phylo)[!ls(SubRegion.Plate.Comm.Phylo
   MPD.LatLong.Env.Plate <- rbind(MPD.LatLong.Env.Plate, MPD.LatLong.Env.SubRegion.Plate)
 }
 
-#######################################################
-############# Within Realm Biome Sampling #############
-#######################################################
+##########################################
+#### Within-Realm Biome Sampling pool ####
+##########################################
 
 # Create a list
 SubRegion.Biome.Comm.Phylo <- list()
@@ -189,6 +209,7 @@ for(i in droplevels(unique(as.factor(regions.LatLong$ID_Biome_Realm)))) {
 
 # ls(SubRegion.Biome.Comm.Phylo)[grepl("NA", ls(SubRegion.Biome.Comm.Phylo))]
 # SubRegion.Biome.Comm.Phylo["NA__NA"] <- NULL
+
 SubRegion.Biome.Comm.Phylo[ls(SubRegion.Biome.Comm.Phylo)[grepl("NA", 
                                                                 ls(SubRegion.Biome.Comm.Phylo))]] <- NULL
 SubRegion.Biome.Comm.Phylo$Tropical_Subtropical_Grasslands_Savannas_Shrublands__Oceanic <- NULL
@@ -229,7 +250,7 @@ for(i in droplevels(unique(regions.LatLong$NAME_Ecoregion))) {
   SubRegion.Ecoregion.Comm. <- SubRegion.Ecoregion.Comm.[ , colSums(SubRegion.Ecoregion.Comm.) > 1, drop = FALSE]
   
   ### Subset the datasets
-  SubRegion.Ecoregion.CommPhylo <- match.phylo.comm.(Chiroptera.FaurSven.tree, 
+  SubRegion.Ecoregion.CommPhylo <- match.phylo.comm.(Chiroptera.FaurSven.tree,
                                                      SubRegion.Ecoregion.Comm.)
   
   if(is.null(SubRegion.Ecoregion.CommPhylo$phy) == FALSE){
@@ -245,7 +266,7 @@ SubRegion.Ecoregion.Comm.Phylo["NA"] <- NULL
 MPD.LatLong.Env.Ecoregion <- NULL
 
 for(j in as.factor(ls(SubRegion.Ecoregion.Comm.Phylo)[!ls(SubRegion.Ecoregion.Comm.Phylo) %in% "Antarctic"])){
-    # Calculate mpd values for each community
+  # Calculate MPD values for each community
   SES.MPD.Chiroptera.Ecoregion <- sf.ses.mpd(SubRegion.Ecoregion.Comm.Phylo[[j]]$Comm,
                                              cophenetic(SubRegion.Ecoregion.Comm.Phylo[[j]]$Phylo), # Convert phylogeny to distance matrix
                                              abundance.weighted = FALSE, 
@@ -261,6 +282,9 @@ for(j in as.factor(ls(SubRegion.Ecoregion.Comm.Phylo)[!ls(SubRegion.Ecoregion.Co
 }
 
 
+# End of the computation of SES.MPD values across the sampling pool
+# restriction gradient
+
 #################################
 #### Combine all data frames ####
 #################################
@@ -274,35 +298,36 @@ MPD.LatLong.Env.AllScales <- rbind(MPD.LatLong.Env.World,
 
 head(MPD.LatLong.Env.AllScales)
 
-# Calculate NRI
+# Calculate NRI by multiplying minus one to MPD.SES
+
 MPD.LatLong.Env.AllScales$NRI <- - 1 * ((MPD.LatLong.Env.AllScales$mpd.obs - MPD.LatLong.Env.AllScales$mpd.rand.mean) / MPD.LatLong.Env.AllScales$mpd.rand.sd)
 
 MPD.LatLong.Env.AllScales$PhyloMetricScale <- rep("MPD", 
                                                   nrow(MPD.LatLong.Env.AllScales)) 
 
-# Rename dataset
+# Refactor data set
 
 MPD.LatLong.Env.AllScales$ID_Realm <- factor(MPD.LatLong.Env.AllScales$ID_Realm, 
-                                             levels=c('Neotropical',
-                                                      'Nearctic',
-                                                      'Afrotropical',
-                                                      'Palearctic', 
-                                                      'Indomalay', 
-                                                      'Australasian'))
+                                             levels = c('Neotropical',
+                                                        'Nearctic',
+                                                        'Afrotropical',
+                                                        'Palearctic', 
+                                                        'Indomalay', 
+                                                        'Australasian'))
 
 MPD.LatLong.Env.AllScales$SamplingPool <-  factor(MPD.LatLong.Env.AllScales$SamplingPool,  
-                                                  levels=c("Global sampling",
-                                                           "Hemispheric sampling",
-                                                           "Realm sampling",
-                                                           "Plate sampling",
-                                                           "Biome sampling",
-                                                           "Ecoregion sampling"))
-# Save dataset
+                                                  levels = c("Global sampling",
+                                                             "Hemispheric sampling",
+                                                             "Realm sampling",
+                                                             "Plate sampling",
+                                                             "Biome sampling",
+                                                             "Ecoregion sampling"))
+# Save data set
 
 write.table(MPD.LatLong.Env.AllScales, 
             "MPD.LatLong.Env.AllScales.50K.FaurSven.3.txt")
 
-# MPD.LatLong.Env.AllScales <- read.table("MPD.LatLong.Env.AllScales.50K.FaurSven.3.txt", h = T)
+# Read data set (if needed)
 
-#################
+# MPD.LatLong.Env.AllScales <- read.table("MPD.LatLong.Env.AllScales.50K.FaurSven.3.txt", h = T)
 

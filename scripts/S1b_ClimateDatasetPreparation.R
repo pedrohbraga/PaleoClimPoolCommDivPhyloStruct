@@ -272,10 +272,8 @@ ggsave(filename = "meanAnnPrec.Time.png",
 
 head(worldClimate)
 
-MPD.MNTD.LatLong.diff.Env.Global <- cbind(filter(MPD.LatLong.Env.AllScales, 
-                                                 SamplingPool == "Global sampling")[, c(1, 4:7, 27:37)],
-                                          filter(MNTD.LatLong.Env.AllScales, 
-                                                 SamplingPool == "Global sampling")[, c(28:33, 36)],
+MPD.MNTD.LatLong.diff.Env.Global <- cbind(filter(MPD.MNTD.LatLong.AllScales, 
+                                                 SamplingPool == "Global sampling"),
                                           diff.AnnTemp.mP2_cur = worldClimate$mP2_bio_1 - worldClimate$cur_bio_1,
                                           diff.AnnTemp.mPWP_cur = worldClimate$mPWP_bio_1 - worldClimate$cur_bio_1,
                                           diff.AnnTemp.MIS19_LGM = worldClimate$MIS19_bio_1 - worldClimate$LGM_bio_1,
@@ -283,10 +281,10 @@ MPD.MNTD.LatLong.diff.Env.Global <- cbind(filter(MPD.LatLong.Env.AllScales,
                                           diff.AnnPrec.mP2_cur = worldClimate$mP2_bio_12 - worldClimate$cur_bio_12,
                                           diff.AnnPrec.mPWP_cur = worldClimate$mPWP_bio_12 - worldClimate$cur_bio_12,
                                           diff.AnnPrec.MIS19_LGM = worldClimate$MIS19_bio_12 - worldClimate$LGM_bio_12,
-                                          diff.AnnPrec.LGM_cur = worldClimate$LGM_bio_12 - worldClimate$cur_bio_12)
+                                          diff.AnnPrec.LGM_cur = log1p(worldClimate$LGM_bio_12) - log1p(worldClimate$cur_bio_12))
 
-MPD.MNTD.LatLong.diff.Env.Global <- MPD.LatLong.diffTemp.Global  %>%
-  filter(!is.na(ID_Realm.))
+MPD.MNTD.LatLong.diff.Env.Global <- MPD.MNTD.LatLong.diff.Env.Global %>%
+  filter(!is.na(ID_Realm))
 
 MPD.MNTD.LatLong.diff.Env.Global$ID_Realm <- factor(MPD.MNTD.LatLong.diff.Env.Global$ID_Realm, 
                                                     levels = c("Nearctic", 
@@ -300,9 +298,9 @@ MPD.MNTD.LatLong.diff.Env.Global$ID_Realm <- factor(MPD.MNTD.LatLong.diff.Env.Gl
 summary(lm(filter(MPD.LatLong.Env.AllScales, 
                   SamplingPool == "Global sampling")$mpd.obs.z ~ diff.AnnTemp.LGM_cur))
 
-plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NTI, na.rm = TRUE)
+plot(MPD.MNTD.LatLong.diff.Env.Global$mpd.ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NTI, na.rm = TRUE)
 
-plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NRI, na.rm = TRUE)
+plot(MPD.MNTD.LatLong.diff.Env.Global$mpd.ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NRI, na.rm = TRUE)
 
 ## AnnTemp plot #####
 
@@ -349,7 +347,7 @@ ggsave(filename = "NRI.diff.AnnTemp.LGM_cur.Global.D.plot.png",
 
 # Divide by biogeographical realm, in the horizontal direction
 NRI.diff.AnnTemp.LGM_cur.plot + 
-  facet_grid(. ~ ID_Realm., scales = "free") +
+  facet_grid(. ~ ID_Realm, scales = "free") +
   theme(strip.background = element_rect(color="white", linetype = NULL),
         strip.text=element_text(color = "black",
                                 face = "bold",
@@ -371,7 +369,7 @@ ggsave(filename = "NRI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
 #### AnnPrec plot ####
 
 (NRI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
-                                         aes(x = diff.AnnPrec.LGM_cur/10, 
+                                         aes(x = diff.AnnPrec.LGM_cur, 
                                              y = NRI,
                                              group = factor(ID_Realm),
                                              colour = factor(ID_Realm))) +
@@ -410,7 +408,7 @@ ggsave(filename = "NRI.diff.AnnPrec.LGM_cur.Global.D.plot.png",
 
 # Divide by biogeographical realm, in the horizontal direction
 NRI.diff.AnnPrec.LGM_cur.plot + 
-  facet_grid(. ~ ID_Realm., scales = "free") +
+  facet_grid(. ~ ID_Realm, scales = "free") +
   theme(strip.background = element_rect(color="white", linetype = NULL),
         strip.text=element_text(color = "black",
                                 face = "bold",
@@ -467,7 +465,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.plot.png",
 
 # Divide by biogeographical realm, in the horizontal direction
 NTI.diff.AnnTemp.LGM_cur.plot + 
-  facet_grid(. ~ ID_Realm., scales = "free") +
+  facet_grid(. ~ ID_Realm, scales = "free") +
   theme(strip.background = element_rect(color="white", linetype = NULL),
         strip.text=element_text(color = "black",
                                 face = "bold",
@@ -488,7 +486,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
 
 
 (NTI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
-                                         aes(x = diff.AnnPrec.LGM_cur/10, 
+                                         aes(x = diff.AnnPrec.LGM_cur, 
                                              y = NTI,
                                              group = factor(ID_Realm),
                                              colour = factor(ID_Realm))) +
@@ -527,7 +525,7 @@ ggsave(filename = "NTI.diff.AnnPrec.LGM_cur.Global.D.plot.png",
 
 # Divide by biogeographical realm, in the horizontal direction
 NTI.diff.AnnPrec.LGM_cur.plot + 
-  facet_grid(. ~ ID_Realm., scales = "free") +
+  facet_grid(. ~ ID_Realm, scales = "free") +
   theme(strip.background = element_rect(color="white", linetype = NULL),
         strip.text=element_text(color = "black",
                                 face = "bold",

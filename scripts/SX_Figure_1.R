@@ -7,8 +7,6 @@
 #                                                                               # 
 #################################################################################
 
-
-
 # Load world projection grid shapefile
 polygonGrid_world_50km <- st_read("data/grids/world_grid_prev_50km.shp")
 
@@ -41,24 +39,25 @@ ggplot(data = long.polygonGrid_world_50km_merged_sf) +
   geom_sf(mapping = aes(fill = PhyloStructure),
           lwd = 0 # no quadrat boundaries 
   ) +
-  scale_fill_gradient2( # Divergent colour scale 
-    name = "Phylogenetic Structure",
-    low = muted("blue"),
-    mid = "white",
-    high = muted("red"),
-    midpoint = 0,
-    na.value = "lightgrey",
-    breaks = breaks_extended(9),
-    guide = guide_colorbar(
-      direction = "horizontal",
-      barheight = unit(2, units = "mm"),
-      barwidth = unit(75, units = "mm"),
-      draw.ulim = F, 
-      title.position = 'top', 
-      title.hjust = 0.5,  # shifting title height 
-      label.hjust = 0.5   # shifting label height
-    ) # FALSE will suppress legend
-  ) +
+  scico::scale_colour_scico(palette = "acton", direction = -1) +
+  # scale_fill_gradient2( # Divergent colour scale 
+  #   name = "Phylogenetic Structure",
+  #   low = muted("blue"),
+  #   mid = "white",
+  #   high = muted("red"),
+  #   midpoint = 0,
+  #   na.value = "lightgrey",
+  #   breaks = breaks_extended(9),
+  #   guide = guide_colorbar(
+  #     direction = "horizontal",
+  #     barheight = unit(2, units = "mm"),
+  #     barwidth = unit(75, units = "mm"),
+  #     draw.ulim = F, 
+  #     title.position = 'top', 
+  #     title.hjust = 0.5,  # shifting title height 
+  #     label.hjust = 0.5   # shifting label height
+  #   ) # FALSE will suppress legend
+  # ) +
   facet_grid(SamplingPool ~ PhyloMetric,
              switch = "x") + # facet_grid top labels on bottom
   # add theme

@@ -21,7 +21,7 @@ car::leveneTest(NRI ~ ID_Realm, data = MPD.Global, na.rm = TRUE)
 Bats.NRI.Realm <- aov(NRI ~ ID_Realm, data = MPD.Global)
 summary(Bats.NRI.Realm)
 
-TukeyHSD(x=Bats.NRI.Realm, 
+TukeyHSD(x = Bats.NRI.Realm, 
          'ID_Realm', 
          conf.level=0.95)
 
@@ -30,7 +30,36 @@ TukeyHSD(x=Bats.NRI.Realm,
 kruskal.test(NRI ~ ID_Realm, data = MPD.Global)
 
 pairwise.wilcox.test(MPD.Global$NRI, MPD.Global$ID_Realm,
-                     p.adjust.method = "BH")
+                     p.adjust.method = "BH",
+                     paired = TRUE)
+
+x <- c(2.9, 3.0, 2.5, 2.6, 3.2) # normal subjects
+y <- c(3.8, 2.7, 4.0, 2.4) # with obstructive airway disease
+z <- c(2.8, 3.4, 3.7, 2.2, 2.0) # with asbestosis
+dunn.test(x=list(x,y,z))
+x <- c(x, y, z)
+g <- factor(rep(1:3, c(5, 4, 5)),
+            labels = c("Normal",
+                       "COPD",
+                       "Asbestosis"))
+dunn.test(x, g)
+
+dunn.test(MPD.Global$NRI, MPD.Global$ID_Realm., 
+          kw = TRUE, 
+          method = "by",
+          rmc = TRUE,
+          altp = TRUE,
+          list = TRUE)
+
+dunn.test(MNTD.Global$NTI, MNTD.Global$ID_Realm., 
+          kw = TRUE, 
+          method = "by",
+          rmc = TRUE,
+          altp = TRUE,
+          list = TRUE)
+
+
+
 
 # Linear Mixed Model
 
@@ -130,7 +159,7 @@ MPD.LatLong.Env.AllScales$ID_Biome_Acronym = factor(MPD.LatLong.Env.AllScales$ID
                                                                              " ",
                                                                              levels(MPD.LatLong.Env.AllScales$ID_Biome))))
 
-NRI.Realm.boxplot <- ggplot(filter(MPD.LatLong.Env.AllScales,
+NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales,
                                    is.na(ID_Realm) == FALSE),
                             aes(x = SamplingPool, y = NRI)) +
   geom_boxplot(aes(fill = SamplingPool)) +
@@ -174,7 +203,7 @@ ggsave(filename = "NRI.Realm.boxplot.png",
        units = "in")
 
 ##
-NRI.Biome.boxplot <- ggplot(filter(MPD.LatLong.Env.AllScales,
+NRI.Biome.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales,
                                    is.na(ID_Biome) == FALSE),
                             aes(x = SamplingPool, y = NRI)) +
   geom_boxplot(aes(fill = SamplingPool)) +

@@ -42,15 +42,15 @@ world_grid_50km@data$id = 1:length(world_grid_50km)
 # Define and match CRS for the other shapefiles
 terrEcoregions <- CRS("+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 
                       +datum=WGS84 +ellps=WGS84 +units=m +no_defs") %>% 
-  spTransform(terrEcoregions, .)
+   spTransform(terrEcoregions, .)
 
 worldPlates <- CRS("+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 
                    +datum=WGS84 +ellps=WGS84 +units=m +no_defs") %>% 
-  spTransform(worldPlates, .)
+   spTransform(worldPlates, .)
 
 biogeoRealms <- CRS("+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 
                     +datum=WGS84 +ellps=WGS84 +units=m +no_defs") %>% 
-  spTransform(biogeoRealms, .)
+   spTransform(biogeoRealms, .)
 
 
 ### Extract coordinates of the centroids of each quadrat from the polygon grid ###
@@ -63,10 +63,12 @@ world_grid_50km_centroids <- SpatialPointsDataFrame(gCentroid(world_grid_50km,
 
 # Overlap coordinates and shapefile and extract required information
 overlaping.regions.world_grid_50km <- data.frame(xx = over(world_grid_50km_centroids, 
-                                                           terrEcoregions))
+                                                           terrEcoregions)
+)
 
 overlaping.plates.world_grid_50km <- data.frame(xx = over(world_grid_50km_centroids, 
-                                                          worldPlates))
+                                                          worldPlates)
+)
 
 # Bind latitude and longitude and subset ecoregions, biomes and realms for cross-scale analyses
 regions.LatLong <- cbind(world_grid_50km_centroids@data$id,
@@ -84,7 +86,7 @@ colnames(regions.LatLong) <- c("ID", "Longitude", "Latitude",
                                "ID_PlateName", 
                                "ID_PlateCode")
 
-# Assign ID to rownames
+# Assign ID to row names
 rownames(regions.LatLong) <- regions.LatLong$ID
 
 ## Rename and reorder levels to make sense
@@ -122,9 +124,9 @@ regions.LatLong$ID_Biome_Realm <- paste(regions.LatLong$ID_Biome,
                                         regions.LatLong$ID_Realm, 
                                         sep = "")
 
-#####################################################
-### Prepare community and environmental datasets ####
-##################################################### 
+######################################################
+### Prepare community and environmental data sets ####
+###################################################### 
 
 # Load environmental data
 
@@ -207,6 +209,17 @@ new.mid.holo.Env <- data.frame(bio_1 = mid.holo.env.raw$ccmidbi1,
                                bio_18 = base::log1p(mid.holo.env.raw$ccmidbi18),
                                bio_19 = base::log1p(mid.holo.env.raw$ccmidbi19),
                                row.names = row.names(regions.LatLong))
+
+# Investigate whether there are some NAs
+
+# (rows.NA <- c(row.names(which(is.na(new.current.Env), 
+#                 arr.ind=TRUE)), 
+# row.names(which(is.na(new.mid.holo.Env), 
+#                 arr.ind=TRUE)),
+# row.names(which(is.na(new.lgm.Env), 
+#                 arr.ind=TRUE))))
+
+# Interpolate NAs with cubic splines
 
 new.current.Env <- as.data.frame(zoo::na.spline(new.current.Env))
 
@@ -292,10 +305,10 @@ Mammal.FaurSven.MCC.tree <- phangorn::maxCladeCred(Mammal.FaurSven.trees)
 
 # Filter species from the phylogenetic tree
 
-#ChiropteraPhylo <- drop.tip(Chiroptera.tree, 
+# ChiropteraPhylo <- drop.tip(Chiroptera.tree, 
 #                               Chiroptera.tree$tip.label[-match(colnames(Chiroptera.Comm), 
 #                                                                Chiroptera.tree$tip.label)]) #Prunning the tree
-#length(ChiropteraPhylo$tip.label); ncol(Chiroptera.Comm)
+# length(ChiropteraPhylo$tip.label); ncol(Chiroptera.Comm)
 
 Chiroptera.FaurSven.tree <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$phy
 Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$comm
@@ -318,10 +331,10 @@ is.ultrametric(Chiroptera.FaurSven.tree)
 # Check if number of species matches between both trait and phylogenetic relationship datasets
 length(Chiroptera.FaurSven.tree$tip.label); ncol(Chiroptera.FaurSven.comm)
 
-###################
+######################################################################################################
 
-library(tidyverse)
-library(ggtree)
+# library(tidyverse)
+# library(ggtree)
 
 # or add the entire scale to the x axis with theme_tree2()
 # ggtree(Chiroptera.FaurSven.tree) + theme_tree2()
@@ -329,7 +342,7 @@ library(ggtree)
 # Label the tips
 # ggtree(Chiroptera.FaurSven.tree) + theme_tree2() + geom_tiplab()
 
-#######################################################################################################
+######################################################################################################
 
 rm(Comm, 
    comm.raw, 

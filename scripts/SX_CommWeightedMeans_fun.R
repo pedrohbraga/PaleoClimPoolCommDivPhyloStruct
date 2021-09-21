@@ -2,9 +2,9 @@
 ###### Utility function to calculate community weighted means of trait data #####
 #######################################################################################################
 
-# Code Author: Pedro Henrique Pereira Braga
-# Based on: 
-# Last Update: 2020-03-10
+# Code Author: Pedro Henrique Pereira Braga                                                           #
+# Based on:                                                                                           #
+# Last Update: 2020-03-10                                                                             #
 #
 # This script provides the calculation for community weighted means (CWM;
 # Lavorel et al. 2008) of a trait for each ecological community. Three measures
