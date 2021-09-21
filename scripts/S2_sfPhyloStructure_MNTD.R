@@ -50,7 +50,8 @@ MNTD.LatLong.Env.World <- data.frame(cbind(regions.LatLong,
 NW.LatLong <- subset(regions.LatLong, 
                      ID_Realm == "Nearctic" | ID_Realm == "Neotropical")
 
-OW.LatLong <- subset(regions.LatLong, !(ID_Realm %in% c("Nearctic", "Neotropical")))
+OW.LatLong <- subset(regions.LatLong, 
+                     !(ID_Realm %in% c("Nearctic", "Neotropical")))
 
 nrow(NW.LatLong) + nrow(OW.LatLong); nrow(regions.LatLong) # Checking the number of rows
 
