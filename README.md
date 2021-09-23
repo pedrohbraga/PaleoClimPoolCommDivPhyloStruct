@@ -12,7 +12,7 @@ A stable data set containing the estimates for bat community phylogenetic struct
 
 <details> 
 
-<summary> Click to read < /summary>
+<summary> Click to read </summary>
 
 ### Aim
 

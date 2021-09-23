@@ -1,3 +1,6 @@
+# Routine to extract a community presence-absence matrix from IUCN species distributions
+# using lets.presab.grid(). This was not used for this project.
+
 require(sp)
 require(rgdal)
 require(snowfall)
