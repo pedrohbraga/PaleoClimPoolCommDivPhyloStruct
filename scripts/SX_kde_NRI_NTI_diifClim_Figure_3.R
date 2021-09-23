@@ -28,7 +28,7 @@ Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks::Hpi(x = CWM.Div.MPD.MNTD.diff.worldCl
                                                  drop_na(),
                                                pilot = "samse")
 
-Global.NRI.diff.AnnTemp.LGM_cur.Hpi
+# Global.NRI.diff.AnnTemp.LGM_cur.Hpi
 
 # Compute kde 
 kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks::kde(x = CWM.Div.MPD.MNTD.diff.worldClimate.Global.data %>%
@@ -43,7 +43,10 @@ kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks::kde(x = CWM.Div.MPD.MNTD.diff.wor
 # "cont" specifies the density contours, which are upper percentages of highest
 # density regions. The default contours are at 25%, 50%, and 75%
 
-percentiles <- percent(c(0.01, seq(0.1, 0.9, length.out = 5), 0.99), 
+percentiles <- percent(c(0.01, 
+                         seq(0.1, 0.9, 
+                             length.out = 5), 
+                         0.99), 
                        accuracy = 1)
 
 plot(kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi, 
@@ -83,8 +86,9 @@ molten.fhat.kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- reshape2::melt(fhat.kde.G
                                scriptstyle("MAT"[Contemporary]-"MAT"[LGM])))),
          y = c(expression("NRI"["Global"]))) +
     geom_hline(yintercept = 0, alpha = 0.25) +  
-    scale_y_continuous(#breaks = round(seq(min(CWM.Div.MPD.MNTD.diff.worldClimate.Global.data$NRI, na.rm = TRUE), 
-      #                    max(CWM.Div.MPD.MNTD.diff.worldClimate.Global.data$NRI, na.rm = TRUE), length.out = 6), 1),
+    scale_y_continuous(
+      # breaks = round(seq(min(CWM.Div.MPD.MNTD.diff.worldClimate.Global.data$NRI, na.rm = TRUE), 
+      # max(CWM.Div.MPD.MNTD.diff.worldClimate.Global.data$NRI, na.rm = TRUE), length.out = 6), 1),
       breaks = pretty_breaks(7, 
                              high.u.bias = 0.1,
                              eps.correct = 0, 
@@ -110,10 +114,7 @@ molten.fhat.kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- reshape2::melt(fhat.kde.G
     )
 )
 
-##
-
-
-# NRI and Annual Precipitation
+# NRI and Annual Precipitation ---------
 
 Global.NRI.diff.AnnPrec.LGM_cur.Hpi <- ks::Hpi(x = CWM.Div.MPD.MNTD.diff.worldClimate.Global.data %>%
                                                  select(NRI,
@@ -129,6 +130,7 @@ CWM.Div.MPD.MNTD.diff.worldClimate.Global.data %>%
   range()
 
 # Compute kde 
+
 kde.Global.NRI.diff.AnnPrec.LGM_cur.Hpi <- ks::kde(x = CWM.Div.MPD.MNTD.diff.worldClimate.Global.data %>%
                                                      select(diff.AnnPrec.LGM_cur, 
                                                             NRI) %>%
@@ -448,7 +450,7 @@ molten.fhat.kde.Global.NTI.diff.AnnPrec.LGM_cur.Hpi <- reshape2::melt(fhat.kde.G
 )
 )
 
-ggsave(file="fig.kde.Global.NRI.NTI.diffTemp.diffPrec.png", 
+ggsave(file = "figures/fig.kde.Global.NRI.NTI.diffTemp.diffPrec.png", 
        fig.kde.Global.NRI.NTI.diffTemp.diffPrec,
        width = 10,
        height = 10,

@@ -36,7 +36,7 @@ kable(samplingProbsBats_tib,
   kable_styling(full_width = F)  %>%
 #  collapse_rows(row_group_label_position = 'stack', 
 #                valign = "top") %>%
-  save_kable(file = "tableS1.rich.samplingProbsBats.html", 
+  save_kable(file = "tables/tableS1.rich.samplingProbsBats.html", 
              self_contained = T)
 
 
@@ -52,6 +52,6 @@ kable(samplingProbsBats[-1, -1] %>%
   kable_styling(full_width = F)  %>%
   collapse_rows(row_group_label_position = 'stack', 
                 valign = "top") %>%
-  save_kable(file = "tableS1.samplingProbsBats.html", 
+  save_kable(file = "tables/tableS1.samplingProbsBats.html", 
              self_contained = T)
 

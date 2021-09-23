@@ -466,7 +466,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.plot.png",
 # Divide by biogeographical realm, in the horizontal direction
 NTI.diff.AnnTemp.LGM_cur.plot + 
   facet_grid(. ~ ID_Realm, scales = "free") +
-  theme(strip.background = element_rect(color="white", linetype = NULL),
+  theme(strip.background = element_rect(color = "white", linetype = NULL),
         strip.text=element_text(color = "black",
                                 face = "bold",
                                 size = 15),

@@ -1,4 +1,5 @@
 # S2a_ClimateDiff_PhyloStr_Global_Representation
+
 MPD.MNTD.diff.worldClimate.Global <- diff.worldClimate %>%
   left_join(cbind(filter(MPD.LatLong.Env.AllScales, 
                          SamplingPool == "Global sampling")[, c(1, 4:9, 29:35, 38)],
@@ -8,7 +9,6 @@ MPD.MNTD.diff.worldClimate.Global <- diff.worldClimate %>%
   filter(!is.na(ID_Realm))
 
 # head(MPD.MNTD.LatLong.Global)
-
 
 MPD.MNTD.diff.worldClimate.Global$ID_Realm <- factor(MPD.MNTD.diff.worldClimate.Global$ID_Realm, 
                                                           levels = c("Nearctic", 
@@ -22,8 +22,10 @@ MPD.MNTD.diff.worldClimate.Global$ID_Realm <- factor(MPD.MNTD.diff.worldClimate.
 # MPD.LatLong.Env.AllScales %>% count(SamplingPool)
 # MNTD.LatLong.Env.AllScales %>% count(SamplingPool)
 
-plot(MPD.MNTD.diff.worldClimate.Global$ntaxa, MPD.MNTD.diff.worldClimate.Global$NRI)
-plot(MPD.MNTD.diff.worldClimate.Global$ntaxa, MPD.MNTD.diff.worldClimate.Global$NRI)
+plot(MPD.MNTD.diff.worldClimate.Global$ntaxa, 
+     MPD.MNTD.diff.worldClimate.Global$NRI)
+plot(MPD.MNTD.diff.worldClimate.Global$ntaxa, 
+     MPD.MNTD.diff.worldClimate.Global$NRI)
 
 ###############################
 #### Statistical analyses #####

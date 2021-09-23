@@ -71,19 +71,19 @@ period.kYA <- data.frame(Period = c("Current",
 
 # Load datasets ####
 
-current.env.raw <- read.csv("data/matrices//world_CHELSA_cur_V1_2B_r2_5m_50km.csv" , row.names = 1, header=TRUE)
+current.env.raw <- read.csv("data/matrices/world_CHELSA_cur_V1_2B_r2_5m_50km.csv" , row.names = 1, header=TRUE)
 
-lateHolo.env.raw <- read.csv("data/matrices//world_LH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
-midHolo.env.raw <- read.csv("data/matrices//world_MH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
-earlyHolo.env.raw <- read.csv("data/matrices//world_EH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
+lateHolo.env.raw <- read.csv("data/matrices/world_LH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
+midHolo.env.raw <- read.csv("data/matrices/world_MH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
+earlyHolo.env.raw <- read.csv("data/matrices/world_EH_v1_2_5m_50km.csv" , row.names = 1, header=TRUE)
 
-Pleisto.LGM.env.raw <- read.csv("data/matrices//world_chelsa_LGM_v1_2B_r2_5m_50km.csv" , row.names = 1, header=TRUE)
+Pleisto.LGM.env.raw <- read.csv("data/matrices/world_chelsa_LGM_v1_2B_r2_5m_50km.csv" , row.names = 1, header=TRUE)
 
-Pleisto.BrunMatRev.env.raw <- read.csv("data/matrices//world_MIS19_v1_r2_5m_50km.csv" , row.names = 1, header=TRUE)
+Pleisto.BrunMatRev.env.raw <- read.csv("data/matrices/world_MIS19_v1_r2_5m_50km.csv" , row.names = 1, header=TRUE)
 
-midPliocene.env.raw <- read.csv("data/matrices//world_mPWP_v1_r2_5m_50km.csv" , row.names = 1, header=TRUE)
+midPliocene.env.raw <- read.csv("data/matrices/world_mPWP_v1_r2_5m_50km.csv" , row.names = 1, header=TRUE)
 
-Pliocene.M2.env.raw <- read.csv("data/matrices//world_M2_v1_r2_5m_50km.csv" , 
+Pliocene.M2.env.raw <- read.csv("data/matrices/world_M2_v1_r2_5m_50km.csv" , 
                                 row.names = 1, header=TRUE)
 
 # Add prefix to all variables of the objects
@@ -167,6 +167,9 @@ meanAnnTemp$factorTime <- as.factor(meanAnnTemp$Time)
 # meanAnnTemp$ID_Realm<-as.factor(meanAnnTemp$ID_Realm)
 levels(meanAnnTemp$Period.y) <- period.kYA$Period
 
+# Plot the mean annual temperature across the time steps to visualize how it
+# changed from the past to now
+
 ggplot(data=filter(meanAnnTemp,
                    is.na(ID_Realm) == FALSE), 
        aes(x=factorTime, y=bio_1/10, 
@@ -217,6 +220,9 @@ ggsave(filename = "meanAnnTemp.Time.png",
 ###########################
 #### For precipitation ####
 ###########################
+
+# Plot the mean annual precipitation across the time steps to visualize how it
+# changed from the past to now
 
 meanAnnPrec$ID_Realm <- factor(meanAnnPrec$ID_Realm, 
                                levels = c("Nearctic", 
@@ -277,7 +283,7 @@ ggsave(filename = "meanAnnPrec.Time.png",
        width =7.5, height = 7.5, 
        units = "in")
 
-## Difference between now and LGM
+# Calculate the differences in climate between now and LGM ####
 
 head(worldClimate)
 
@@ -537,6 +543,7 @@ ggsave(filename = "NTI.diff.AnnPrec.LGM_cur.Global.D.plot.png",
        units = "in")
 
 # Divide by biogeographical realm, in the horizontal direction
+
 NTI.diff.AnnPrec.LGM_cur.plot + 
   facet_grid(. ~ ID_Realm., scales = "free") +
   theme(strip.background = element_rect(color="white", linetype = NULL),

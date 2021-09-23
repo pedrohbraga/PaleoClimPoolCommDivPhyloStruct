@@ -255,8 +255,6 @@ tabulation <- table(MPD.MNTD.LatLong.AllScales %>%
 
 rowSums(tabulation)
 
-
-
 NRI.SamplingPool.NT <- MPD.MNTD.LatLong.AllScales %>%
   select(ID, NRI, SamplingPool, ID_Realm) %>%
   filter(ID_Realm == "Neotropical") %>%
@@ -266,8 +264,11 @@ NRI.SamplingPool.NT <- MPD.MNTD.LatLong.AllScales %>%
   mutate(ID = as.factor(ID)) %>%
   as.data.frame()
 
+
 library(WRS2)
 
+#### Hypothesis testing with WRS2::rmanova() and WRS2::rmmcp() ####
+#### NRI ####
 r <- levels(MPD.MNTD.LatLong.AllScales$ID_Realm)
 
 rmmcp.NRI.SamplingPool.summary.r <- data.frame()
@@ -320,8 +321,7 @@ for(ri in r){
 
 rmmcp.NRI.SamplingPool.summary.r
 
-
-###
+#
 
 rmmcp.NTI.SamplingPool.summary.r <- data.frame()
 
