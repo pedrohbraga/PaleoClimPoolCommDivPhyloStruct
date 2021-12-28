@@ -6,6 +6,8 @@
 #                                                                                               #
 #################################################################################################
 
+?set.seed()
+
 # Begin with setting up non-CRAN packages
 
 ## try http:// if https:// URLs are not supported
