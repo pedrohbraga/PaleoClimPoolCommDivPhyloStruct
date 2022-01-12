@@ -63,9 +63,9 @@ lapply(required.libraries,
 
 ##### Import utility functions #############################################
 
-source("scripts/SX_CommWeightedMeans_fun.R")
-source("scripts/SX_sf.ses.phylostr.R")
-source("scripts/SX_brokenStick.selection.R")
+source("scripts/SX_fun_CommWeightedMeans.R")
+source("scripts/SX_fun_sf.ses.phylostr.R")
+source("scripts/SX_fun_brokenStick.selection.R")
 
 ############################################################################
 ###### Utility function to create a hexagonal or square polygon grid #######

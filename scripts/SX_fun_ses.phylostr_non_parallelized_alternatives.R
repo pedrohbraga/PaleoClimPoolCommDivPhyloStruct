@@ -22,6 +22,7 @@ library(geiger)
 library(microbenchmark)
 library(matrixStats)
 library(PhyloMeasures)
+library(snowfall)
 
 # Required functions
 
@@ -245,6 +246,11 @@ ses.mpd.picante <- ses.mpd(samp = species.data,
                            null.model = "taxa.labels",
                            runs = 99)
 
+sf.ses.mpd.picante <- sf.ses.mpd(samp = species.data,
+                                 dis = cophenetic(phylo.tree),
+                                 runs = 99)
+
+
 #### Some cross-checking
 
 plot(test.mod.ses.mpd.picante$ses.mpd.z.picante,
@@ -269,7 +275,9 @@ plot(sf.ses.mpd.phpb$mpd.obs.z,
 ### Note: this is slower than using microbenchmark and similar packages
 
 changing.communities.benchpress <- press(
-  p = seq(100, 1000, length.out = 10),
+  p = seq(100, 
+          1000, 
+          length.out = 10),
   {
     n.species <- 1000
     n.communities <- p
@@ -308,8 +316,9 @@ changing.communities.benchpress <- press(
     
     phylo.tree <- simulated.tree
     
-    perms <- 99
-    
+    perms <- 999
+    n.cores <- 8
+      
     bench::mark(
       min_time = Inf,
       
@@ -326,7 +335,14 @@ changing.communities.benchpress <- press(
                                  dis = cophenetic(phylo.tree),
                                  null.model = "taxa.labels",
                                  runs = perms),
-      
+      mpd.new.parallel.ppn <- mpd.new.parallel(species.data, 
+                                               cophenetic(phylo.tree),
+                                               perms, 
+                                               n.cores = n.cores),
+      test.sf.ses.mpd <- sf.ses.mpd(species.data, 
+                                    cophenetic(phylo.tree), 
+                                    runs = perms, 
+                                    cores = n.cores),
       max_iterations = 1,
       min_iterations = 1,
       iterations = 1,
@@ -339,17 +355,19 @@ changing.communities.benchpress <- press(
 # Representing the results from the comparsions
 
 library(ggplot2)
+library(tidyr)
 
-changing.species.benchpress %>%
+changing.communities.benchpress %>%
   summary() %>%
   dplyr::mutate(Approach = as.character(expression)) %>%
   ggplot(
-    aes(p, median, color = Approach, group = Approach)) +
+    aes(p, as.numeric(median), color = Approach, group = Approach)) +
   geom_point() +
   geom_line() +
-  labs(x = "Number of Species",
+  scale_y_continuous(n.breaks = 25) +
+  labs(x = "Number of Communities",
        y = "Median (s)") +
   theme_bw() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "right")
 
 
