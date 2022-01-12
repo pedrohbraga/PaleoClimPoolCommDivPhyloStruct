@@ -303,6 +303,49 @@ Mammal.FaurSven.trees <- c(Mammal.FaurSven.tree.1,
 # Calculate a maximum credibility tree
 Mammal.FaurSven.MCC.tree <- phangorn::maxCladeCred(Mammal.FaurSven.trees)
 
+# Calculate the log clade credibility scores, which will be used to sample other
+# trees to assess whether the results from the maximum credibility clade tree
+# differs across different trees
+
+Mammal.FaurSven.MCC.tree.scores <- phangorn::maxCladeCred(Mammal.FaurSven.trees, tree = FALSE)
+
+# Represent log credibility scores in a histogram 
+
+histogram <- hist(Mammal.FaurSven.MCC.tree.scores,
+                  breaks = 25,
+                  col = "gray",
+                  main = "",
+                  xlab = "log(Clade Credibility for Faurby and Svenning's (2015) tree)")
+
+arrows(x0 = max(Mammal.FaurSven.MCC.tree.scores), 
+       y0 = 0.5*max(histogram$counts),
+       x1 = max(Mammal.FaurSven.MCC.tree.scores),
+       y1 = 0,
+       col = "red",
+       lwd = 2,
+       length = 0.15, 
+       angle = 20)
+
+text(x = max(Mammal.FaurSven.MCC.tree.scores),
+     y = 0.5*max(histogram$counts)+ 1,
+     "Clade credibility of the tree we used",
+     adj = c(0, 0.3),
+     srt = 90)
+
+arrows(x0 = median(Mammal.FaurSven.MCC.tree.scores), 
+       y0 = 0.5*median(histogram$counts),
+       x1 = median(Mammal.FaurSven.MCC.tree.scores),
+       y1 = 0,
+       col = "blue",
+       lwd = 2,
+       length = 0.15,
+       angle = 20)
+
+Mammal.FaurSven.MCC.tree.scores
+
+Mammal.FaurSven.MCC.tree.scores[Mammal.FaurSven.MCC.tree.scores < quantile(Mammal.FaurSven.MCC.tree.scores, 0.05)]
+
+
 # Filter species from the phylogenetic tree
 
 # ChiropteraPhylo <- drop.tip(Chiroptera.tree, 
@@ -312,6 +355,7 @@ Mammal.FaurSven.MCC.tree <- phangorn::maxCladeCred(Mammal.FaurSven.trees)
 
 Chiroptera.FaurSven.tree <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$phy
 Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$comm
+
 
 # Save results
 
