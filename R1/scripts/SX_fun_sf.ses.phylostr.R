@@ -29,7 +29,7 @@ sf.ses.mpd <- function(samp, dis,
   ## build null models in parallel
   sfInit(parallel = TRUE, 
          cpus = cores, 
-         slaveOutfile="logAnalysis.txt")
+         slaveOutfile = "logAnalysis.txt")
   
   # load libraries in parallel
   sfLibrary(picante)

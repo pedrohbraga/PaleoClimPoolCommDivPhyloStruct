@@ -6,9 +6,7 @@
 #                                                                              #
 ################################################################################
 
-#############################
-#### Dataset preparation ####
-#############################
+### Preparing the spatial dataset ----------------------------------------------
 
 # Load the world projection grid shapefile
 world_grid_50km <- st_read("data/grids/world_grid_prev_50km.shp")
@@ -119,7 +117,8 @@ world_grid_50km_cat_sf <- world_grid_50km_cat %>%
          ID_Biome = BIOME,
          ID_Realm = REALM,
          ID_PlateName = PlateName) %>%
-  unnest(cols = c(ID_Ecoregion, ID_Biome, ID_Realm))
+  unnest(cols = c(ID_Ecoregion, ID_Biome, ID_Realm),
+         keep_empty = TRUE)
 
 ## Rename and reorder levels to make sense
 
@@ -152,61 +151,51 @@ Biomes.code <- c("Tropical_Subtropical_Moist_Broadleaf_Forests" = 1,
                  "Mangroves" = 14)
 
 world_grid_50km_cat_df$ID_Biome <- names(Biomes.code)[match(world_grid_50km_cat_df$ID_Biome, 
-                                                         Biomes.code)]
+                                                            Biomes.code)]
 
 world_grid_50km_cat_df$ID_Biome <- as.factor(world_grid_50km_cat_df$ID_Biome)
 
 # Create a new variable that nests biomes within their respective realms
 world_grid_50km_cat_df$ID_Biome_Realm <- paste(world_grid_50km_cat_df$ID_Biome, 
-                                            "__",
-                                            world_grid_50km_cat_df$ID_Realm, 
-                                            sep = "")
+                                               "__",
+                                               world_grid_50km_cat_df$ID_Realm, 
+                                               sep = "")
 # Define NA values
 
 world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
   naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA")))
 
 
+#### Preparing the bat community dataset ---------------------------------------
 
-#### Preparing the community data ####
+# Load community data ###
 
-# Load community data
-new.Comm <- read.csv("data/matrices/world_chiroptera_PropCover_50KM.csv",header=TRUE)
+Chiroptera.Comm <- read.csv("data/matrices/world_chiroptera_PropCover_50KM.csv",
+                            header = TRUE)
 
-nrow(new.Comm); nrow(world_grid_50km_cat) # Verify lengths
-
-# Remove species (i.e. columns) that have sum zero
-Comm <- new.Comm[,colSums(new.Comm) >= 1]
-
-ncol(new.Comm); ncol(Comm) # Verify lengths
-
-#### Rename community data ###
-
-Chiroptera.Comm <- Comm
+nrow(Chiroptera.Comm); nrow(world_grid_50km_cat_df) # Verify lengths
 
 # Replace periods in species names by underscores
-colnames(Chiroptera.Comm) <- gsub('\\.', "_", colnames(Chiroptera.Comm))
+colnames(Chiroptera.Comm) <- gsub('\\.', 
+                                  "_", 
+                                  colnames(Chiroptera.Comm))
 
 head(Chiroptera.Comm); nrow(Chiroptera.Comm)
 
-### A few more levels of cleaning ####
+# Remove species that do not occur in any community
+# To identify them: colnames(Chiroptera.Comm[,colSums(Chiroptera.Comm) < 1])
 
-# Remove rows.NA from the regions and coordinates data.frame
+# Remove species (i.e. columns) that have sum zero
+Chiroptera.Comm <- Chiroptera.Comm[, colSums(Chiroptera.Comm) >= 1]
 
-regions.LatLong <- regions.LatLong[!(rownames(regions.LatLong) %in% rows.NA), ] 
-# regions.LatLong$NAME_Ecoregion <- paste("__", regions.LatLong$NAME_Ecoregion, sep = '')
-# regions.LatLong$ID_Biome <- paste("__", regions.LatLong$ID_Biome, sep = '')
+# Drop levels, but not working so far
 
-regions.LatLong$ID_Realm <- droplevels(regions.LatLong$ID_Realm)
-regions.LatLong$ID_Biome <- droplevels(regions.LatLong$ID_Biome)
+world_grid_50km_cat_df$ID_Realm <- droplevels(world_grid_50km_cat_df$ID_Realm)
+world_grid_50km_cat_df$ID_Biome <- droplevels(world_grid_50km_cat_df$ID_Biome)
 
-nrow(new.Comm); nrow(current.Env); nrow(regions.LatLong) # Everything should have the same number of rows
+### Preparing the phylogenetic dataset -----------------------------------------
 
-#########################################
-### Prepare the phylogenetic dataset ####
-#########################################
-
-#### Load phylogenetic trees from Faurby and Svenning ####
+#### Load phylogenetic trees from Faurby and Svenning, 2015 () #
 
 Mammal.FaurSven.tree.1 <-  read.nexus("data/phylogenies/Fully_resolved_phylogeny_1.nex")
 Mammal.FaurSven.tree.2 <-  read.nexus("data/phylogenies/Fully_resolved_phylogeny_2.nex")
@@ -216,14 +205,16 @@ Mammal.FaurSven.trees <- c(Mammal.FaurSven.tree.1,
                            Mammal.FaurSven.tree.2, 
                            Mammal.FaurSven.tree.3)
 
-# Calculate a maximum credibility tree
+# Obtain the maximum credibility tree
+
 Mammal.FaurSven.MCC.tree <- phangorn::maxCladeCred(Mammal.FaurSven.trees)
 
 # Calculate the log clade credibility scores, which will be used to sample other
 # trees to assess whether the results from the maximum credibility clade tree
 # differs across different trees
 
-Mammal.FaurSven.MCC.tree.scores <- phangorn::maxCladeCred(Mammal.FaurSven.trees, tree = FALSE)
+Mammal.FaurSven.MCC.tree.scores <- phangorn::maxCladeCred(Mammal.FaurSven.trees, 
+                                                          tree = FALSE)
 
 # Represent log credibility scores in a histogram 
 
@@ -261,7 +252,6 @@ Mammal.FaurSven.MCC.tree.scores
 
 Mammal.FaurSven.MCC.tree.scores[Mammal.FaurSven.MCC.tree.scores < quantile(Mammal.FaurSven.MCC.tree.scores, 0.05)]
 
-
 # Filter species from the phylogenetic tree
 
 # ChiropteraPhylo <- drop.tip(Chiroptera.tree, 
@@ -269,9 +259,10 @@ Mammal.FaurSven.MCC.tree.scores[Mammal.FaurSven.MCC.tree.scores < quantile(Mamma
 #                                                                Chiroptera.tree$tip.label)]) #Prunning the tree
 # length(ChiropteraPhylo$tip.label); ncol(Chiroptera.Comm)
 
-Chiroptera.FaurSven.tree <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$phy
-Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree, Chiroptera.Comm)$comm
-
+Chiroptera.FaurSven.tree <- match.phylo.comm(Mammal.FaurSven.MCC.tree, 
+                                             Chiroptera.Comm)$phy
+Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree, 
+                                             Chiroptera.Comm)$comm
 
 # Save results
 
@@ -304,15 +295,10 @@ length(Chiroptera.FaurSven.tree$tip.label); ncol(Chiroptera.FaurSven.comm)
 
 ######################################################################################################
 
-rm(Comm, 
-   comm.raw, 
-   current.env.raw, mid.holo.env.raw, lgm.env.raw, 
-   new.Comm,
-   new.current.Env, new.mid.holo.Env, new.lgm.Env,
+rm(intersects_plates_world_grid_50km_centroids,
+   intersects_terrEcoregions_world_grid_50km_centroids,
    Mammal.FaurSven.tree.1,
    Mammal.FaurSven.tree.2,
-   Mammal.FaurSven.tree.3,
-   Mammal.FaurSven.trees,
-   Mammal.FaurSven.MCC.tree)
+   Mammal.FaurSven.tree.3)
 
 #######################################################################################################

@@ -2,11 +2,11 @@
 #### Code to prepare your R environment for all the subsequent analyses done in this project ####
 #                                                                                               #
 # Author: Pedro Henrique Pereira Braga                                                          #
-# Last Update: "2021-09-21"                                                        #
+# Last Update: "2021-09-21"                                                                     #
 #                                                                                               #
 #################################################################################################
 
-?set.seed()
+set.seed("213293")
 
 # Begin with setting up non-CRAN packages
 
