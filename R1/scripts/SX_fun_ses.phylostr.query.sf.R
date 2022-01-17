@@ -16,6 +16,11 @@
 #                                                                               # 
 #################################################################################
 
+shuffle_tiplabels <- function(tree){
+  tree$tip.label <- sample(tree$tip.label)
+  return(tree)
+}
+
 mod.ses.mpd.query.sf <- function(phylo.tree = phylo.tree,
                                  perms = 999,
                                  species.data = species.data,
@@ -98,7 +103,8 @@ mod.ses.mpd.query.sf <- function(phylo.tree = phylo.tree,
   ses.mpd.z.query <- (mpd.obs.query - random.mpd.query.mean)/random.mpd.query.sd
   
   return(
-    data.frame(ntaxa = specnumber(species.data),
+    data.frame(ID = names(mpd.obs.query),
+               ntaxa = specnumber(species.data),
                mpd.obs.query,
                random.mpd.query.mean,
                random.mpd.query.sd,
@@ -109,6 +115,102 @@ mod.ses.mpd.query.sf <- function(phylo.tree = phylo.tree,
                ntaxa.pool.size = length(phylo.tree$tip.label))
   )
 }
+
+##
+
+mod.ses.mpd.query <- function(phylo.tree = phylo.tree,
+                              perms = 999,
+                              species.data = species.data){
+  
+  mpd.obs.query <- mpd.query(tree = phylo.tree,
+                             matrix = species.data)
+  
+  # Replace the mpd of all communities that have 1 or less species for NA
+  
+  mpd.obs.query <- replace(x = mpd.obs.query,  
+                           rowSums(species.data > 0) <= 1, 
+                           values = NA)
+  
+  taxaShuffle.map <- purrr::map(1:perms, 
+                                ~shuffle_tiplabels(phylo.tree))
+  
+  random.mpd.query <- lapply(X = taxaShuffle.map,
+                             FUN = mpd.query,
+                             matrix = species.data,
+                             #USE.NAMES = TRUE,
+                             #simplify = TRUE,
+                             standardize = FALSE)
+  
+  random.mpd.query <- rlist::list.rbind(random.mpd.query)  
+  
+  random.mpd.query <-  t(apply(random.mpd.query,
+                               1,
+                               FUN = replace,
+                               rowSums(species.data > 0) <= 1, 
+                               values = NA))
+  
+  
+  random.mpd.query.mean <- apply(X = random.mpd.query, 
+                                 MARGIN = 2, # by rows
+                                 FUN = mean,
+                                 na.rm = TRUE)
+  
+  random.mpd.query.sd <- apply(X = random.mpd.query, 
+                               MARGIN = 2, # by rows
+                               FUN = sd,
+                               na.rm = TRUE)
+  
+  
+  mpd.obs.rank <- apply(X = rbind(mpd.obs.query, random.mpd.query.mean), 
+                        MARGIN = 2, 
+                        FUN = rank)[1, ]
+  
+  mpd.obs.rank <- ifelse(is.na(random.mpd.query.mean), 
+                         NA, 
+                         mpd.obs.rank)
+  
+  
+  names(mpd.obs.query) <- row.names(species.data)
+  
+  ses.mpd.z.query <- (mpd.obs.query - random.mpd.query.mean)/random.mpd.query.sd
+  
+  
+  return(data.frame(ID = names(mpd.obs.query),
+                    ntaxa = specnumber(species.data),
+                    mpd.obs.query,
+                    random.mpd.query.mean,
+                    random.mpd.query.sd,
+                    ses.mpd.z.query,
+                    mpd.obs.p = mpd.obs.rank/(perms + 1),
+                    nri = -1 * (mpd.obs.query - random.mpd.query.mean)/random.mpd.query.sd,
+                    perms,
+                    ntaxa.pool.size = length(phylo.tree$tip.label))
+  )
+}
+
+
+ses.mpd.query.call <- function(region, Comm.Phylo.list,
+                               perms = 999){
+  
+  message("Computing mpd for: ", region,  
+          ".\nRegion ", 
+          which(region == as.factor(ls(Comm.Phylo.list))),
+          " from ",
+          length(as.factor(ls(Comm.Phylo.list))),
+          ".\n")
+  
+  phylo.tree = Comm.Phylo.list[[region]]$Phylo
+  species.data = Comm.Phylo.list[[region]]$Comm
+  
+  mod.ses.mpd.query(phylo.tree = phylo.tree,
+                    perms = perms,
+                    species.data = species.data)
+  
+}
+
+
+###
+
 
 mod.ses.mntd.query.sf <- function(phylo.tree = phylo.tree,
                                   perms = 999,
@@ -192,7 +294,8 @@ mod.ses.mntd.query.sf <- function(phylo.tree = phylo.tree,
   ses.mntd.z.query <- (mntd.obs.query - random.mntd.query.mean)/random.mntd.query.sd
   
   return(
-    data.frame(ntaxa = specnumber(species.data),
+    data.frame(ID = names(mntd.obs.query),
+               ntaxa = specnumber(species.data),
                mntd.obs.query,
                random.mntd.query.mean,
                random.mntd.query.sd,
@@ -204,14 +307,93 @@ mod.ses.mntd.query.sf <- function(phylo.tree = phylo.tree,
   )
 }
 
-# 
-# system.time({mod.ses.mntd.query.sf(phylo.tree = phylo.tree,
-#                                    perms = 99,
-#                                    species.data = species.data,
-#                                    cores = 20)})
+##
 
+mod.ses.mntd.query <- function(phylo.tree = phylo.tree,
+                               perms = 999,
+                               species.data = species.data){
+  
+  mntd.obs.query <- mntd.query(tree = phylo.tree,
+                               matrix = species.data)
+  
+  # Replace the mntd of all communities that have 1 or less species for NA
+  
+  mntd.obs.query <- replace(x = mntd.obs.query,  
+                            rowSums(species.data > 0) <= 1, 
+                            values = NA)
+  
+  taxaShuffle.map <- purrr::map(1:perms, 
+                                ~shuffle_tiplabels(phylo.tree))
+  
+  random.mntd.query <- lapply(X = taxaShuffle.map,
+                              FUN = mntd.query,
+                              matrix = species.data,
+                              #USE.NAMES = TRUE,
+                              #simplify = TRUE,
+                              standardize = FALSE)
+  
+  random.mntd.query <- rlist::list.rbind(random.mntd.query)  
+  
+  random.mntd.query <-  t(apply(random.mntd.query,
+                                1,
+                                FUN = replace,
+                                rowSums(species.data > 0) <= 1, 
+                                values = NA))
+  
+  
+  random.mntd.query.mean <- apply(X = random.mntd.query, 
+                                  MARGIN = 2, # by rows
+                                  FUN = mean,
+                                  na.rm = TRUE)
+  
+  random.mntd.query.sd <- apply(X = random.mntd.query, 
+                                MARGIN = 2, # by rows
+                                FUN = sd,
+                                na.rm = TRUE)
+  
+  
+  mntd.obs.rank <- apply(X = rbind(mntd.obs.query, random.mntd.query.mean), 
+                         MARGIN = 2, 
+                         FUN = rank)[1, ]
+  
+  mntd.obs.rank <- ifelse(is.na(random.mntd.query.mean), 
+                          NA, 
+                          mntd.obs.rank)
+  
+  
+  names(mntd.obs.query) <- row.names(species.data)
+  
+  ses.mntd.z.query <- (mntd.obs.query - random.mntd.query.mean)/random.mntd.query.sd
+  
+  
+  return(data.frame(ID = names(mntd.obs.query),
+                    ntaxa = specnumber(species.data),
+                    mntd.obs.query,
+                    random.mntd.query.mean,
+                    random.mntd.query.sd,
+                    ses.mntd.z.query,
+                    mntd.obs.p = mntd.obs.rank/(perms + 1),
+                    nti = -1 * (mntd.obs.query - random.mntd.query.mean)/random.mntd.query.sd,
+                    perms,
+                    ntaxa.pool.size = length(phylo.tree$tip.label))
+  )
+}
 
-# system.time({mod.ses.mpd.query.sf(phylo.tree = phylo.tree,
-#                                   perms = 999,
-#                                   species.data = species.data,
-#                                   cores = 20)})
+ses.mntd.query.call <- function(region, Comm.Phylo.list,
+                                perms = 999){
+  
+  message("Computing mntd for: ", region,  
+          ".\nRegion ", 
+          which(region == as.factor(ls(Comm.Phylo.list))),
+          " from ",
+          length(as.factor(ls(Comm.Phylo.list))),
+          ".\n")
+  
+  phylo.tree = Comm.Phylo.list[[region]]$Phylo
+  species.data = Comm.Phylo.list[[region]]$Comm
+  
+  mod.ses.mntd.query(phylo.tree = phylo.tree,
+                     perms = perms,
+                     species.data = species.data)
+  
+}

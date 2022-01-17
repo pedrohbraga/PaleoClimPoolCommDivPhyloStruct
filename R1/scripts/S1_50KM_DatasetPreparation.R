@@ -193,6 +193,9 @@ Chiroptera.Comm <- Chiroptera.Comm[, colSums(Chiroptera.Comm) >= 1]
 world_grid_50km_cat_df$ID_Realm <- droplevels(world_grid_50km_cat_df$ID_Realm)
 world_grid_50km_cat_df$ID_Biome <- droplevels(world_grid_50km_cat_df$ID_Biome)
 
+world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
+  select(-QuadratID, -geometry)
+
 ### Preparing the phylogenetic dataset -----------------------------------------
 
 #### Load phylogenetic trees from Faurby and Svenning, 2015 () #
@@ -277,7 +280,9 @@ write.tree(Chiroptera.FaurSven.tree, file = "data/phylogenies/Chiroptera.FaurSve
 is.ultrametric(Chiroptera.FaurSven.tree)
 
 # Force tree to be ultrametric
-# Chiroptera.FaurSven.Phylo.ultra <- force.ultrametric(Chiroptera.FaurSven.tree)
+Chiroptera.FaurSven.Phylo.ultra <- force.ultrametric(Chiroptera.FaurSven.tree)
+
+Chiroptera.FaurSven.Phylo.ultra
 
 # Check if number of species matches between both trait and phylogenetic relationship datasets
 length(Chiroptera.FaurSven.tree$tip.label); ncol(Chiroptera.FaurSven.comm)
@@ -302,3 +307,4 @@ rm(intersects_plates_world_grid_50km_centroids,
    Mammal.FaurSven.tree.3)
 
 #######################################################################################################
+

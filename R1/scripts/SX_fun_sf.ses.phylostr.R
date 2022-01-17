@@ -16,6 +16,11 @@
 #                                                                               # 
 #################################################################################
 
+shuffle_tiplabels <- function(tree){
+  tree$tip.label <- sample(tree$tip.label)
+  return(tree)
+}
+
 sf.ses.mpd <- function(samp, dis, 
                        abundance.weighted = FALSE, 
                        runs = 999, 
@@ -88,7 +93,7 @@ sf.ses.mntd <- function(samp,
 
   sfInit(parallel = TRUE, 
          cpus = cores, 
-         slaveOutfile="logAnalysis.txt")
+         slaveOutfile = "logAnalysis.txt")
   
   sfLibrary(picante)
   sfLibrary(base)
