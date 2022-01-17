@@ -65,7 +65,7 @@ lapply(required.libraries,
 ##### Import utility functions #############################################
 
 source("scripts/SX_fun_CommWeightedMeans.R")
-source("scripts/SX_fun_sf.ses.phylostr.R")
+source("scripts/SX_fun_ses.phylostr.query.sf.R")
 source("scripts/SX_fun_brokenStick.selection.R")
 source("scripts/SX_fun_make_grid_sf.R")
 source("scripts/SX_fun_ggplot_theme_map.R")

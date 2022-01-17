@@ -162,20 +162,20 @@ CWM.Div.MPD.MNTD.Chiroptera.Comm %>%
 # CWM.Div.MPD.Chiroptera.Comm <- read.csv("data/matrices/CWM.Div.MPD.Chiroptera.Comm.csv", h = T)
 
 CWM.Div.MPD.Chiroptera.Comm$ID_Realm <- factor(CWM.Div.MPD.Chiroptera.Comm$ID_Realm, 
-                                              levels=c('Neotropical',
-                                                       'Nearctic',
-                                                       'Afrotropical',
-                                                       'Palearctic', 
-                                                       'Indomalay', 
-                                                       'Australasian'))
+                                               levels=c('Neotropical',
+                                                        'Nearctic',
+                                                        'Afrotropical',
+                                                        'Palearctic', 
+                                                        'Indomalay', 
+                                                        'Australasian'))
 
 CWM.Div.MPD.Chiroptera.Comm$SamplingPool <-  factor(CWM.Div.MPD.Chiroptera.Comm$SamplingPool,  
-                                                   levels = c("Global sampling",
-                                                              "Hemispheric sampling",
-                                                              "Realm sampling",
-                                                              "Plate sampling",
-                                                              "Biome sampling",
-                                                              "Ecoregion sampling"))
+                                                    levels = c("Global sampling",
+                                                               "Hemispheric sampling",
+                                                               "Realm sampling",
+                                                               "Plate sampling",
+                                                               "Biome sampling",
+                                                               "Ecoregion sampling"))
 
 
 #############################################################################################
@@ -188,7 +188,7 @@ CWM.Div.MPD.Chiroptera.Comm$SamplingPool <-  factor(CWM.Div.MPD.Chiroptera.Comm$
 lm.NRI.netDiv_CWM_std_tw <- lm(NRI ~ netDiv_CWM_std_tw, 
                                data = CWM.Div.MPD.Chiroptera.Comm %>%
                                  filter(SamplingPool == "Global sampling")
-                               )
+)
 
 
 summary(lm.NRI.netDiv_CWM_std_tw)
@@ -511,15 +511,15 @@ rq.poly.4.NRI.netDiv_CWM_std_tw.mapped <- map(q10, ~rq(NRI ~ poly(netDiv_CWM_std
 )
 
 coef.formatted.table.rq.poly.4.NRI <- stargazer::stargazer(rq.poly.4.NRI.netDiv_CWM_std_tw.mapped, 
-                                           rq.se = "boot",
-                                           column.labels = c(paste("tau = ", q10)),
-                                           covariate.labels = NULL,
-                                           dep.var.labels = "NRI",
-                                           omit = c("Constant"),
-                                           model.numbers = TRUE,
-                                           model.names =  FALSE,
-                                           keep.stat = c('n'),
-                                           type ='html')
+                                                           rq.se = "boot",
+                                                           column.labels = c(paste("tau = ", q10)),
+                                                           covariate.labels = NULL,
+                                                           dep.var.labels = "NRI",
+                                                           omit = c("Constant"),
+                                                           model.numbers = TRUE,
+                                                           model.names =  FALSE,
+                                                           keep.stat = c('n'),
+                                                           type ='html')
 
 write(coef.formatted.table.rq.poly.4.NRI, "coef.formatted.table.rq.poly.4.NRI.html")
 
@@ -543,8 +543,8 @@ for(i in 1:length(q10)){
   ## conditional quantile model
   rq.poly.4.NRI.netDiv_CWM_std_tw.i <- rq(NRI ~ poly(netDiv_CWM_std_tw, 4), 
                                           tau = q10[i],
-                                        #  method = "conquer",
-                                        #  ci = TRUE,
+                                          #  method = "conquer",
+                                          #  ci = TRUE,
                                           data = prebinning_test)
   
   resid.rq.poly.4.NRI.netDiv_CWM_std_tw.i <- resid(rq.poly.4.NRI.netDiv_CWM_std_tw.i)
@@ -561,8 +561,8 @@ for(i in 1:length(q10)){
   ## Quantile regression goodness of fit
   
   goodfit.rq.poly.4.NRI.i <- goodfit(resid.rq.poly.4.NRI.netDiv_CWM_std_tw.i, 
-                          null.resid.rq.poly.4.NRI.netDiv_CWM_std_tw.i, 
-                          q10[i])
+                                     null.resid.rq.poly.4.NRI.netDiv_CWM_std_tw.i, 
+                                     q10[i])
   
   (goodfit.rq.poly.4.NRI[i] <- goodfit.rq.poly.4.NRI.i)
 }
@@ -600,13 +600,10 @@ stargazer::stargazer(rq.poly.4.NRI.netDiv_CWM_std_tw[[1]],
                      keep.stat = c('n'),
                      type ='text')
 
-
-
 visreg::visreg(rq.poly.4.NRI.netDiv_CWM_std_tw, 
                "netDiv_CWM_std_tw", 
                overlay = TRUE, 
                collapse = TRUE)
-
 
 # Using geom_quantile()
 
@@ -615,10 +612,10 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
          drop_na(ID_Realm), 
        aes(x = netDiv_CWM_std_tw, 
            y = NRI)) +
-  # geom_point(alpha = 0.25, 
-  #            size = 1.4,
-  #            stroke = 0.01,
-  #            aes(colour = factor(ID_Realm))) +
+   geom_point(alpha = 0.25, 
+              size = 1.4,
+              stroke = 0.01,
+              aes(colour = factor(ID_Realm))) +
   # scale_colour_viridis(option="D", 
   #                     begin = 0,
   #                     end = 1,
@@ -627,12 +624,11 @@ ggplot(data = CWM.Div.MPD.Chiroptera.Comm %>%
   #                     name = "Realm") +
   stat_quantile(quantiles = q10, 
                 formula = y ~ poly(x, 4), 
-                colour = "black"
-  ) +
-  xlim(min(prebinning_test$netDiv_CWM_std_tw),
-       0.35) +
-# facet_grid(. ~ ID_Realm,
-#  scales = "free") +
+                colour = "black") +
+  #  xlim(min(prebinning_test$netDiv_CWM_std_tw),
+  #       0.35) +
+  # facet_grid(. ~ ID_Realm,
+  #  scales = "free") +
   labs(x = c(expression("Net Diversification Rate"[CWM[STD[tw]]]))) +
   theme_classic() +
   theme(legend.position = "bottom", 
@@ -657,7 +653,6 @@ rq.poly.4.NRI.netDiv_CWM_std_tw.broom <- rq.poly.4.NRI.netDiv_CWM_std_tw %>%
 rq.poly.4.NRI.netDiv_CWM_std_tw.broom.f <- rq.poly.4.NRI.netDiv_CWM_std_tw.broom %>%
   filter(!grepl("factor", term)) %>% 
   mutate(term = as.factor(term))
-
 
 rq.poly.4.NRI.netDiv_CWM_std_tw.broom.f$term <- recode(rq.poly.4.NRI.netDiv_CWM_std_tw.broom.f$term, 
                                                        "poly(netDiv_CWM_std_tw, 4)1" = "Linear",
@@ -1018,8 +1013,8 @@ fit <- mqgam(NRI ~ s(netDiv_CWM_std_tw,  k = 10, bs = "ad"),
              lsig = closs$lsig)
 
 n <- nlrq(NRI ~ netDiv_CWM_std_tw, 
-         data = prebinning_test, 
-         start = list(k = 1, e = 2))
+          data = prebinning_test, 
+          start = list(k = 1, e = 2))
 
 tidy(n)
 augment(n)

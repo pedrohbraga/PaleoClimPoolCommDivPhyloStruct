@@ -176,8 +176,8 @@ mod.ses.mpd.picante <- function(phylo.tree = phylo.tree,
 # Set seed
 set.seed(100)
 
-n.species <- 100
-n.communities <- 200
+n.species <- 1000
+n.communities <- 60000
 
 simulated.tree <- pbtree(n = n.species, 
                          scale = 1)
@@ -203,7 +203,7 @@ colnames(species.data) <- simulated.tree$tip.label
 
 row.names(species.data) <- sprintf("comm_%02d", 
                                    seq(1, nrow(species.data))
-                                   )
+)
 
 # forces one (the first) community to have only one species for testing the
 # function
@@ -229,13 +229,14 @@ shuffle_tiplabels <- function(tree){
 
 # Dummy runs
 
-test.mod.ses.mpd.picante <- mod.ses.mpd.picante(phylo.tree = phylo.tree,
-                                                perms = 99,
-                                                species.data = species.data)
 
-test.mod.ses.mpd.query <-  mod.ses.mpd.query(phylo.tree = phylo.tree,
-                                             perms = 99,
-                                             species.data = species.data)
+system.time({test.mod.ses.mpd.picante <- mod.ses.mpd.picante(phylo.tree = phylo.tree,
+                                                             perms = 999,
+                                                             species.data = species.data)})
+
+system.time({test.mod.ses.mpd.query <-  mod.ses.mpd.query(phylo.tree = phylo.tree,
+                                                          perms = 999,
+                                                          species.data = species.data)})
 
 mpd.new.ppn <- mpd.new(species.data, 
                        cophenetic(phylo.tree), 
@@ -318,7 +319,7 @@ changing.communities.benchpress <- press(
     
     perms <- 999
     n.cores <- 8
-      
+    
     bench::mark(
       min_time = Inf,
       
