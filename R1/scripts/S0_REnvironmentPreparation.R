@@ -49,7 +49,7 @@ required.libraries <- c("ade4","subniche",
                         "rgdal", "tidyverse", "rbin", 
                         "quantreg", "WRTDStidal",
                         "ggrepel",
-                        "naniar"
+                        "naniar", "data.table"
 )
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
@@ -65,9 +65,9 @@ lapply(required.libraries,
 ##### Import utility functions #############################################
 
 source("scripts/SX_fun_CommWeightedMeans.R")
-source("scripts/SX_fun_ses.phylostr.query.sf.R")
 source("scripts/SX_fun_brokenStick.selection.R")
 source("scripts/SX_fun_make_grid_sf.R")
 source("scripts/SX_fun_ggplot_theme_map.R")
 source("scripts/SX_fun_match_phylo_comm.R")
-
+source("scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
+source("scripts/SX_fun_ses.phylostr.query.sf.R")

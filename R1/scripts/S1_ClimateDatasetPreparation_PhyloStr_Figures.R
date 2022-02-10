@@ -69,30 +69,30 @@ period.kYA <- data.frame(Period = c("Current",
                                   3300))
 
 
-# Load datasets ####
+# Load data sets ####
 
-current.env.raw <- read.csv("data/matrices/world_CHELSA_cur_V1_2B_r2_5m_50km.csv" , 
+current.raw <- read.csv("data/matrices/world_CHELSA_cur_V1_2B_r2_5m_50km.csv", 
+                        row.names = 1, 
+                        header = TRUE)
+
+Pleisto.LGM.raw <- read.csv("data/matrices/world_chelsa_LGM_v1_2B_r2_5m_50km.csv", 
                             row.names = 1, 
                             header = TRUE)
 
-Pleisto.LGM.env.raw <- read.csv("data/matrices/world_chelsa_LGM_v1_2B_r2_5m_50km.csv" , 
-                                row.names = 1, 
-                                header = TRUE)
-
 # Add prefix to all variables of the objects
 
-colnames(current.env.raw) <- paste("cur", 
-                                   colnames(current.env.raw),
-                                   sep = "_")
+colnames(current.raw) <- paste("cur", 
+                               colnames(current.raw),
+                               sep = "_")
 
-colnames(Pleisto.LGM.env.raw) <- paste("LGM", 
-                                       colnames(Pleisto.LGM.env.raw), 
-                                       sep = "_")
+colnames(Pleisto.LGM.raw) <- paste("LGM", 
+                                   colnames(Pleisto.LGM.raw), 
+                                   sep = "_")
 
 # Bind all columns to create a big data.frame
 
-worldClimate <- cbind(current.env.raw,
-                      Pleisto.LGM.env.raw)
+worldClimate <- cbind(current.raw,
+                      Pleisto.LGM.raw)
 
 str(worldClimate); dim(worldClimate)
 
@@ -106,9 +106,42 @@ worldClimate <- as.data.frame(zoo::na.spline(worldClimate))
 
 # Identify rows that have NA in all environmental datasets
 c(row.names(which(is.na(worldClimate), 
-                  arr.ind = TRUE)))
+                  arr.ind = TRUE)
+            )
+  )
 
 head(worldClimate); str(worldClimate)
+
+# Calculate the differences in climate between now and LGM ####
+
+worldClimate.diff <- data.frame(ID = 1:nrow(worldClimate),
+                                diff.AnnTemp.LGM_cur = worldClimate$LGM_bio_1 - worldClimate$cur_bio_1,
+                                diff.AnnPrec.LGM_cur = worldClimate$LGM_bio_12 - worldClimate$cur_bio_12,
+                                LGM_bio_1 = worldClimate$LGM_bio_1, 
+                                cur_bio_1 = worldClimate$cur_bio_1,   
+                                LGM_bio_12 = worldClimate$LGM_bio_12, 
+                                cur_bio_12 = worldClimate$cur_bio_12)
+
+MPD.MNTD.LatLong.AllScales.worldClimate.diff <- MPD.LatLong.AllScales %>%
+  right_join(worldClimate.diff,
+             by = "ID")
+
+MPD.MNTD.LatLong.AllScales.rarefaction.relative.worldClimate.diff <- MPD.LatLong.AllScales.rarefaction.relative %>%
+  right_join(worldClimate.diff,
+             by = "ID")
+
+MPD.MNTD.LatLong.AllScales.worldClimate.diff$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.worldClimate.diff$ID_Realm, 
+                                                                levels = c("Nearctic", 
+                                                                           "Neotropical", 
+                                                                           "Afrotropical", 
+                                                                           "Palearctic",
+                                                                           "Indomalay",
+                                                                           "Australasian",
+                                                                           "Oceanic")
+                                                                )
+
+
+
 
 ################################################################################ 
 # Subset variables and explore the mean values through time and represent them #
@@ -118,7 +151,7 @@ head(worldClimate); str(worldClimate)
 
 (meanAnnTemp <- worldClimate %>% 
    select(ends_with("bio_1")) %>%
-   bind_cols(regions.LatLong[ ,6, drop = FALSE]) %>%
+   bind_cols(world_grid_50km_cat_df[ , "ID_Realm", drop = FALSE]) %>%
    group_by(ID_Realm) %>% 
    summarise_all(funs(mean)) %>%
    gather(Period, bio_1,-ID_Realm) %>%
@@ -148,6 +181,7 @@ meanAnnTemp$ID_Realm <- factor(meanAnnTemp$ID_Realm,
 
 meanAnnTemp$factorTime <- as.factor(meanAnnTemp$Time)
 # meanAnnTemp$ID_Realm<-as.factor(meanAnnTemp$ID_Realm)
+
 levels(meanAnnTemp$Period.y) <- period.kYA$Period
 
 # Plot the mean annual temperature across the time steps to visualize how it
@@ -266,52 +300,26 @@ ggsave(filename = "meanAnnPrec.Time.png",
        width =7.5, height = 7.5, 
        units = "in")
 
-# Calculate the differences in climate between now and LGM ####
 
-head(worldClimate)
 
-MPD.MNTD.LatLong.diff.Env.Global <- cbind(filter(MPD.LatLong.Env.AllScales, 
-                                                 SamplingPool == "Global sampling")[, c(1, 4:7, 27:37)],
-                                          filter(MNTD.LatLong.Env.AllScales, 
-                                                 SamplingPool == "Global sampling")[, c(28:33, 36)],
-                                          diff.AnnTemp.mP2_cur = worldClimate$mP2_bio_1 - worldClimate$cur_bio_1,
-                                          diff.AnnTemp.mPWP_cur = worldClimate$mPWP_bio_1 - worldClimate$cur_bio_1,
-                                          diff.AnnTemp.MIS19_LGM = worldClimate$MIS19_bio_1 - worldClimate$LGM_bio_1,
-                                          diff.AnnTemp.LGM_cur = worldClimate$LGM_bio_1 - worldClimate$cur_bio_1,
-                                          diff.AnnPrec.mP2_cur = worldClimate$mP2_bio_12 - worldClimate$cur_bio_12,
-                                          diff.AnnPrec.mPWP_cur = worldClimate$mPWP_bio_12 - worldClimate$cur_bio_12,
-                                          diff.AnnPrec.MIS19_LGM = worldClimate$MIS19_bio_12 - worldClimate$LGM_bio_12,
-                                          diff.AnnPrec.LGM_cur = worldClimate$LGM_bio_12 - worldClimate$cur_bio_12)
-
-MPD.MNTD.LatLong.diff.Env.Global <- MPD.LatLong.diffTemp.Global  %>%
-  filter(!is.na(ID_Realm.))
-
-MPD.MNTD.LatLong.diff.Env.Global$ID_Realm <- factor(MPD.MNTD.LatLong.diff.Env.Global$ID_Realm, 
-                                                    levels = c("Nearctic", 
-                                                               "Neotropical", 
-                                                               "Afrotropical", 
-                                                               "Palearctic",
-                                                               "Indomalay",
-                                                               "Australasian",
-                                                               "Oceanic"))
-
-summary(lm(filter(MPD.LatLong.Env.AllScales, 
-                  SamplingPool == "Global sampling")$mpd.obs.z ~ diff.AnnTemp.LGM_cur))
+summary(lm(filter(MPD.MNTD.LatLong.AllScales.worldClimate.diff, 
+                  SamplingPool == "Global sampling")$ses.mpd.z.query ~ diff.AnnTemp.LGM_cur))
 
 # Richness and NTI
-plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NTI, na.rm = TRUE)
+plot(MPD.MNTD.LatLong.diff.Global$ntaxa, MPD.MNTD.LatLong.diff.Global$NTI, na.rm = TRUE)
 
 # Richness and NRI
-plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NRI, na.rm = TRUE)
+plot(MPD.MNTD.LatLong.diff.Global$ntaxa, MPD.MNTD.LatLong.diff.Global$NRI, na.rm = TRUE)
 
 ## AnnTemp plot #####
 
 ## Boxplot vs. Quantil. Regression
 ## SD
 
-(NRI.diff.AnnTemp.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
+(NRI.diff.AnnTemp.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.AllScales.rarefaction.relative.worldClimate.diff %>%
+                                           filter(SamplingPool == "Global sampling"), 
                                          aes(x = diff.AnnTemp.LGM_cur/10, 
-                                             y = NRI,
+                                             y = nri.rarefac.mean,
                                              group = factor(ID_Realm),
                                              colour = factor(ID_Realm))) +
    geom_point(alpha = 0.4, size = 1.75) +
@@ -325,7 +333,7 @@ plot(MPD.MNTD.LatLong.diff.Env.Global$ntaxa, MPD.MNTD.LatLong.diff.Env.Global$NR
    labs(x = c(expression(atop("Historical Temperature Change (°C)", 
                               scriptstyle("MAT"[Contemporary]-"MAT"[LGM])))),
         y = c(expression("NRI"["Global"]))) +
-   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Env.Global$NRI, n = 7)) +
+   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.AllScales.worldClimate.diff$nri, n = 7)) +
    geom_hline(yintercept = 0, alpha = 0.5) +
    theme_classic() +
    theme(legend.position = "bottom", 
@@ -370,7 +378,7 @@ ggsave(filename = "NRI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
 
 #### AnnPrec plot ####
 
-(NRI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
+(NRI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Global, 
                                          aes(x = diff.AnnPrec.LGM_cur/10, 
                                              y = NRI,
                                              group = factor(ID_Realm),
@@ -386,7 +394,7 @@ ggsave(filename = "NRI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
    labs(x = c(expression(atop("Historical Precipitation Change (mm)", 
                               scriptstyle("MAP"[Contemporary]-"MAP"[LGM])))),
         y = c(expression("NRI"["Global"]))) +
-   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Env.Global$NRI, n = 7)) +
+   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Global$NRI, n = 7)) +
    #  scale_x_continuous(trans = "pseudo_log") +
    geom_hline(yintercept = 0, alpha = 0.5) +
    theme_classic() +
@@ -427,7 +435,7 @@ ggsave(filename = "NRI.diff.AnnPrec.LGM_cur.Global.D.Split.plot.png",
 
 ## AnnTemp plot #####
 
-(NTI.diff.AnnTemp.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
+(NTI.diff.AnnTemp.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Global, 
                                          aes(x = diff.AnnTemp.LGM_cur/10, 
                                              y = NTI,
                                              group = factor(ID_Realm),
@@ -443,7 +451,7 @@ ggsave(filename = "NRI.diff.AnnPrec.LGM_cur.Global.D.Split.plot.png",
    labs(x = c(expression(atop("Historical Temperature Change (°C)", 
                               scriptstyle("MAT"[Contemporary]-"MAT"[LGM])))),
         y = c(expression("NTI"["Global"]))) +
-   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Env.Global$NTI, n = 7)) +
+   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Global$NTI, n = 7)) +
    geom_hline(yintercept = 0, alpha = 0.5) +
    theme_classic() +
    theme(legend.position = "bottom", 
@@ -487,7 +495,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
 #### AnnPrec plot ####
 
 
-(NTI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Env.Global, 
+(NTI.diff.AnnPrec.LGM_cur.plot <- ggplot(MPD.MNTD.LatLong.diff.Global, 
                                          aes(x = diff.AnnPrec.LGM_cur/10, 
                                              y = NTI,
                                              group = factor(ID_Realm),
@@ -503,7 +511,7 @@ ggsave(filename = "NTI.diff.AnnTemp.LGM_cur.Global.D.Split.plot.png",
    labs(x = c(expression(atop("Historical Precipitation Change (mm)", 
                               scriptstyle("MAP"[Contemporary]-"MAP"[LGM])))),
         y = c(expression("NTI"["Global"]))) +
-   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Env.Global$NTI, n = 7)) +
+   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.diff.Global$NTI, n = 7)) +
    #  scale_x_continuous(trans = "pseudo_log") +
    geom_hline(yintercept = 0, alpha = 0.5) +
    theme_classic() +
