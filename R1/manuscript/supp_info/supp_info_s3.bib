@@ -1,0 +1,141 @@
+@inproceedings{10.1007/978-3-642-33122-0_3,
+  title = {Efficient Computation of Popular Phylogenetic Tree Measures},
+  booktitle = {Algorithms in Bioinformatics},
+  author = {Tsirogiannis, Constantinos and Sandel, Brody and Cheliotis, Dimitris},
+  editor = {Raphael, Ben and Tang, Jijun},
+  year = {2012},
+  pages = {30--43},
+  publisher = {{Springer Berlin Heidelberg}},
+  address = {{Berlin, Heidelberg}},
+  abstract = {Given a phylogenetic tree \$\textbackslash mathcal\{T\}\$of n nodes, and a sample R of its tips (leaf nodes) a very common problem in ecological and evolutionary research is to evaluate a distance measure for the elements in R. Two of the most common measures of this kind are the Mean Pairwise Distance (\$\textbackslash ensuremath\{\textbackslash mathrm\{MPD\}\} \$) and the Phylogenetic Diversity (\$\textbackslash ensuremath\{\textbackslash mathrm\{PD\}\} \$). In many applications, it is often necessary to compute the expectation and standard deviation of one of these measures over all subsets of tips of \$\textbackslash mathcal\{T\}\$that have a certain size. Unfortunately, existing methods to calculate the expectation and deviation of these measures are inexact and inefficient.},
+  isbn = {978-3-642-33122-0}
+}
+
+@article{tsirogiannis2016e,
+  title = {{{PhyloMeasures}}: A Package for Computing Phylogenetic Biodiversity Measures and Their Statistical Moments},
+  shorttitle = {{{PhyloMeasures}}},
+  author = {Tsirogiannis, Constantinos and Sandel, Brody},
+  year = {2016},
+  journal = {Ecography},
+  volume = {39},
+  number = {7},
+  pages = {709--714},
+  issn = {1600-0587},
+  doi = {10.1111/ecog.01814},
+  url = {http://onlinelibrary.wiley.com/doi/abs/10.1111/ecog.01814},
+  urldate = {2022-03-07},
+  abstract = {We present PhyloMeasures, a new software package including both a C++ and R version, that provides very fast computation of popular phylogenetic diversity measures. PhyloMeasures introduces two major advances over existing methods. First, it uses efficient algorithms for calculating basic phylogenetic metrics (such as Faith's PD and the mean pairwise distance, MPD) and two-sample measures (such as common branch length, CBL, and the unique fraction) that are designed to perform well even on very large trees. Second, it computes exact richness-standardised versions of these measures (such as the widely used net relatedness index, NRI) by efficiently evaluating analytical expressions for the mean and variance of the basic measures, rather than by the slow and inexact randomization techniques that are the current standard. Together, these lead to massive improvements in performance compared to the current state of the art. For example, running on a standard laptop, PhyloMeasures functions can provide the NRI for 20 samples from a tree of 100 000 tips in about 1.5 s, compared to an estimated 37 d using standard resampling approaches. This will allow analyses on larger data sets than were previously possible.},
+  langid = {english},
+  annotation = {\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/ecog.01814},
+  file = {C\:\\Users\\phper\\OneDrive - Concordia University - Canada\\Literature\\AUTH\\tsirogiannis_et_al_2016_phylomeasures_-_a_package_for_computing_phylogenetic_biodiversity_measures_and.pdf}
+}
+
+@article{sandel2018e,
+  title = {Richness-Dependence of Phylogenetic Diversity Indices},
+  author = {Sandel, Brody},
+  year = {2018},
+  journal = {Ecography},
+  volume = {41},
+  number = {5},
+  pages = {837--844},
+  issn = {1600-0587},
+  doi = {10.1111/ecog.02967},
+  url = {http://onlinelibrary.wiley.com/doi/abs/10.1111/ecog.02967},
+  urldate = {2022-03-07},
+  abstract = {Phylogenetic diversity indices are widely used to characterize the structure and diversity of ecological communities. Most indices are based on a metric that is expected to vary with species richness, so they are standardized to remove this richness-dependence. With this standardization, values of 0 are consistent with random phylogenetic structure, while phylogenetic clustering is associated with either negative or positive values (depending on the index). One common interpretation of phylogenetic clustering is that it indicates some combination of environmental and biological filtering that restricts the species that can be present in a community. Increasingly, studies are comparing phylogenetic indices along environmental gradients to infer differences in the factors structuring communities. This comparison implicitly assumes that index values are comparable among communities with different numbers of species. Using a set of simulations, I show here that this assumption is incorrect. Holding the strength of filtering constant, communities composed of more species show larger absolute index values. This problem is most pronounced when the environmental filter favors a moderate-sized clade strongly over others and when using the net relatedness index (NRI) to measure clustering. This bias potentially casts doubt on studies studying phylogenetic index patterns along gradients where richness also varies. Fortunately, the arising generality that more stressful environments have lower species richness and stronger clustering is opposite to this bias and therefore robust. I also show that a simple rarefaction can remove the richness-dependence of these indices, at the expense of increased error.},
+  langid = {english},
+  annotation = {\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/ecog.02967},
+  file = {C\:\\Users\\phper\\OneDrive - Concordia University - Canada\\Literature\\AUTH\\sandel_2018_richness-dependence_of_phylogenetic_diversity_indices.pdf}
+}
+
+
+@article{webbExploringPhylogeneticStructure2000,
+  title = {Exploring the {{Phylogenetic Structure}} of {{Ecological Communities}}: {{An Example}} for {{Rain Forest Trees}}},
+  shorttitle = {Exploring the {{Phylogenetic Structure}} of {{Ecological Communities}}},
+  author = {Webb, Campbell O.},
+  year = {2000},
+  month = aug,
+  journal = {The American Naturalist},
+  volume = {156},
+  number = {2},
+  pages = {145--155},
+  issn = {1537-5323},
+  doi = {10.1086/303378},
+  abstract = {Because of the correlation expected between the phylogenetic relatedness of two taxa and their net ecological similarity, a measure of the overall phylogenetic relatedness of a community of interacting organisms can be used to investigate the contemporary ecological processes that structure community composition. I describe two indices that use the number of nodes that separate taxa on a phylogeny as a measure of their phylogenetic relatedness. As an example of the use of these indices in community analysis, I compared the mean observed net relatedness of trees ({$\geq$}10 cm diameter at breast height) in each of 28 plots (each 0.16 ha) in a Bornean rain forest with the net relatedness expected if species were drawn randomly from the species pool (of the 324 species in the 28 plots), using a supertree that I assembled from published sources. I found that the species in plots were more phylogenetically related than expected by chance, a result that was insensitive to various modifications to the basic methodology. I tentatively infer that variation in habitat among plots causes ecologically more similar species to co-occur within plots. Finally, I suggest a range of applications for phylogenetic relatedness measures in community analysis.},
+  langid = {english},
+  pmid = {10856198},
+  keywords = {net ecological similarity,phylogenetic conservatism,supertree,taxonomic diversity,tropical rain forest}
+}
+
+
+@book{rcoreteamLanguageEnvironmentStatistical2019,
+  title = {R: {{A Language}} and {{Environment}} for {{Statistical Computing}}},
+  author = {{R Core Team}},
+  year = {2019},
+  publisher = {{R Foundation for Statistical Computing}},
+  address = {{Vienna, Austria}},
+  url = {https://www.R-project.org/}
+}
+
+
+@manual{rstudioteam2020,
+  type = {Manual},
+  title = {{{RStudio}}: {{Integrated}} Development Environment for r},
+  author = {{RStudio Team}},
+  year = {2020},
+  address = {{Boston, MA}},
+  url = {http://www.rstudio.com/},
+  organization = {{RStudio, PBC.}}
+}
+
+
+@manual{tsirogiannis2017,
+  type = {Manual},
+  title = {{{PhyloMeasures}}: {{Fast}} and Exact Algorithms for Computing Phylogenetic Biodiversity Measures},
+  author = {Tsirogiannis, Constantinos and Sandel, Brody},
+  year = {2017},
+  url = {https://CRAN.R-project.org/package=PhyloMeasures}
+}
+
+
+@article{wickham2019joss,
+  title = {Welcome to the {{tidyverse}}},
+  author = {Wickham, Hadley and Averick, Mara and Bryan, Jennifer and Chang, Winston and McGowan, Lucy D'Agostino and Fran{\c c}ois, Romain and Grolemund, Garrett and Hayes, Alex and Henry, Lionel and Hester, Jim and Kuhn, Max and Pedersen, Thomas Lin and Miller, Evan and Bache, Stephan Milton and M{\"u}ller, Kirill and Ooms, Jeroen and Robinson, David and Seidel, Dana Paige and Spinu, Vitalie and Takahashi, Kohske and Vaughan, Davis and Wilke, Claus and Woo, Kara and Yutani, Hiroaki},
+  year = {2019},
+  journal = {Journal of Open Source Software},
+  volume = {4},
+  number = {43},
+  pages = {1686},
+  doi = {10.21105/joss.01686}
+}
+
+
+@article{kembel2010b,
+  title = {Picante: {{R}} Tools for Integrating Phylogenies and Ecology},
+  author = {Kembel, S.W. and Cowan, P.D. and Helmus, M.R. and Cornwell, W.K. and Morlon, H. and Ackerly, D.D. and Blomberg, S.P. and Webb, C.O.},
+  year = {2010},
+  journal = {Bioinformatics (Oxford, England)},
+  volume = {26},
+  pages = {1463--1464}
+}
+
+
+@article{paradis2019ba,
+  title = {Ape 5.0: An Environment for Modern Phylogenetics and Evolutionary Analyses in {{R}}},
+  author = {Paradis, E. and Schliep, K.},
+  year = {2019},
+  journal = {Bioinformatics (Oxford, England)},
+  volume = {35},
+  pages = {526--528}
+}
+
+
+
+
+
+
+
+
+
+
+

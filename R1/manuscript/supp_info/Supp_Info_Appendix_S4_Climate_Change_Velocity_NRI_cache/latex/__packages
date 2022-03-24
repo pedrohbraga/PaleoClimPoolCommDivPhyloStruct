@@ -1,0 +1,10 @@
+ggplot2
+ggpubr
+sf
+sp
+raster
+dplyr
+tidyr
+exactextractr
+reshape2
+scales

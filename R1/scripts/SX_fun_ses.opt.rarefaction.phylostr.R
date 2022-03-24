@@ -16,7 +16,7 @@ opt.rarefaction.mpd <- function(phylo.tree,
   species.names <- colnames(species.data)
   n.species <- ncol(species.data)
   
-  ses.mpd.z.query <- mpd.query(phylo.tree,
+  ses.mpd.z.query <- mpd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree))))),
                                species.data,
                                standardize = TRUE)
   
@@ -34,16 +34,19 @@ opt.rarefaction.mpd <- function(phylo.tree,
   
   
   library(foreach)
-  library(doMC)
+  # library(doFuture)
   
   registerDoMC(cores = n.cores)
+  
+#  registerDoFuture()                        
+ # plan(multicore, workers = n.cores)     
   
   values.rarefac <- foreach(i = 1:n.rep) %dopar% {
     choose.species.rarefac <- species.names[sample(n.species)[1:n.species.rarefac]]
     species.data.rarefac <- species.data[, choose.species.rarefac]
     phylo.tree.rarefac <- keep.tip(phylo.tree, 
                                    choose.species.rarefac)
-    mpd <- mpd.query(phylo.tree.rarefac, 
+    mpd <- mpd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree.rarefac))))), 
                      species.data.rarefac, 
                      standardize = TRUE)
     
@@ -95,7 +98,7 @@ opt.rarefaction.mntd <- function(phylo.tree,
   species.names <- colnames(species.data)
   n.species <- ncol(species.data)
   
-  ses.mntd.z.query <- mntd.query(phylo.tree,
+  ses.mntd.z.query <- mntd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree))))),
                                  species.data,
                                  standardize = TRUE
   )
@@ -118,7 +121,8 @@ opt.rarefaction.mntd <- function(phylo.tree,
     choose.species.rarefac <- species.names[sample(n.species)[1:n.species.rarefac]]
     species.data.rarefac <- species.data[, choose.species.rarefac]
     phylo.tree.rarefac <- keep.tip(phylo.tree, choose.species.rarefac)
-    mntd <- mntd.query(phylo.tree.rarefac, species.data.rarefac, standardize = TRUE)
+    mntd <- mntd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree.rarefac))))), 
+                       species.data.rarefac, standardize = TRUE)
     
     names(mntd) <- row.names(species.data)
     

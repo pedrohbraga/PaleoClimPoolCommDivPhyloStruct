@@ -1,0 +1,203 @@
+---
+output:
+  bookdown::pdf_document2:
+      latex_engine: xelatex
+      number_sections: false
+      toc: false
+mainfont: "Times New Roman"
+geometry: margin = 1in
+spacing: double
+fontsize: 11pt
+editor_options:
+  markdown:
+    wrap: sentence
+bibliography: "supp_info_s4.bib"
+csl: https://raw.githubusercontent.com/marlonecobos/kuenm/master/ecography.csl
+link-citations: yes
+header-includes:
+   - \usepackage{lineno}
+   - \linenumbers
+   - \usepackage{setspace}\doublespacing
+   - \usepackage{parskip}
+   - \setlength{\parindent}{4em}
+   - \setlength{\parskip}{0em}
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(ggpubr)
+library(sf)
+library(raster)
+library(dplyr)
+library(tidyr)
+library(exactextractr)
+library(reshape2)
+library(scales)
+
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      fig.height = 5,
+                      fig.width = 5,
+                      fig.align = "center")
+```
+
+```{r extract_clim_change_veloc, message=FALSE, warning=FALSE, include=FALSE}
+# Load the world projection grid shapefile
+
+projectDir <- "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/"
+
+world_grid_50km <- st_read(paste0(projectDir, 
+                                  "data/grids/world_grid_prev_50km.shp"))
+world_grid_50km$CRI <- NULL
+
+equal_area_projection <- st_crs(world_grid_50km)
+
+world_grid_50km$id <- 1:nrow(world_grid_50km)
+
+# Load the climate change velocity raster from Sandel et al. 2011 (Science)
+
+clim_velocity <- raster(paste0(projectDir, 
+                               "data/rasters/Velocity.tif"))
+
+# plot(clim_velocity)
+
+templateBase <- raster(world_grid_50km, 
+                       res = 50000, 
+                       ext = extent(world_grid_50km)) # 50000m resolution
+
+raster.ClimVelocity.i <- projectRaster(clim_velocity,
+                                       to = templateBase,
+                                       crs = equal_area_projection,
+                                       format = "GTiff", 
+                                       overwrite = FALSE)
+
+# plot(raster.ClimVelocity.i)
+
+extract.raster.ClimVelocity.i <- exactextractr::exact_extract(raster.ClimVelocity.i, 
+                                                              world_grid_50km,
+                                                              include_xy = FALSE, # include coordinates
+                                                              include_cell = FALSE, # include cell IDs
+                                                              fun = "mean",
+                                                              force_df = TRUE,
+                                                              max_cells_in_memory = 3e+08)
+
+extract.raster.ClimVelocity.i$ID <- 1:nrow(extract.raster.ClimVelocity.i) 
+
+extract.raster.ClimVelocity.i <- extract.raster.ClimVelocity.i %>%
+  rename(ClimVelocity = mean)
+
+# dim(extract.raster.ClimVelocity.i)
+
+# head(extract.raster.ClimVelocity.i)
+```
+
+```{r load_phylo_clim_diff_object, include = FALSE}
+MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff <- readRDS(paste0(projectDir, "data/matrices/MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff.RDS"))
+
+```
+
+```{r cor_ClimVelocity_diff.AnnTemp.LGM_cur, echo = FALSE}
+cor_ClimVelocity_diff.AnnTemp.LGM_cur <- MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff %>%
+  left_join(extract.raster.ClimVelocity.i,
+            by = "ID") %>%
+  drop_na(ClimVelocity, diff.AnnTemp.LGM_cur) %>%
+  select(ClimVelocity, diff.AnnTemp.LGM_cur) %>%
+  cor()
+```
+
+\doublespacing
+
+## Study
+
+### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities
+
+### Supplementary Information 4
+
+### Comparing the effects of paleoclimatic historical stability to those of climate change velocity on the phylogenetic relatedness of bat communities
+
+We also assessed if the patterns we observed for the effects of climatic historical stability (measured as the difference between climate estimates for the last glacial maximum (LGM) period and climate observations for the contemporary period; see Methods) on the phylogenetic community structure of bats would be similar to those expected using another variable for climatic stability, the index for climate change velocity used in Sandel _et al_. [-@sandelInfluenceLateQuaternary2011].
+
+For this, we downloaded the raster for temperature change velocity from Sandel _et al_. [-@sandelInfluenceLateQuaternary2011] containing the local average displacement rate of mean annual temperature since the LGM (in metres per year), and extracted and aggregated (by calculating the average of all pixels occurring in each cell, weighted by the coverage overlapping area of cells) the data to the 50 km × 50 km equal-area cell-grid. We then correlated and represented the relationship between aggregated index for climate change velocity in temperature and the historical climatic stability in temperature we had used to test the hypothesis that phylogenetic relatedness is higher in regions where climate remained more stable (see Figure S4.1). We also represented the relationship between climate change velocity in temperature with both the indices for bat community phylogenetic relatedness (*i.e.* the net relatedness index and the nearest taxon index) (see Figure S4.2). For the purposes of simplification, we present these results only for the global sampling frame extent.
+
+We have found that temperature change velocity was highly correlated with the measure of historical climatic stability in temperature we used in our study (Pearson's r of `r round(cor_ClimVelocity_diff.AnnTemp.LGM_cur[1, 2], 2)`; see Figure S4.1). 
+
+Highly phylogenetically clustered bat communities tended to be only frequent in regions where temperature change velocity since the last glacial maximum was lower (see Figure S4.2). This pattern was noticeable at both overall phylogenetic structure (net relatedness index; NRI) and tip-level phylogenetic structure (nearest taxon index; NTI) of bat communities.
+
+These patterns we observed are similar to the ones we observed when measuring historical climatic stability from the differences between the climate from the contemporary period and from the LGM.
+
+## References for Supporting Information 4
+
+<div id="refs"></div>
+
+## Figures
+
+\noindent 
+**Figure S4.1** Relationship between temperature change velocity (extracted from Sandel _et al_. [-@sandelInfluenceLateQuaternary2011]) and historical change in temperature since the last glacial maximum (22,000 years ago) for bat communities across the globe.
+
+```{r plot_ClimVelocity_diff.AnnTemp.LGM_cur, echo=FALSE, message = FALSE, warning = FALSE}
+ggplot(data = MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff %>%
+         left_join(extract.raster.ClimVelocity.i,
+                   by = "ID"), aes(x = diff.AnnTemp.LGM_cur, 
+                                   y = ClimVelocity)
+) +
+  geom_point(size = 2.5,
+             alpha = 0.1) +
+  labs(y = c(expression("Temperature Change Velocity (m/year)"["(from Sandel et al. 2011)"])),
+       x = c(expression(atop(
+         "Historical Change in Temperature (°C)",
+         scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+       )))) +
+  # geom_smooth(method = "lm") +
+  theme_pubclean()
+```
+
+\noindent 
+**Figure S4.2** Relationship between temperature change velocity and the phylogenetic structure of bat communities across sampling frame extents. The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at the global sampling frame extent. Climate change velocity in temperature from the last glacial maximum (LGM; approximately 22,000 years ago) to the contemporary period was extracted and aggregated from Sandel _et al_. (2011) (see Methods).
+
+```{r plot_ClimVelocity_NRI, echo=FALSE, message=FALSE, warning=FALSE}
+fig.Global.NRI.ClimVelocity.LGM_cur <- ggplot(data = MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff %>%
+                                                left_join(extract.raster.ClimVelocity.i,
+                                                          by = "ID"), 
+                                              aes(x = ClimVelocity, 
+                                                  y = nri)
+) +
+  geom_point(size = 2.5,
+             alpha = 0.1) +
+  labs(y = c(expression("NRI"["Global"])),
+       x = c(expression(atop("Temperature Change Velocity (m/year)",
+                             scriptstyle("(extracted from Sandel et al. 2011)")
+       )))) +
+  # geom_quantile(quantiles = 0.90) +
+  theme_pubclean()
+```
+
+```{r plot_ClimVelocity_NTI, echo=FALSE, message=FALSE, warning=FALSE}
+fig.Global.NTI.ClimVelocity.LGM_cur <- ggplot(data = MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff %>%
+                                                left_join(extract.raster.ClimVelocity.i,
+                                                          by = "ID"), 
+                                              aes(x = ClimVelocity, 
+                                                  y = nti)
+) +
+  geom_point(size = 2.5,
+             alpha = 0.1) +
+  labs(y = c(expression("NTI"["Global"])),
+       x = c(expression(atop("Temperature Change Velocity (m/year)",
+                             scriptstyle("(extracted from Sandel et al. 2011)")
+       )))) +
+  # geom_quantile(quantiles = 0.90) +
+  theme_pubclean()
+```
+
+```{r plot_ClimVelocity_NTI_NRI, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
+ggarrange(
+  fig.Global.NRI.ClimVelocity.LGM_cur,
+  fig.Global.NTI.ClimVelocity.LGM_cur,
+  labels = c("A", "B"),
+  ncol = 2, nrow = 1,
+  widths = c(1, 1),
+  heights = c(0.9, 1),
+  align = "v",
+  font.label = list(size = 14)
+)
+```
+

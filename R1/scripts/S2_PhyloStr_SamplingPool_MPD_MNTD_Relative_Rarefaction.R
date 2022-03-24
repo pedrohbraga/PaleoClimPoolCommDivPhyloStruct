@@ -5,6 +5,26 @@
 divide.sampling.pool.size.by <- 3
 min.size <- divide.sampling.pool.size.by*2
 
+
+# dir.create("data/forFuriosa")
+# 
+# saveRDS(Chiroptera.FaurSven.Phylo.ultra,
+#         "data/forFuriosa/Chiroptera.FaurSven.Phylo.ultra.RDS")
+# 
+# saveRDS(Chiroptera.FaurSven.comm,
+#         "data/forFuriosa/Chiroptera.FaurSven.comm.RDS")
+
+saveRDS(MPD.LatLong.World,
+        "data/forFuriosa/MPD.LatLong.World.RDS")
+
+saveRDS(Chiroptera.NW.Tree,
+        "data/forFuriosa/Chiroptera.NW.Tree.RDS")
+
+saveRDS(Chiroptera.NW.Tree,
+        "data/forFuriosa/Chiroptera.NW.Tree.RDS")
+
+
+
 #########################
 #### Global sampling ####
 #########################
@@ -13,7 +33,8 @@ min.size <- divide.sampling.pool.size.by*2
 SES.MPD.Chiroptera.World.rarefaction.relative <- opt.rarefaction.mpd(phylo.tree = Chiroptera.FaurSven.Phylo.ultra, 
                                                                      species.data = Chiroptera.FaurSven.comm, 
                                                                      n.species.rarefac = round(ncol(Chiroptera.FaurSven.comm)/divide.sampling.pool.size.by),
-                                                                     n.rep = 999, n.cores = 4)
+                                                                     n.rep = 999, 
+                                                                     n.cores = 12)
 
 # Add everything to a data.frame
 SES.MPD.Chiroptera.World.rarefaction.relative$ses.mpd.z.query.rarefac$ID <- as.numeric(row.names(SES.MPD.Chiroptera.World.rarefaction.relative$ses.mpd.z.query.rarefac))
@@ -223,7 +244,8 @@ MPD.LatLong.AllScales.rarefaction.relative <- rbind(MPD.LatLong.World.rarefactio
 SES.MNTD.Chiroptera.World.rarefaction.relative <- opt.rarefaction.mntd(phylo.tree = Chiroptera.FaurSven.Phylo.ultra, 
                                                                        species.data = Chiroptera.FaurSven.comm, 
                                                                        n.species.rarefac = round(ncol(Chiroptera.FaurSven.comm)/divide.sampling.pool.size.by),
-                                                                       n.rep = 999, n.cores = 4)
+                                                                       n.rep = 999, 
+                                                                       n.cores = 20)
 
 # Add everything to a data.frame
 SES.MNTD.Chiroptera.World.rarefaction.relative$ses.mntd.z.query.rarefac$ID <- as.numeric(row.names(SES.MNTD.Chiroptera.World.rarefaction.relative$ses.mntd.z.query.rarefac))
@@ -242,13 +264,13 @@ MNTD.LatLong.World.rarefaction.relative <- right_join(SES.MNTD.Chiroptera.World.
 SES.MNTD.Chiroptera.NW.rarefaction.relative <- opt.rarefaction.mntd(phylo.tree = Chiroptera.NW.Tree, 
                                                                     species.data = Chiroptera.NW.Comm, 
                                                                     n.species.rarefac = round(ncol(Chiroptera.NW.Comm)/divide.sampling.pool.size.by),
-                                                                    n.rep = 999, n.cores = 4)
+                                                                    n.rep = 999, n.cores = 8)
 
 #### Old World ####
 SES.MNTD.Chiroptera.OW.rarefaction.relative <-  opt.rarefaction.mntd(phylo.tree = Chiroptera.OW.Tree, 
                                                                      species.data = Chiroptera.OW.Comm, 
                                                                      n.species.rarefac = round(ncol(Chiroptera.OW.Comm)/divide.sampling.pool.size.by),
-                                                                     n.rep = 999, n.cores = 4)
+                                                                     n.rep = 999, n.cores = 8)
 
 
 MNTD.LatLong.NW.OW.rarefaction.relative <- rbind(SES.MNTD.Chiroptera.NW.rarefaction.relative$ses.mntd.z.query.rarefac, 
@@ -466,7 +488,8 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative <- MPD.LatLong.AllScales.rarefac
                     SamplingPool, 
                     remove = FALSE) %>%
               filter(!is.na(SamplingPool)) %>%
-              select(-c("ntaxa", "ID", "perms", "ntaxa.pool.size", "rarefac.pool.size",
+              select(-c("ntaxa", "ID", "perms", 
+                        "ntaxa.pool.size", "rarefac.pool.size",
                         LONB:SamplingPool)),
             by = "ID_SamplingPool")
 
@@ -489,12 +512,17 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative$SamplingPool <-  factor(MPD.MNTD
                                                                                    "Ecoregion sampling"))
 
 MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome_Acronym = factor(MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome, 
-                                                                          labels = abbreviate(gsub("_", 
-                                                                                                   " ",
-                                                                                                   levels(MPD.LatLong.AllScales.rarefaction.relative$ID_Biome))))
+                                                                          labels = abbreviate(
+                                                                            gsub("_", 
+                                                                                 " ",
+                                                                                 levels(MPD.LatLong.AllScales.rarefaction.relative$ID_Biome))))
 
-write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative, 
-          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.csv")
+# write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative, 
+#          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv")
+
+# MPD.MNTD.LatLong.AllScales.rarefaction.relative <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T, row.names = 1)
+
+# MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T)
 
 ############################################################################ 
 ### Representing the phylogenetic community structure of bats across the ###
@@ -505,7 +533,8 @@ write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative,
 
 (NRI.Realm.rarefaction.relative.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.rarefaction.relative,
                                                          is.na(ID_Realm) == FALSE),
-                                                  aes(x = SamplingPool, y = nri.rarefac.mean)) +
+                                                  aes(x = SamplingPool, 
+                                                      y = nri.rarefac.mean)) +
    geom_boxplot(aes(fill = SamplingPool)) +
    facet_wrap(~ID_Realm,
               nrow = 1,
