@@ -22,6 +22,7 @@ pred.rq.poly.4.NRI.netDiv_CWM_std_tw<- melt(pred.rq.poly.4.NRI.netDiv_CWM_std_tw
 
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$tau <- as.numeric(gsub("tau= (.*)", "\\1", 
                                                             rq.poly.4.NRI.netDiv_CWM_std_tw$tau))
+
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$label <- NA
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$label[which(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw == max(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw))] <- pred.rq.poly.4.NRI.netDiv_CWM_std_tw$tau[which(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw == max(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw))]
 
@@ -67,6 +68,7 @@ pred.rq.poly.4.NRI.netDiv_CWM_std_tw$label[which(pred.rq.poly.4.NRI.netDiv_CWM_s
           legend.box = "horizontal") + 
     guides(colour = guide_legend(nrow = 1))
 )
+
 
 ggsave(filename = "figures/Fig.X.rq.poly.4.NRI.netDiv_CWM_std_tw_clean.png", 
        dpi = 300, 

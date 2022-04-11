@@ -51,10 +51,16 @@ We show that the worldwide phylogenetic structure of bat assemblages is strongly
 <summary> `scripts/` </summary>
 
 1. `S0_REnvironmentPreparation.R`
+3. `SX_fun_brokenStick.selection.R`
+4. `SX_fun_CommWeightedMeans.R`
+4. `SX_fun_ggplot_theme_map.R`
+5. `SX_fun_make_grid_sf.R`
+6. `SX_fun_match_phylo_comm.R`
+7. `SX_fun_ses.opt.rarefaction.phylostr.R`
+
 2. `S1_50KM_DatasetPreparation.R`
 3. `S1_ClimateDatasetPreparation_PhyloStr_Figures.R` 
-
-
+4. `S2_PhyloStr_SamplingPool_MPD_MNTD_Relative_Rarefaction.R` 
 
 </details>
 
