@@ -10,3 +10,7 @@
 # ignore all files in any directory
 data/
 figures/
+
+
+R1/manuscript/supp_info/Supp_Info_Appendix_S3_Pool_Size_Correction_Rarefaction_Sqrt_cache/
+R1/manuscript/supp_info/Supp_Info_Appendix_S6_Raw_Data_Figures_cache/
