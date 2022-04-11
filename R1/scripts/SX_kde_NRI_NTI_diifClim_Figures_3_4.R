@@ -39,15 +39,23 @@ ks_kde_geom_contours_phyloStr_diffClim <- function(parent_data = MPD.MNTD.CWM.Di
   # density regions. The default contours are at 25%, 50%, and 75%
   
   percentiles <- percent(c(
-    0.01,
-    seq(0.1, 0.9,
-        length.out = 10
-    ),
-    0.99
+    seq(0.01, 0.99,
+        length.out = 99
+    )
   ),
   accuracy = 1)
   
-  # plot(kde.subset.var_y.var_x.Hpi,
+  # percentiles <- percent(c(
+  #   0.01,
+  #   seq(0.01, 0.9,
+  #       length.out = 98
+  #   ),
+  #   0.99
+  # ),
+  # accuracy = 1)
+  # 
+  
+    # plot(kde.subset.var_y.var_x.Hpi,
   #      display = "filled.contour2",
   #      approx = FALSE,
   #      cont = as.numeric(sub("%", "", 
@@ -134,9 +142,9 @@ ks_kde_geom_contours_phyloStr_diffClim <- function(parent_data = MPD.MNTD.CWM.Di
 
 saveRDS(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
         "data/matrices/MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.rds")
- 
+
 saveRDS(MPD.MNTD.LatLong.AllScales.worldClimate.diff,
-         "data/matrices/MPD.MNTD.LatLong.AllScales.worldClimate.diff.rds")
+        "data/matrices/MPD.MNTD.LatLong.AllScales.worldClimate.diff.rds")
 
 ## NRI and Annual Temperature and Precipitation ----------
 

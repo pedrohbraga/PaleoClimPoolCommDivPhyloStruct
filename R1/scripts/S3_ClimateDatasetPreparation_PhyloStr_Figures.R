@@ -146,12 +146,12 @@ worldClimate.diff <- data.frame(
     diff.AnnTemp.LGM_cur = diff.AnnTemp.LGM_cur / 10
   )
 
-MPD.MNTD.LatLong.AllScales.worldClimate.diff <- MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff <- MPD.MNTD.LatLong.AllScales.rarefaction.relative %>%
   right_join(worldClimate.diff,
              by = "ID"
   )
 
-MPD.MNTD.LatLong.AllScales.worldClimate.diff$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.worldClimate.diff$ID_Realm,
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff$ID_Realm,
                                                                 levels = c(
                                                                   "Nearctic",
                                                                   "Neotropical",
@@ -163,5 +163,5 @@ MPD.MNTD.LatLong.AllScales.worldClimate.diff$ID_Realm <- factor(MPD.MNTD.LatLong
                                                                 )
 )
 
-head(MPD.MNTD.LatLong.AllScales.worldClimate.diff)
-dim(MPD.MNTD.LatLong.AllScales.worldClimate.diff)
+head(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff)
+dim(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff)

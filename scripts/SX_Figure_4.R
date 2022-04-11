@@ -7,7 +7,10 @@ library(ggrepel)
 # Obtain predicted values for the same x
 
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw <- as.data.frame(predict(rq.poly.4.NRI.netDiv_CWM_std_tw, 
-                                                              newdata = prebinning_test %>% select(netDiv_CWM_std_tw)))
+                                                              newdata = prebinning_test %>% 
+                                                                select(netDiv_CWM_std_tw)
+                                                              )
+                                                      )
 
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw <- prebinning_test$netDiv_CWM_std_tw
 
@@ -18,14 +21,15 @@ pred.rq.poly.4.NRI.netDiv_CWM_std_tw<- melt(pred.rq.poly.4.NRI.netDiv_CWM_std_tw
                                             value.name = "NRI")
 
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$tau <- as.numeric(gsub("tau= (.*)", "\\1", 
-                                                            pred.rq.poly.4.NRI.netDiv_CWM_std_tw$tau))
+                                                            rq.poly.4.NRI.netDiv_CWM_std_tw$tau))
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$label <- NA
 pred.rq.poly.4.NRI.netDiv_CWM_std_tw$label[which(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw == max(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw))] <- pred.rq.poly.4.NRI.netDiv_CWM_std_tw$tau[which(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw == max(pred.rq.poly.4.NRI.netDiv_CWM_std_tw$netDiv_CWM_std_tw))]
 
 (NRI.poly.4.netDiv_CWM_std_tw.rq.plot <- ggplot(data = pred.rq.poly.4.NRI.netDiv_CWM_std_tw, 
                                                 aes(x = netDiv_CWM_std_tw, 
                                                     y = NRI,
-                                                    colour = tau, group = factor(tau)))  +   
+                                                    colour = tau, 
+                                                    group = factor(tau)))  +   
     geom_point(aes(y = NRI,
                    x = netDiv_CWM_std_tw),
                data = prebinning_test,

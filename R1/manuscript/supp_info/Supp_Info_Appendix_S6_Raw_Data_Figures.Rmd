@@ -99,7 +99,8 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
                                                  aes(x = SamplingPool, 
                                                      y = nri)
 ) +
-  geom_jitter(aes(fill = SamplingPool, colour = SamplingPool), size = 0.01, alpha = 0.2) +
+  geom_jitter(aes(fill = SamplingPool, 
+                  colour = SamplingPool), size = 0.01, alpha = 0.2) +
   geom_boxplot(aes(fill = SamplingPool), alpha = 0.7) +
   facet_wrap(~ID_Realm,
              nrow = 1,
@@ -146,7 +147,8 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
         legend.margin=margin(0, 0, 0, 0),
         legend.box.margin=margin(-5, -5, 2, -5)
   ) +   
-  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+  guides(fill = guide_legend(nrow = 1, 
+                             byrow = TRUE,
                              title.position = "bottom",
                              title = "Lower  ⬅  Sampling Prame Restriction  ➡  Higher",)
   )
@@ -194,7 +196,8 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
         legend.margin=margin(0, 0, 0, 0),
         legend.box.margin=margin(-5, -5, -5, -5)
   ) +
-  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+  guides(fill = guide_legend(nrow = 1, 
+                             byrow = TRUE,
                              title.position = "bottom",
                              title = "Lower  ⬅  Sampling Frame Restriction  ➡  Higher",)
   )

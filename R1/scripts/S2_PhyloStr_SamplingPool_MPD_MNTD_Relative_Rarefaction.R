@@ -446,6 +446,7 @@ MNTD.LatLong.AllScales.rarefaction.relative <- rbind(MNTD.LatLong.World.rarefact
                                                      MNTD.LatLong.Biome.rarefaction.relative,
                                                      MNTD.LatLong.Ecoregion.rarefaction.relative)
 
+MNTD.LatLong.AllScales.rarefaction.relative %>% filter(SamplingPool == "Realm sampling")
 
 ######################################################################################
 #### Code to merge, represent the MPD and MNTD, and test for the effects of       ####
@@ -655,3 +656,10 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.rarefaction.relative.boxplot_1_3.sa
        dpi = 300, 
        width = 18.5, height = 10, 
        units = "in")
+
+
+####
+
+
+MPD.MNTD.LatLong.AllScales
+
