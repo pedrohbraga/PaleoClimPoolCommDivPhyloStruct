@@ -32,14 +32,13 @@ devtools::install_github("stamats/MKmisc")
 # Check for needed packages, and install the missing ones
 required.libraries <- c("ade4","subniche",
                         "RcppEigen", "snowfall", "rlist",
-                        "ape", "picante", "phytools",
+                        "ape", "picante", "phytools", "PhyloMeasures",
                         "vegan", "geiger", "Rcpp", "adephylo", "phylobase",
-                        "geiger", "hisse",
-                        "lme4", "spgwr", "dglm", "coda",
+                         "coda",
                         "devtools", "rgeos", "dplyr", "gtable", "grid", "readxl",
                         "sf", "lwgeom", "sp","raster", "maptools", "splancs",
-                        "ggplot2", "ggtree",  "viridis", "magrittr",
-                        "rasterVis", "gridExtra", "PhyloMeasures",
+                        "ggplot2", "ggtree", "viridis", "magrittr",
+                        "rasterVis", "gridExtra", 
                         "tidyverse", "wesanderson", "mosaic",
                         "broom", "tidyr", "scales",
                         "BiocManager", "ggpubr",
@@ -47,9 +46,11 @@ required.libraries <- c("ade4","subniche",
                         "BAMMtools", "coda",
                         "rgdal", "tidyverse", "rbin", 
                         "quantreg", "WRTDStidal",
-                        "ggrepel",
-                        "naniar", "data.table"
+                        "ggrepel", "ggpubr",
+                        "naniar", "data.table",
+                        "robust"
 )
+
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
 

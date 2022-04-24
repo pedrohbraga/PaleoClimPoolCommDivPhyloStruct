@@ -170,7 +170,7 @@ for(n in extra.species.for.pool){
     mpd.sampling.pool <- opt.rarefaction.mpd(n.species.rarefac = round(length(smaller.tree$tip.label)/3), 
                                              phylo.tree = smaller.tree,
                                              species.data = subset.species.data.region,
-                                             n.rep = 100, 
+                                             n.rep = 1000, 
                                              n.cores = 8)
     
     mpd.sampling.pool$ses.mpd.z.query.rarefac$pool.size <- length(smaller.tree$tip.label)
@@ -194,7 +194,7 @@ for(n in extra.species.for.pool){
     mntd.sampling.pool <- opt.rarefaction.mntd(n.species.rarefac = round(length(smaller.tree$tip.label)/3), 
                                                phylo.tree = smaller.tree,
                                                species.data = subset.species.data.region,
-                                               n.rep = 100, 
+                                               n.rep = 1000, 
                                                n.cores = 8)
     
     mntd.sampling.pool$ses.mntd.z.query.rarefac$pool.size <- length(smaller.tree$tip.label)
@@ -219,7 +219,7 @@ for(n in extra.species.for.pool){
     mpd.sampling.pool <- opt.rarefaction.mpd(n.species.rarefac = 100, 
                                              phylo.tree = smaller.tree,
                                              species.data = subset.species.data.region,
-                                             n.rep = 100, 
+                                             n.rep = 1000, 
                                              n.cores = 8)
     
     mpd.sampling.pool$ses.mpd.z.query.rarefac$pool.size <- length(smaller.tree$tip.label)
@@ -243,7 +243,7 @@ for(n in extra.species.for.pool){
     mntd.sampling.pool <- opt.rarefaction.mntd(n.species.rarefac = 100, 
                                                phylo.tree = smaller.tree,
                                                species.data = subset.species.data.region,
-                                               n.rep = 100, 
+                                               n.rep = 1000, 
                                                n.cores = 8)
     
     mntd.sampling.pool$ses.mntd.z.query.rarefac$pool.size <- length(smaller.tree$tip.label)
@@ -465,7 +465,7 @@ fig.NRI.NTI.Realm.boxplot.phyloSampling <- ggarrange(
 
 
 ### Study
-### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities
+### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities\
 
 ### Supplementary Information 3
 
@@ -473,29 +473,35 @@ fig.NRI.NTI.Realm.boxplot.phyloSampling <- ggarrange(
 
 ### Sampling frame size-dependence in indices for phylogenetic community structure
 
-The magnitude of standardized effect sizes of indices for phylogenetic community structure may increase with the size of the phylogeny used to compute the null models pertinent to these metrics [@sandel2018e]. This bias requires that studies comparing standardized effect sizes of phylogenetic relatedness between communities to assess whether these comparisons hold after correcting for this problem.
+The magnitude of standardized effect sizes of indices for phylogenetic community structure may increase with the number of species in the phylogeny (or size of the sampling frame) used to compute the null models pertinent to these metrics [@sandel2018e]. This bias requires that studies comparing standardized effect sizes of phylogenetic relatedness between biological communities to assess whether these comparisons hold after correcting for this problem.
 
-One possible approach to correct for the sampling frame size bias is to repeatedly randomly subsample (_i.e._ rarefy) the community matrix to smaller sampling frame sizes, then to calculate the average indices for phylogenetic community structure [here, the net relatedness index (NRI) and the nearest taxon index (NTI); see Methods] across the rarefied subset [see @sandel2018e]. The resulting index from this procedure should show a negligible relationship with the size of the sampling frame (or size or richness of the phylogeny), but at the expense of losing power intrinsic to the rarefaction procedure [@sandel2018e]. The information from sampling frames that have less species than the size chosen for the subsampling procedure is also lost.
+One possible approach to correct for the sampling frame size bias is to repeatedly randomly subsample (_i.e._ rarefy) the community matrix to smaller sampling frame sizes, and then to calculate the average indices for phylogenetic community structure [here, the net relatedness index (NRI) and the nearest taxon index (NTI); see Methods] across the rarefied subset [see @sandel2018e]. The resulting index from this procedure should show a negligible relationship with the size of the sampling frame or the phylogeny. Because the original size of the sampling frame is decreased, this correction comes at the expense of losing power intrinsic to the rarefaction procedure [@sandel2018e]. The information from sampling frames that have less species than the size chosen for the subsampling procedure is also lost.
 
-### Implementation
+### Bias-correction robustness and implementation 
 
-To assess whether our results still held after correcting for the influence of the size of sampling frames in the standardized effect sizes index values for phylogenetic community structure, we recalculated the net relatedness index (NRI) and nearest taxon index (NTI) of bat communities applying two rarefaction procedures that differed in the number of species subsampled in each computation. 
+We begin by demonstrating the influence of sampling frame sizes on the phylogenetic community structure indices and the robustness of the bias-correction approach with a simple set of simulations. We generated 10000 communities and a random pure-birth tree, both containing 1000 species, which represents the broad-scale sampling frame. We then subset 5000 communities and 250 species from the broad-scale sampling frame.
 
-For the first procedure, we computed $\mathsf{NRI_{raref_{LOW}}}$ and $\mathsf{NTI_{raref_{LOW}}}$ by rarefying the community presence-absence matrix to the lowest species pool possible for that sampling frame extent, and then computing NRI and NTI on this matrix (which is the same approach used in Sandel, 2018).
+Then, for sampling frame sizes increasing from 250 species to 1000 species, in increments of 50 species, we iteratively calculated the uncorrected net relatedness index (NRI) and the nearest taxon index (NTI) of these simulated communities, as well as two indices corrected through rarefaction -- $\mathsf{NRI_{raref_{FIX}}}$, $\mathsf{NTI_{raref_{FIX}}}$, $\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$ --, which differed in the number of species subsampled in each computation.
 
-In the second procedure, we calculated $\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$ by rarefying the community presence-absence matrix to one third of the number of species in the sampling frame of that region. This procedure allowed for a lower influence of the rarefaction procedure on the power, and allowed for less communities to be removed.
+$\mathsf{NRI_{raref_{LOW}}}$ and $\mathsf{NTI_{raref_{LOW}}}$ were computed by rarefying the community presence-absence matrix to the lowest species pool possible for that sampling frame extent, and then computing NRI and NTI on this matrix (as in Sandel, 2018).
 
-In both approaches, we repeated the rarefaction procedure 1000 times and reproduced the figures addressing the hypothesis testing from our manuscript using the separate averages of both rarefaction indices across their replicates. The interpretation of the rarefied indices follow the same ones for NRI and NTI (see Methods; Webb, 2000).
+$\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$ rarefy the community presence-absence matrix to one third of the number of species in the sampling frame of that region. This procedure removed less communities from the computation and allowed for less loss of power and loss of information inherent from the rarefaction procedure.
 
-To demonstrate the influence of sampling frame size on the phylogenetic community structure indices and the robustness of both bias-correction approaches, we perform the same calculations on a simple set of simulations. We generated 10000 communities and a random pure-birth tree, both containing 1000 species, which represents the broad-scale sampling frame. We then subset 5000 communities and 250 species from the broad-scale sampling frame. We iteratively calculated $\mathsf{NRI}$, $\mathsf{NTI}$ $\mathsf{NRI_{raref_{FIX}}}$, $\mathsf{NTI_{raref_{FIX}}}$, $\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$ for sampling frame sizes increasing from 250 species to 1000 species, in increments of 50 species.
+To assess whether the results from our study still held after correcting for the influence of the size of sampling frames in the standardized effect sizes index values for phylogenetic community structure, we recalculated the NRI and NTI of bat communities using the second bias-correction approach, which ensures less loss information but still corrects for the influence of sampling frame size. We repeated the rarefaction procedure 1000 times and reproduced the figures addressing the hypothesis testing from our manuscript using the separate averages of both rarefaction indices across their replicates. 
 
-This process was also performed in R and RStudio [@rcoreteamLanguageEnvironmentStatistical2019; @rstudioteam2020], with the help of functions from the `ape` [@paradis2019ba], `picante` [@kembel2010b], `PhyloMeasures` [@tsirogiannis2017], `tidyverse` [@wickham2019joss] packages. See Appendix S1 for complementary information on tools used in this study.
+The interpretation of the rarefied indices follow the same ones for NRI and NTI (see Methods in the main document; Webb, 2000).
 
-### Results
+We performed these procedures using R and RStudio [@rcoreteamLanguageEnvironmentStatistical2019; @rstudioteam2020], with the help of functions from the `ape` [@paradis2019ba], `picante` [@kembel2010b], `PhyloMeasures` [@tsirogiannis2017], `tidyverse` [@wickham2019joss] packages. See Appendix S1 for complementary information on tools used in this study.
 
-As demonstrated in Sandel [-@sandel2018e], the traditional community phylogenetic relatedness indices (NRI and NTI) increased with the size of the phylogenetic sampling frame in our simulated communities [as shown by $\mathsf{NRI}$ (net relatedness index) and $\mathsf{NTI}$ (nearest taxon index); A and B]. However, the rarefaction-based calculation of phylogenetic relatedness effectively removes the sampling frame size-dependence in the simulations (see Figure SX) and in our empirical data set (see Figure SX).
+### Rarefaction corrects for sampling frame size bias in both simulations and in empirical data
 
-The rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) were expectedly closer to zero, but highly correlated with their respective unrarefied indices for phylogenetic relatedness. Moreover, all figures we reproduced with the rarefied NRI and NTI indices (Figures S3.2, S3.3, S3.4 and S3.5) had similar patterns to those we observed in the figures from the main manuscript (Figures 2, 3, 4 and 5). Hence, for the purposes of simplification and to avoid the loss of information introduced by the rarefaction procedure, we use the unrarefied values for NRI and NTI in the main manuscript.
+As demonstrated in Sandel [-@sandel2018e], the traditional community phylogenetic relatedness indices (NRI and NTI) increased with the size of the phylogenetic sampling frame in our simulated communities [as shown by $\mathsf{NRI}$ (net relatedness index) and $\mathsf{NTI}$ (nearest taxon index); Figure S3.1 A and B]. However, the rarefaction-based calculation of phylogenetic relatedness effectively removes the sampling frame size bias in the simulations (see Figure S3.1 C-F). $\mathsf{NRI_{raref_{LOW}}}$ and $\mathsf{NTI_{raref_{LOW}}}$, which fix the size of sampling frames to the smallest sample,
+
+As expected, the rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) for bat communities were closer to zero, but highly correlated with their respective unrarefied indices for phylogenetic relatedness.
+
+All figures we reproduced with the rarefied NRI and NTI indices (Figures S3.2, S3.3, S3.4 and S3.5) had similar patterns to those we observed in the figures from the main manuscript (Figures 2, 3, 4 and 5). 
+
+For the purposes of simplification and to avoid the loss of information introduced by the rarefaction procedure, we use the unrarefied values for NRI and NTI in the main manuscript.
 
 ## References for Supporting Information 4
 
@@ -508,138 +514,6 @@ The rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and nearest ta
 
 ```{r echo=FALSE, eval = TRUE, fig.width = 12, fig.height = 18, fig.align = "center"}
 fig.NRI.NTI.Realm.boxplot.phyloSampling
-```
-
-```{r echo=FALSE, eval = TRUE, fig.width = 12, fig.height = 18, fig.align = "center"}
-ks_kde_geom_contours_phyloStr_diffClim <- function(parent_data = MPD.MNTD.CWM.Div.diff.worldClimate.subset.data,
-                                                   var_x = "diff.AnnTemp.LGM_cur",
-                                                   var_y = "nri",
-                                                   lab_x = c(expression(atop(
-                                                     "Historical Change in Temperature (°C)",
-                                                     scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                   ))),
-                                                   lab_y = c(expression("NRI"["Global"]))
-){
-  
-  phyloStr.diff.Clim.subset.data <- parent_data %>%
-    select({{var_x}},
-           {{var_y}}) %>%
-    drop_na()
-  
-  
-  subset.var_y.var_x.Hpi <- ks::Hpi(
-    x =  phyloStr.diff.Clim.subset.data,
-    pilot = "samse"
-  )
-  
-  # subset.var_y.var_x.Hpi
-  
-  # Compute KDE
-  
-  kde.subset.var_y.var_x.Hpi <- ks::kde(
-    x =  phyloStr.diff.Clim.subset.data,
-    H = subset.var_y.var_x.Hpi,
-    binned = TRUE,
-    compute.cont = TRUE,
-    approx.cont = TRUE
-  )
-  
-  # Represent with ks::plot.kde()
-  
-  # "cont" specifies the density contours, which are upper percentages of highest
-  # density regions. The default contours are at 25%, 50%, and 75%
-  
-  percentiles <- percent(c(
-    0.01,
-    seq(0.1, 0.9,
-        length.out = 10
-    ),
-    0.99
-  ),
-  accuracy = 1)
-  
-  # plot(kde.subset.var_y.var_x.Hpi,
-  #      display = "filled.contour2",
-  #      approx = FALSE,
-  #      cont = as.numeric(sub("%", "", 
-  #                            percentiles,
-  #                            fixed = TRUE)))
-  
-  # plot(kde.subset.var_y.var_x.Hpi, display = "persp")
-  
-  ## Subset and prepare information to represent
-  
-  fhat.kde.subset.var_y.var_x.Hpi <- kde.subset.var_y.var_x.Hpi
-  
-  dimnames(fhat.kde.subset.var_y.var_x.Hpi[["estimate"]]) <- list(
-    fhat.kde.subset.var_y.var_x.Hpi[["eval.points"]][[1]],
-    fhat.kde.subset.var_y.var_x.Hpi[["eval.points"]][[2]]
-  )
-  
-  molten.fhat.kde.subset.var_y.var_x.Hpi <- reshape2::melt(fhat.kde.subset.var_y.var_x.Hpi[["estimate"]],
-                                                           value.name = "estimate") %>%
-    rename(
-      var_x = Var1,
-      var_y = Var2
-    )
-  
-  # Represent contours with ggplot() and geom_contour
-  
-  fig.kde.subset.var_y.var_x.Hpi <- ggplot(
-    molten.fhat.kde.subset.var_y.var_x.Hpi,
-    aes(
-      x = var_x,
-      y = var_y
-    )
-  ) +
-    geom_contour_filled(aes(z = estimate),
-                        breaks = 
-                          fhat.kde.subset.var_y.var_x.Hpi[["cont"]][percentiles]
-    ) +
-    scico::scale_fill_scico_d(palette = "acton", 
-                              direction = -1, 
-                              drop = FALSE) +
-    labs(
-      x = lab_x,
-      y = lab_y) +
-    geom_hline(yintercept = 0, alpha = 0.25) +
-    scale_y_continuous(
-      breaks = pretty_breaks(6,
-                             high.u.bias = 0.1,
-                             eps.correct = 0,
-                             min.n = 6
-      ),
-      limits = c(-0.5, 0.5) + range(molten.fhat.kde.subset.var_y.var_x.Hpi$var_y,
-                                    na.rm = TRUE
-      )
-    ) +
-    scale_x_continuous(
-      limits = c(-0.1, 0.1) + range(molten.fhat.kde.subset.var_y.var_x.Hpi$var_x,
-                                    na.rm = TRUE
-      )) +
-    theme_classic(base_size = 17 * 1.6) +
-    theme(
-      legend.position = "none",
-      legend.direction = "horizontal",
-      legend.key.size = unit(0.5, "cm"),
-      legend.text = element_blank(),
-      legend.title = element_blank(),
-      legend.box = "horizontal",
-      # axis.title.x = element_blank(),
-      # axis.text.x = element_blank(),
-      # axis.text.y = element_text(face = "bold", size = 14),
-      axis.title.y = element_text(
-        size = 17 * 1.7,
-        face = "bold"
-      ),
-      axis.title.x = element_text(
-        size = 17 * 1.6,
-        face = "bold"
-      )
-    ) +
-    guides(colour = guide_legend(nrow = 1))
-  return(fig.kde.subset.var_y.var_x.Hpi)
-}
 ```
 
 \noindent 
@@ -772,526 +646,11 @@ NTI.Realm.rarefaction.relative.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm
 ```
 
 
-```{r echo=FALSE, eval = TRUE, fig.width = 12, fig.height = 18, fig.align = "center"}
-
-## NRI and Annual Temperature and Precipitation ----------
-
-fig.kde.Global.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                        filter(SamplingPool == "Global sampling") %>%
-                                                                                        left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                    filter(SamplingPool == "Global sampling") %>%
-                                                                                                    select(
-                                                                                                      ID,
-                                                                                                      diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                    ),
-                                                                                                  by = "ID"
-                                                                                        ),
-                                                                                      var_x = "diff.AnnTemp.LGM_cur",
-                                                                                      var_y = "nri.rarefac.mean",
-                                                                                      lab_x = c(expression(atop(
-                                                                                        "Historical Change in Temperature (°C)",
-                                                                                        scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                      ))),
-                                                                                      lab_y = c(expression("NRI"["Global"]))
-)
-
-
-fig.kde.Global.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                filter(SamplingPool == "Global sampling") %>%
-                                                                                                left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                            filter(SamplingPool == "Global sampling") %>%
-                                                                                                            select(
-                                                                                                              ID,
-                                                                                                              diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                            ),
-                                                                                                          by = "ID"
-                                                                                                ),
-                                                                                              var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                              var_y = "nri.rarefac.mean",
-                                                                                              lab_x = c(expression(atop(
-                                                                                                "Historical Change in Precipitation",
-                                                                                                scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                              ))),
-                                                                                              lab_y = c(expression("NRI"["Global"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation ----------
-
-
-fig.kde.Global.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                        filter(SamplingPool == "Global sampling") %>%
-                                                                                        left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                    filter(SamplingPool == "Global sampling") %>%
-                                                                                                    select(
-                                                                                                      ID,
-                                                                                                      diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                    ),
-                                                                                                  by = "ID"
-                                                                                        ),
-                                                                                      var_x = "diff.AnnTemp.LGM_cur",
-                                                                                      var_y = "nti.rarefac.mean",
-                                                                                      lab_x = c(expression(atop(
-                                                                                        "Historical Change in Temperature (°C)",
-                                                                                        scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                      ))),
-                                                                                      lab_y = c(expression("NTI"["Global"]))
-)
-
-
-fig.kde.Global.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                filter(SamplingPool == "Global sampling") %>%
-                                                                                                left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                            filter(SamplingPool == "Global sampling") %>%
-                                                                                                            select(
-                                                                                                              ID,
-                                                                                                              diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                            ),
-                                                                                                          by = "ID"
-                                                                                                ),
-                                                                                              var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                              var_y = "nti.rarefac.mean",
-                                                                                              lab_x = c(expression(atop(
-                                                                                                "Historical Change in Precipitation",
-                                                                                                scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                              ))),
-                                                                                              lab_y = c(expression("NTI"["Global"]))
-)
-
-# Hemispheric ----------------------------------------------
-
-## NRI and Annual Temperature and Precipitation ------------
-
-fig.kde.Hemispheric.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                             filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                             left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                         filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                         select(
-                                                                                                           ID,
-                                                                                                           diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                         ),
-                                                                                                       by = "ID"
-                                                                                             ),
-                                                                                           var_x = "diff.AnnTemp.LGM_cur",
-                                                                                           var_y = "nri.rarefac.mean",
-                                                                                           lab_x = c(expression(atop(
-                                                                                             "Historical Change in Temperature (°C)",
-                                                                                             scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                           ))),
-                                                                                           lab_y = c(expression("NRI"["Hemispheric"]))
-)
-
-
-fig.kde.Hemispheric.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                     filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                     left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                                 filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                                 select(
-                                                                                                                   ID,
-                                                                                                                   diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                                 ),
-                                                                                                               by = "ID"
-                                                                                                     ),
-                                                                                                   var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                                   var_y = "nri.rarefac.mean",
-                                                                                                   lab_x = c(expression(atop(
-                                                                                                     "Historical Change in Precipitation",
-                                                                                                     scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                                   ))),
-                                                                                                   lab_y = c(expression("NRI"["Hemispheric"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation ------------
-
-
-fig.kde.Hemispheric.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                             filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                             left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                         filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                         select(
-                                                                                                           ID,
-                                                                                                           diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                         ),
-                                                                                                       by = "ID"
-                                                                                             ),
-                                                                                           var_x = "diff.AnnTemp.LGM_cur",
-                                                                                           var_y = "nti.rarefac.mean",
-                                                                                           lab_x = c(expression(atop(
-                                                                                             "Historical Change in Temperature (°C)",
-                                                                                             scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                           ))),
-                                                                                           lab_y = c(expression("NTI"["Hemispheric"]))
-)
-
-
-fig.kde.Hemispheric.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                     filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                     left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                                 filter(SamplingPool == "Hemispheric sampling") %>%
-                                                                                                                 select(
-                                                                                                                   ID,
-                                                                                                                   diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                                 ),
-                                                                                                               by = "ID"
-                                                                                                     ),
-                                                                                                   var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                                   var_y = "nti.rarefac.mean",
-                                                                                                   lab_x = c(expression(atop(
-                                                                                                     "Historical Change in Precipitation",
-                                                                                                     scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                                   ))),
-                                                                                                   lab_y = c(expression("NTI"["Hemispheric"]))
-)
-
-# Realm ------------
-
-## NRI and Annual Temperature and Precipitation ------------
-
-fig.kde.Realm.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Realm sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Realm sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nri.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NRI"["Realm"]))
-)
-
-
-fig.kde.Realm.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Realm sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Realm sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nri.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NRI"["Realm"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation ------------
-
-
-fig.kde.Realm.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Realm sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Realm sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nti.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NTI"["Realm"]))
-)
-
-
-fig.kde.Realm.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Realm sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Realm sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nti.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NTI"["Realm"]))
-)
-
-# Plate ------------
-
-## NRI and Annual Temperature and Precipitation ------------
-
-fig.kde.Plate.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Plate sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Plate sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nri.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NRI"["Plate"]))
-)
-
-
-fig.kde.Plate.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Plate sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Plate sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nri.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NRI"["Plate"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation ------------
-
-
-fig.kde.Plate.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Plate sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Plate sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nti.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NTI"["Plate"]))
-)
-
-
-fig.kde.Plate.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Plate sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Plate sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nti.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NTI"["Plate"]))
-)
-# Biome ------------
-
-## NRI and Annual Temperature and Precipitation ------------
-
-fig.kde.Biome.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Biome sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Biome sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nri.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NRI"["Biome"]))
-)
-
-
-fig.kde.Biome.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Biome sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Biome sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nri.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NRI"["Biome"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation ------------
-
-
-fig.kde.Biome.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                       filter(SamplingPool == "Biome sampling") %>%
-                                                                                       left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                   filter(SamplingPool == "Biome sampling") %>%
-                                                                                                   select(
-                                                                                                     ID,
-                                                                                                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                   ),
-                                                                                                 by = "ID"
-                                                                                       ),
-                                                                                     var_x = "diff.AnnTemp.LGM_cur",
-                                                                                     var_y = "nti.rarefac.mean",
-                                                                                     lab_x = c(expression(atop(
-                                                                                       "Historical Change in Temperature (°C)",
-                                                                                       scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                     ))),
-                                                                                     lab_y = c(expression("NTI"["Biome"]))
-)
-
-
-fig.kde.Biome.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                               filter(SamplingPool == "Biome sampling") %>%
-                                                                                               left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                           filter(SamplingPool == "Biome sampling") %>%
-                                                                                                           select(
-                                                                                                             ID,
-                                                                                                             diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                           ),
-                                                                                                         by = "ID"
-                                                                                               ),
-                                                                                             var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                             var_y = "nti.rarefac.mean",
-                                                                                             lab_x = c(expression(atop(
-                                                                                               "Historical Change in Precipitation",
-                                                                                               scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                             ))),
-                                                                                             lab_y = c(expression("NTI"["Biome"]))
-)
-
-# Ecoregion ---------
-
-## NRI and Annual Temperature and Precipitation -----------
-
-fig.kde.Ecoregion.NRI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                           filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                           left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                       filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                       select(
-                                                                                                         ID,
-                                                                                                         diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                       ),
-                                                                                                     by = "ID"
-                                                                                           ),
-                                                                                         var_x = "diff.AnnTemp.LGM_cur",
-                                                                                         var_y = "nri.rarefac.mean",
-                                                                                         lab_x = c(expression(atop(
-                                                                                           "Historical Change in Temperature (°C)",
-                                                                                           scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                         ))),
-                                                                                         lab_y = c(expression("NRI"["Ecoregion"]))
-)
-
-
-fig.kde.Ecoregion.NRI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                   filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                   left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                               filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                               select(
-                                                                                                                 ID,
-                                                                                                                 diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                               ),
-                                                                                                             by = "ID"
-                                                                                                   ),
-                                                                                                 var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                                 var_y = "nri.rarefac.mean",
-                                                                                                 lab_x = c(expression(atop(
-                                                                                                   "Historical Change in Precipitation",
-                                                                                                   scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                                 ))),
-                                                                                                 lab_y = c(expression("NRI"["Ecoregion"]))
-)
-
-
-## NTI and Annual Temperature and Precipitation  --------
-
-
-fig.kde.Ecoregion.NTI.diff.AnnTemp.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                           filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                           left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                       filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                       select(
-                                                                                                         ID,
-                                                                                                         diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                       ),
-                                                                                                     by = "ID"
-                                                                                           ),
-                                                                                         var_x = "diff.AnnTemp.LGM_cur",
-                                                                                         var_y = "nti.rarefac.mean",
-                                                                                         lab_x = c(expression(atop(
-                                                                                           "Historical Change in Temperature (°C)",
-                                                                                           scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                                                                         ))),
-                                                                                         lab_y = c(expression("NTI"["Ecoregion"]))
-)
-
-
-fig.kde.Ecoregion.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_phyloStr_diffClim(parent_data = MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div %>%
-                                                                                                   filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                   left_join(MPD.MNTD.LatLong.AllScales.worldClimate.diff %>%
-                                                                                                               filter(SamplingPool == "Ecoregion sampling") %>%
-                                                                                                               select(
-                                                                                                                 ID,
-                                                                                                                 diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur
-                                                                                                               ),
-                                                                                                             by = "ID"
-                                                                                                   ),
-                                                                                                 var_x = "diff.log.AnnPrec.log.LGM_cur",
-                                                                                                 var_y = "nti.rarefac.mean",
-                                                                                                 lab_x = c(expression(atop(
-                                                                                                   "Historical Change in Precipitation",
-                                                                                                   scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
-                                                                                                 ))),
-                                                                                                 lab_y = c(expression("NTI"["Ecoregion"]))
-)
-```
 
 \noindent 
 **Figure S3.3.** Probability contours for the kernel density estimation between paleoclimatic legacies and the sampling frame size bias-corrected rarefied net relatedness index ($\mathsf{NRI_{raref}}$) of worldwide bat communities across sampling frame extents. Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods). Bivariate kernel density estimates are represented as the probability contours between the historical changes in temperature (left-column) and precipitation (right-column and) $\mathsf{NRI_{raref}}$ was measured at the (A and B) global, (C and D) east-west hemispheric (New World vs. Old World), (E and F) biogeographical realm, (G and H) tectonic plate, (I and J) within-realm biome, and (K and L) ecoregional sampling frame extents. Lighter tones represent lower quantiles and less frequent combinations while darker tones represent higher quantiles of the probability distribution.
 
-```{r echo=FALSE, eval = TRUE, fig.width = 16.5, fig.height = 7.5*6, fig.align = "center"}
+```{r echo=FALSE, eval = FALSE, fig.width = 16.5, fig.height = 7.5*6, fig.align = "center"}
 # Combining plots --------------------------------------------
 
 (fig.kde.SamplingPool.NRI.diffTemp.diffPrec <- ggarrange(
@@ -1336,7 +695,7 @@ fig.kde.Ecoregion.NTI.diff.log.AnnPrec.log.LGM_cur.Hpi <- ks_kde_geom_contours_p
 \noindent
 **Figure S3.4.** Probability contours for the kernel density estimation between paleoclimatic legacies and the sampling frame size bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{raref}}$) of worldwide bat communities across sampling frame extents. Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods). Bivariate kernel density estimates are represented as the probability contours between the historical changes in temperature (left-column) and precipitation (right-column and) $\mathsf{NTI_{raref}}$ was measured at the (A and B) global, (C and D) east-west hemispheric (New World vs. Old World), (E and F) biogeographical realm, (G and H) tectonic plate, (I and J) within-realm biome, and (K and L) ecoregional sampling frame extents. Lighter tones represent lower quantiles and less frequent combinations while darker tones represent higher quantiles of the probability distribution.
 
-```{r echo=FALSE, eval = TRUE, fig.width = 16.5, fig.height = 7.5*6, fig.align = "center"}
+```{r echo=FALSE, eval = FALSE, fig.width = 16.5, fig.height = 7.5*6, fig.align = "center"}
 (fig.kde.SamplingPool.NTI.diffTemp.diffPrec <- ggarrange(
   fig.kde.Global.NTI.diff.AnnTemp.LGM_cur.Hpi +
     theme(axis.title.x = element_blank()),

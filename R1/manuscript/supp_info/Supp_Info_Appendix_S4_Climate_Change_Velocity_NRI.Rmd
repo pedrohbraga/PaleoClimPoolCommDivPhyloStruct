@@ -92,8 +92,8 @@ extract.raster.ClimVelocity.i <- extract.raster.ClimVelocity.i %>%
 ```
 
 ```{r load_phylo_clim_diff_object, include = FALSE}
-MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff <- readRDS(paste0(projectDir, "data/matrices/MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff.RDS"))
-
+MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff <- readRDS(
+  paste0(projectDir, "data/matrices/MPD.MNTD.Chiroptera.Comm.Global.CWM.Div.worldClimate.diff.RDS"))
 ```
 
 ```{r cor_ClimVelocity_diff.AnnTemp.LGM_cur, echo = FALSE}
@@ -109,7 +109,7 @@ cor_ClimVelocity_diff.AnnTemp.LGM_cur <- MPD.MNTD.Chiroptera.Comm.Global.CWM.Div
 
 ## Study
 
-### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities
+### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities\
 
 ### Supplementary Information 4
 

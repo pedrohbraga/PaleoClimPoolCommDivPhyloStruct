@@ -52,40 +52,40 @@ lapply(required.libraries,
 
 ### Loading data
 
-# MPD.MNTD.LatLong.AllScales.rarefaction.relative.CWM.netDiv <- MPD.MNTD.LatLong.AllScales.rarefaction.relative %>% 
-#   filter(SamplingPool == "Global sampling") %>%
-#   left_join(CWM.Div.MPD.Chiroptera.Comm %>%
-#               filter(SamplingPool == "Global sampling") %>%
-#               select(ID, 
-#                      lambda_CWM:netDiv_CWM_std_w), 
-#             by = c("ID" = "ID")) %>%
-#   drop_na(nri.sec) %>%
-#   drop_na(ID_Realm)
-# 
-# phyloStr.LatLong.AllScales.raref.rel.CWM.netDiv.ClimStab.diff <- MPD.MNTD.LatLong.AllScales.rarefaction.relative.CWM.netDiv %>%
-#   left_join(MPD.MNTD.LatLong.AllScales.rarefaction.relative.worldClimate.diff %>%
-#               filter(SamplingPool == "Global sampling") %>%
-#               select(ID,
-#                      diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur),
-#             by = c("ID" = "ID")) %>%
-#   select(ID, 
-#          ID_SamplingPool,
-#          Longitude, Latitude,
-#          LONB:LATDD,
-#          SamplingPool,
-#          ID_Realm,
-#          ID_PlateName,
-#          ID_Biome,
-#          ID_Biome_Realm,
-#          ID_Ecoregion,
-#          ntaxa,
-#          mpd.obs.query:nri,
-#          ses.mpd.z.query.rarefac.mean:nri.rarefac.mean,
-#          mntd.obs.query:nti,
-#          ses.mntd.z.query.rarefac.mean:nti.rarefac.mean,
-#          ntaxa.pool.size,
-#          rarefac.pool.size,
-#          lambda_CWM:diff.log.AnnPrec.log.LGM_cur)
+MPD.MNTD.LatLong.AllScales.rarefaction.relative.CWM.netDiv <- MPD.MNTD.LatLong.AllScales.rarefaction.relative %>%
+  filter(SamplingPool == "Global sampling") %>%
+  left_join(CWM.Div.MPD.Chiroptera.Comm %>%
+              filter(SamplingPool == "Global sampling") %>%
+              select(ID,
+                     lambda_CWM:netDiv_CWM_std_w),
+            by = c("ID" = "ID")) %>%
+  drop_na(nri.sec) %>%
+  drop_na(ID_Realm)
+
+phyloStr.LatLong.AllScales.raref.rel.CWM.netDiv.ClimStab.diff <- MPD.MNTD.LatLong.AllScales.rarefaction.relative.CWM.netDiv %>%
+  left_join(MPD.MNTD.LatLong.AllScales.rarefaction.relative.worldClimate.diff %>%
+              filter(SamplingPool == "Global sampling") %>%
+              select(ID,
+                     diff.AnnTemp.LGM_cur:diff.log.AnnPrec.log.LGM_cur),
+            by = c("ID" = "ID")) %>%
+  select(ID,
+         ID_SamplingPool,
+         Longitude, Latitude,
+         LONB:LATDD,
+         SamplingPool,
+         ID_Realm,
+         ID_PlateName,
+         ID_Biome,
+         ID_Biome_Realm,
+         ID_Ecoregion,
+         ntaxa,
+         mpd.obs.query:nri,
+         ses.mpd.z.query.rarefac.mean:nri.rarefac.mean,
+         mntd.obs.query:nti,
+         ses.mntd.z.query.rarefac.mean:nti.rarefac.mean,
+         ntaxa.pool.size,
+         rarefac.pool.size,
+         lambda_CWM:diff.log.AnnPrec.log.LGM_cur)
 
 # write.csv(phyloStr.LatLong.AllScales.raref.rel.CWM.netDiv.ClimStab.diff,
 #           "data/matrices/phyloStr.LatLong.AllScales.raref.rel.CWM.netDiv.ClimStab.diff.csv")

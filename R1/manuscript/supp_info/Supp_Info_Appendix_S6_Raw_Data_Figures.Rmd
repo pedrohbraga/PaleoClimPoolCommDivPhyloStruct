@@ -100,7 +100,7 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
                                                      y = nri)
 ) +
   geom_jitter(aes(fill = SamplingPool, 
-                  colour = SamplingPool), size = 0.01, alpha = 0.2) +
+                  colour = SamplingPool), size = 0.01, alpha = 0.05) +
   geom_boxplot(aes(fill = SamplingPool), alpha = 0.7) +
   facet_wrap(~ID_Realm,
              nrow = 1,
