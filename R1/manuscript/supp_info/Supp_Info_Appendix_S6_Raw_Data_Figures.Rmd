@@ -45,9 +45,9 @@ MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.worldClimate.diff <- readRDS("~/chapt
 ```
 
 ### Study
-### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities
+### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities/
 
-### Supplementary Information 3
+### Supplementary Information 6
 
 ### Appendix S6. Raw data representation
 
@@ -219,5 +219,3 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
 )
 ```
 
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

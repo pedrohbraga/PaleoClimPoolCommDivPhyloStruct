@@ -25,6 +25,8 @@ theme_map <- function(...) {
     )
 }
 
+# General theme for the quantile bootstrap boxplots
+
 
 theme_boot_quant <- function(...){ 
   theme_minimal(base_size = 20) %+replace%    #replace elements we want to change

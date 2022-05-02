@@ -22,10 +22,6 @@
 #
 #######################################################################################################
 
-CWM_Std_TW(Trait = tip.rates$lambda.avg, 
-           Distrib = Chiroptera.FaurSven.comm)
-
-
 CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
   
   # Distrib = Comm
@@ -123,3 +119,6 @@ CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
                                   CWM_std_w = CWM_std_w)
     )
 }
+
+# CWM_Std_TW(Trait = tip.rates$lambda.avg, 
+#            Distrib = Chiroptera.FaurSven.comm)
