@@ -1,6 +1,6 @@
 ---
 output:
-  pdf_document:
+  bookdown::pdf_document2:
       latex_engine: xelatex
       number_sections: false
       toc: false
@@ -21,6 +21,10 @@ header-includes:
    - \usepackage{parskip}
    - \setlength{\parindent}{4em}
    - \setlength{\parskip}{0em}
+   - \usepackage{caption}
+   - \usepackage{pdflscape}
+   - \newcommand{\blandscape}{\begin{landscape}}
+   - \newcommand{\elandscape}{\end{landscape}}
 ---
 
 ```{r setup, include = FALSE}
@@ -40,6 +44,8 @@ library(latex2exp)
 source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
 
 source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 
@@ -258,7 +264,9 @@ for(n in extra.species.for.pool){
 
 ### Study
 
-### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities/
+### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities
+
+
 
 ### Supplementary Information 3
 
@@ -292,7 +300,7 @@ We repeated the rarefaction procedure 1000 times and reproduced the figures addr
 The interpretation of the rarefied indices follow the same ones for NRI and NTI (see Methods in the main document; Webb, 2000).
 
 We performed these procedures using R and RStudio [@rcoreteamLanguageEnvironmentStatistical2019; @rstudioteam2020], with the help of functions from the `ape` [@paradis2019ba], `picante` [@kembel2010b], `PhyloMeasures` [@tsirogiannis2017], `tidyverse` [@wickham2019joss] packages.
-See Appendix S1 for complementary information on tools used in this study.
+See Methods and Appendix S1 for complementary information on the procedures and tools used in this study.
 
 ### Rarefaction corrects for sampling frame size bias in both simulations and in empirical data
 
@@ -300,7 +308,13 @@ As demonstrated in Sandel [-@sandel2018e], the traditional community phylogeneti
 However, the rarefaction-based calculation of phylogenetic relatedness effectively removes the sampling frame size bias in the simulations (see Figure S3.1 C-F).
 $\mathsf{NRI_{raref_{FIX}}}$ and $\mathsf{NTI_{raref_{FIX}}}$, which fixes the size of sampling frames to the smallest sample,
 
-As expected, the rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) for bat communities were closer to zero, but highly correlated with their respective unrarefied indices for phylogenetic relatedness (Pearson's $r$ of `r MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>% dplyr::select(nri, nri.rarefac.mean) %>% drop_na() %>% cor() %>% pluck(2) %>% round(digits = 2)`, and Pearson's $r$ `r MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>% dplyr::select(nti, nti.rarefac.mean) %>%   drop_na() %>% cor(method = "kendall") %>% pluck(2) %>% round(digits = 2)`, respectively).
+```{r rarefaction-correlations, message=FALSE, warning=FALSE, include=FALSE}
+cor.nri.nri.raref.mean <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>% dplyr::select(nri, nri.rarefac.mean) %>% drop_na() %>%  cor(method = "kendall") %>% pluck(2) %>% round(digits = 2)
+
+cor.nti.nti.raref.mean <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>% dplyr::select(nti, nti.rarefac.mean) %>%   drop_na() %>% cor(method = "kendall") %>% pluck(2) %>% round(digits = 2)
+```
+
+As expected, the rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) for bat communities were closer to zero, but highly correlated with their respective unrarefied indices for phylogenetic relatedness (Kendall's $\tau$ of `r cor.nri.nri.raref.mean`, and Kendall's $\tau$ `r cor.nti.nti.raref.mean`, respectively).
 
 All figures we reproduced with the rarefied NRI and NTI indices (Figures S3.2, S3.3, S3.4 and S3.5) had similar patterns to those we observed in the figures from the main manuscript (Figures 2, 3, 4 and 5).
 
@@ -313,10 +327,12 @@ For the purposes of simplification and to avoid the loss of information introduc
 
 ## Figures
 
-\noindent **Figure S3.1.** The size of the phylogenetic sampling frame influences community phylogenetic relatedness index values of simulated communities [as shown by $\mathsf{NRI}$ (net relatedness index) and $\mathsf{NTI}$ (nearest taxon index); A and B].
+\noindent 
+**Figure S3.1.** The size of the phylogenetic sampling frame influences community phylogenetic relatedness index values of simulated communities [as shown by $\mathsf{NRI}$ (net relatedness index) and $\mathsf{NTI}$ (nearest taxon index); A and B].
 Rarefaction with both fixed-size sub-sampling [$\mathsf{NRI_{raref_{FIX}}}$ and $\mathsf{NTI_{raref_{FIX}}}$; C and D] and relative-size sub-sampling [$\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$; E and F] removes the sampling frame size-dependence.
 
-```{r fig-sim-raref, echo=FALSE, eval = F, fig.width = 12, fig.height = 18, fig.align = "center"}
+```{r fig-sim-raref, echo = FALSE, eval = T, fig.width = 12, fig.height = 18, fig.align = "center"}
+
 NRI.fixed.pool.size.rarefac<- ggplot(mpd.fixed.pool.comparisons, 
                                      aes(x = pool.size, 
                                          y = nri.rarefac.mean, 
@@ -527,7 +543,8 @@ fig.NRI.NTI.Realm.boxplot.phyloSampling <- ggarrange(
 fig.NRI.NTI.Realm.boxplot.phyloSampling
 ```
 
-\noindent *Figure S3.2.* Realm-comparison of the sampling frame size bias-corrected phylogenetic structure of bat assemblages -- measured through the (A) rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and (B) nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) -- across a gradient of sampling frame spatial restrictions (see Methods).
+\noindent 
+*Figure S3.2.* Realm-comparison of the sampling frame size bias-corrected phylogenetic structure of bat assemblages -- measured through the (A) rarefied net relatedness index ($\mathsf{NRI_{raref_{REL}}}$) and (B) nearest taxon index ($\mathsf{NTI_{raref_{REL}}}$) -- across a gradient of sampling frame spatial restrictions (see Methods).
 Sampling frames were restricted for the (i) global, (ii) east-west hemispheric (New World vs. Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents.
 Bat communities with positive values of $\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent.
 Conversely, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
@@ -658,7 +675,8 @@ NTI.Realm.rarefaction.relative.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScal
 )
 ```
 
-\noindent **Figure S3.3.** Average bias-corrected rarefied net relatedness index ($\mathsf{NRI_{raref}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
+\noindent 
+**Figure S3.3.** Average bias-corrected rarefied net relatedness index ($\mathsf{NRI_{raref}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
 $\mathsf{NRI_{raref}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
@@ -1004,7 +1022,8 @@ fig.Ecoregion.mean.NRI.rarefaction.relative.netDiv_CWM_std_tw_rs_1.quantile <- q
 
 ```
 
-\noindent **Figure S3.4.** Average bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{raref}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
+\noindent 
+**Figure S3.4.** Average bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{raref}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
 $\mathsf{NTI_{raref}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
@@ -1349,11 +1368,16 @@ fig.Ecoregion.mean.NTI.rarefaction.relative.netDiv_CWM_std_tw_rs_1.quantile <- q
 )
 ```
 
-\noindent **Figure S3.5.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial sampling frame extents.
+\newpage
+
+\blandscape
+
+\noindent 
+**Figure S3.5.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial sampling frame extents.
 The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each sampling frame extent.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature or logarithm of the mean annual precipitation from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
-Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90^th^ percentile) for the indices for phylogenetic community relatedness (XXX and XXXX ) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions; see Table XXX).
+Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($\mathsf{NRI_{raref_{REL}}}$ and $\mathsf{NTI_{raref_{REL}}}$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
 
 ```{r boot-logistic-binary-outcome-09-phylostr-rarefac-paleoclim-stab-net-div, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
 
@@ -1629,30 +1653,34 @@ glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$S
 
 glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure <- as.factor(glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure)
 
-levels(glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure) <- c(TeX("$Pr(mean.NRI.rarefaction.relative_{Q90}=1)$"), 
-                                                                                                           TeX("$Pr(mean.NTI.rarefaction.relative_{Q90}=1)$")
+# levels(glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure) 
+
+levels(glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure) <- c(TeX("$Pr(NRI_{rar}_{Q90}=1)$",  output = c("expression")), 
+                                                                                                           TeX("$Pr(NTI_{rar}_{Q90}=1)$", output = c("expression"))
                                                                                                            )
 
+# levels(glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09$PhyloStructure) 
 # TeX('$Pr(NRI_{Q_{90}}=1)$')
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 
+```{r echo=FALSE, fig.dim=c(5*6, 5), message=FALSE, warning=FALSE, fig.align = 'center', dpi = 250}
 ggplot(data = glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09,
                                                                     aes(x = estimate,
                                                                         y = variable)
 ) +
-    geom_tile(data = glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09,
-              aes(fill = SamplingPool),
-              alpha = 1) +
+    # geom_tile(data = glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.quantiles.09,
+    #           aes(fill = SamplingPool),
+    #           alpha = 1) +
     geom_boxplot(
       lwd = 0.2,
-      outlier.size = 1,
+      outlier.size = 0.5,
       outlier.stroke = 0.2,
       aes(fill = SamplingPool, 
           colour = SamplingPool
-      ))  +
-    ggsci::scale_fill_uchicago(alpha = 0.8) +
+      )
+      )  +
+    ggsci::scale_fill_uchicago(alpha = 0.7) +
     ggsci::scale_colour_uchicago() +
     labs(y = "",
          x = "Partial bootstrapped coefficients") +
@@ -1679,7 +1707,7 @@ ggplot(data = glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.
     #            strip.position = c("top",
     #                               "right")) +
     
-    theme_boot_quant() +
+    theme_boot_quant(base_size = 20) +
     theme(
       plot.margin = unit(
         c(1.2, # top
@@ -1713,4 +1741,15 @@ ggplot(data = glm.boot.AllScales.mean.NRI.NTI.rarefaction.relative.ClimStab.Div.
       
     )
 ```
+\def\fillandplacepagenumber{%
+ \par\pagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
 
+\fillandplacepagenumber
+
+\elandscape
