@@ -1,5 +1,10 @@
 .Rhistory
-.RData
+
+*.Rdata
+*.RData
+*.html
+*.tex
+
 .Rproj.user
 .png
 .html
@@ -12,5 +17,14 @@ data/
 figures/
 
 
-R1/manuscript/supp_info/Supp_Info_Appendix_S3_Pool_Size_Correction_Rarefaction_Sqrt_cache/
-R1/manuscript/supp_info/Supp_Info_Appendix_S6_Raw_Data_Figures_cache/
+R1/manuscript/supp_info/**_files/
+R1/manuscript/supp_info/**_cache/
+
+*.png
+*.out
+
+*.docx
+
+*.pdf
+
+**not_included/
