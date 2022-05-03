@@ -1,0 +1,1355 @@
+---
+output:
+  bookdown::pdf_document2:
+      latex_engine: xelatex
+      number_sections: false
+      toc: false
+mainfont: "Times New Roman"
+geometry: margin = 1in
+spacing: double
+fontsize: 11pt
+editor_options:
+  markdown:
+    wrap: sentence
+bibliography: "supp_info_s5.bib"
+csl: https://raw.githubusercontent.com/marlonecobos/kuenm/master/ecography.csl
+link-citations: yes
+header-includes:
+   - \usepackage{lineno}
+   - \linenumbers
+   - \usepackage{setspace}\doublespacing
+   - \usepackage{parskip}
+   - \setlength{\parindent}{4em}
+   - \setlength{\parskip}{0em}
+   - \usepackage{caption}
+   - \usepackage{pdflscape}
+   - \newcommand{\blandscape}{\begin{landscape}}
+   - \newcommand{\elandscape}{\end{landscape}}
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(ggpubr)
+library(sf)
+library(raster)
+library(exactextractr)
+library(data.table)
+library(phytools)
+library(PhyloMeasures)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(scales)
+library(purrr)
+library(robust)
+library(latex2exp)
+
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      fig.height = 5,
+                      fig.width = 5,
+                      fig.align = "center",
+                      cache.lazy = TRUE)
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
+
+netDiv.CWM.Chiroptera.rs_5.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_5.mean.csv")[, -1]
+netDiv.CWM.Chiroptera.rs_1.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_1.mean.csv")[, -1]
+```
+
+### Study
+
+### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities\
+
+### Supplementary Information 5
+
+### Appendix S5. Robustness to phylogenetic uncertainty
+
+To account for phylogenetic uncertainty, we recalculated the phylogenetic relatedness and the _in situ_ diversification rates of bat communities on a subset of randomly sampled trees from the posterior distribution of phylogenetic trees from Faurby and Svenning (-@faurby2015mpae) [see @donoghue1996ptrslbbs]. We then took the average net relatedness index, nearest taxon index and community-weighted net diversification rates across the calculations done of the phylogenetic sampled and used these averages to reproduce the figures testing each hypothesis from our study.
+
+These results were qualitately similar to the ones computed on the maximum credibility clade phylogenetic tree (see Figures 2, 3, 4 and 5, and Figures S5.1, S5.2, S5.3 and S5.4), allowing us to consider that our inferences are robust to the uncertainty of phylogenetic hypotheses from the posterior distribution of the phylogenetic relationships we used in our study.
+
+## References for Supporting Information 5
+
+::: {#refs}
+:::
+
+### Figures
+
+\noindent
+**Figure S5.1.** Realm-comparison of the phylogenetic structure of bat assemblages – measured through the averages of (A) net relatedness index ($\mathsf{NRI_{rob}}$) and (B) nearest taxon index ($\mathsf{NTI_{rob}}$) across computations on a subset of 50 phylogenetic trees sampled from the posterior distribution of phylogenetic trees available in Faurby and Svenning (2015) – across a gradient of sampling frame spatial restrictions (see Methods). Sampling frames were restricted for the (i) global, (ii) east-west hemispheric (New World vs. Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents. Bat communities with positive values of NRI and NTI indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent. On the other hand, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+
+```{r include=FALSE}
+# Recursively read all MPD MNTD files from the phylo sampling procedure
+
+phyloSampling_mpd_mntd_dir <- dir("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/phyoSampling_mpd_mntd", full.names = TRUE)
+
+MPD.MNTD.LatLong.AllScales_phyloSampling <- data.frame()
+
+for(full.file.name.i in phyloSampling_mpd_mntd_dir){
+  MPD.MNTD.LatLong.AllScales_sampled <- fread(full.file.name.i) %>%
+    dplyr::select(-"V1")
+  
+  MPD.MNTD.LatLong.AllScales_phyloSampling <- MPD.MNTD.LatLong.AllScales_phyloSampling %>%
+    bind_rows(MPD.MNTD.LatLong.AllScales_sampled)
+}
+
+MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Realm, 
+                                                            levels = c('Neotropical',
+                                                                     'Nearctic',
+                                                                     'Afrotropical',
+                                                                     'Palearctic', 
+                                                                     'Indomalay', 
+                                                                     'Australasian')
+                                                            )
+
+MPD.MNTD.LatLong.AllScales_phyloSampling$SamplingPool <-  factor(MPD.MNTD.LatLong.AllScales_phyloSampling$SamplingPool,  
+                                                                 levels = c("Global sampling",
+                                                                            "Hemispheric sampling",
+                                                                            "Realm sampling",
+                                                                            "Plate sampling",
+                                                                            "Biome sampling",
+                                                                            "Ecoregion sampling"))
+
+MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Biome <- as.factor(MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Biome)
+
+MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Biome_Acronym = factor(MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Biome, 
+                                                                   labels = abbreviate(gsub("_", 
+                                                                                            " ",
+                                                                                            levels(MPD.MNTD.LatLong.AllScales_phyloSampling$ID_Biome))))
+
+
+MPD.MNTD.LatLong.AllScales_phyloSampling_summary <- MPD.MNTD.LatLong.AllScales_phyloSampling %>%
+  group_by(ID_SamplingPool) %>%
+  summarise(nri.mean.samp = mean(nri, na.rm = T), 
+            nti.mean.samp = mean(nti, na.rm = T),
+            n.samp = n()) %>%
+  right_join(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div, 
+             by = "ID_SamplingPool") # %>%
+  # left_join(netDiv.CWM.Chiroptera.rs_5.mean,
+  #           by = "ID") %>%
+  # left_join(netDiv.CWM.Chiroptera.rs_1.mean,
+  #           by = "ID") %>%
+  # as.data.frame()
+
+rm(MPD.MNTD.LatLong.AllScales_phyloSampling)
+```
+
+```{r eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
+
+## Representing the phylogenetic community structure of bats across the ###
+### gradient of sampling pool (or species pool) restriction              ###
+
+# Representing NRI wrapping across Realms
+
+NRI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                       filter(!is.na(ID_Realm)),
+                                     aes(x = SamplingPool, y = nri.mean.samp, fill = SamplingPool)) +
+  geom_boxplot(aes(x = SamplingPool, y = nri.mean.samp)) +
+  facet_wrap(~ID_Realm,
+             nrow = 1,
+             strip.position = "bottom") +
+  ggsci::scale_fill_uchicago() +
+  # scale_fill_nord("baie_mouton", reverse = TRUE) +
+  # scale_fill_okabeito(reverse = TRUE) +
+  # scale_fill_brewer(palette = "Dark2") +
+  # scale_fill_viridis(discrete = TRUE,
+  #                    name="Sampling Pool") +
+  scale_y_continuous(breaks = round(
+    #pretty(MPD.LatLong.Env.AllScales$NRI, n = 7)
+    c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri.mean.samp, na.rm = T),
+      0,
+      5,
+      10,
+      15,
+      max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri.mean.samp, na.rm = T)))
+  ) +
+  geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  labs(y=c(expression(bar("NRI")["rob"])), x = "") +
+  theme_minimal() +
+  theme_minimal(base_size = 20) +
+  theme(strip.background = element_rect(fill = "white",
+                                        linetype = NULL,
+                                        color = "white"),
+        strip.text = element_text(color = "black",
+                                  face = "bold",
+                                  size = 15),
+        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_blank(),
+        axis.title = element_text(size = 16, face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        legend.title.align = 0.5,
+        legend.margin=margin(0, 0, 0, 0),
+        legend.box.margin=margin(-5, -5, 2, -5)
+  ) +   
+  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                             title.position = "bottom",
+                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+  )
+
+# Representing NTI wrapping across Realms
+
+NTI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                       filter(!is.na(ID_Realm)),
+                                     aes(x = SamplingPool, y = nti.mean.samp, fill = SamplingPool)) +
+  geom_boxplot(aes(x = SamplingPool, y = nti)) +
+  facet_wrap(~ID_Realm,
+             nrow = 1,
+             strip.position = "bottom") +
+  ggsci::scale_fill_uchicago() +
+  # scale_fill_nord("baie_mouton", reverse = TRUE) +
+  # scale_fill_okabeito(reverse = TRUE) +
+  # scale_fill_brewer(palette = "Dark2") +
+  # scale_fill_viridis(discrete = TRUE,
+  #                    name="Sampling Pool") +
+  scale_y_continuous(
+    breaks =
+      #   pretty(MPD.MNTD.LatLong.AllScales$nti, n = 5),
+      round(
+        c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T),
+          -2,
+          0,
+          2,
+          4,
+          max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) + 0.1)
+      ),
+    limits = c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) - 0.1,
+               max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) + 0.1)
+    # n.breaks = 4
+  ) +
+  geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  labs(y = c(expression(bar("NTI")["rob"])), x = "") +
+  theme_minimal(base_size = 20) +
+  theme(strip.background = element_rect(fill = "white",
+                                        linetype = NULL,
+                                        color = "white"),
+        strip.text = element_text(color = "black",
+                                  face = "bold",
+                                  size = 15),
+        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_blank(),
+        axis.title = element_text(size = 16, face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        legend.title.align = 0.5,
+        legend.margin=margin(0, 0, 0, 0),
+        legend.box.margin=margin(-5, -5, 2, -5)
+  ) +   
+  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                             title.position = "bottom",
+                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+  )
+
+
+### Combining plots into a single figure ###
+
+(
+  fig.NRI.NTI.Realm.boxplot.phyloSampling <- ggarrange(
+    NRI.Realm.sampling.boxplot +
+      theme(axis.title.x = element_blank()), 
+    NTI.Realm.sampling.boxplot,
+    labels = c("A", "B"),
+    ncol = 1, nrow = 2,
+    widths = c(1, 1),
+    heights = c(1, 1.1),
+    align = "v",
+    common.legend = TRUE,
+    legend = "bottom"
+  )
+)
+
+```
+
+\noindent 
+**Figure S5.2.** Average net relatedness index ($\mathsf{NRI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and average _in situ_ net diversification rates across sampling frame extents.
+Average *in situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
+Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
+$\mathsf{NRI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
+Bat communities with positive values of $\mathsf{NRI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent.
+Conversely, negative values of $\mathsf{NRI_{rob}}$ indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+
+```{r NRI-phylo-sampling-quantiles-paleoclim-stab-net-div, eval=TRUE, echo = FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
+#### NRI ####
+
+fig.Global.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    dplyr::filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Global"]]))
+)
+
+fig.Hemispheric.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) °C",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Ecoregion"]]))
+)
+
+
+###
+
+fig.Global.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Global"]]))
+)
+
+
+fig.Hemispheric.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")["rob"["Ecoregion"]]))
+)
+
+
+fig.Global.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Global"]]))
+)
+
+fig.Hemispheric.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")["rob"["Ecoregion"]]))
+)
+
+
+# Combining plots --------------------------------------------
+
+(fig.quantile.SamplingPool.NRI.diffTemp.diffPrec.netDiv <- ggpubr::ggarrange(
+  fig.Global.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Global.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Global.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),  
+  fig.Ecoregion.mean.NRI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile,
+  fig.Ecoregion.mean.NRI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile,
+  fig.Ecoregion.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile,
+  labels = c("A", "B", "C", 
+             "D", "E", "F",
+             "G", "H", "I", 
+             "J", "K", "L",
+             "M", "N", "O",
+             "P", "Q", "R"
+  ),
+  ncol = 3, nrow = 6,
+  widths = c(1, 1),
+  heights = c(0.9, 1),
+  align = "v",
+  font.label = list(size = 28)
+)
+)
+
+```
+
+\noindent 
+**Figure S5.3.** Average bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
+*In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
+Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
+$\mathsf{NTI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
+Bat communities with positive values of $\mathsf{NTI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent.
+Conversely, negative values of NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+
+```{r NTI-phylo-sampling-quantiles-paleoclim-stab-net-div, eval=TRUE, echo=FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
+
+#### NTI ####
+
+fig.Global.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    dplyr::filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Global"]]))
+)
+
+fig.Hemispheric.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y =  c(expression(bar("NTI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) (°C)",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.AnnTemp.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.AnnTemp.LGM_cur"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Historical Change in Temperature) °C",
+    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Ecoregion"]]))
+)
+
+
+###
+
+fig.Global.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Global"]]))
+)
+
+
+fig.Hemispheric.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "diff.log.AnnPrec.log.LGM_cur",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("diff.log.AnnPrec.log.LGM_cur"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Historical Change in Precipitation)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")["rob"["Ecoregion"]]))
+)
+
+
+fig.Global.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")["rob"["Global"]]))
+)
+
+fig.Hemispheric.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")["rob"["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")["rob"["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")["rob"["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti.mean.samp",
+  X = "netDiv_CWM_std_tw_rs_1_mean",
+  dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti.mean.samp") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1_mean"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")["rob"["Ecoregion"]]))
+)
+
+
+# Combining plots --------------------------------------------
+
+(fig.quantile.SamplingPool.NTI.diffTemp.diffPrec.netDiv <- ggpubr::ggarrange(
+  fig.Global.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Global.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Global.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Hemispheric.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Realm.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Plate.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile +
+    theme(axis.title.x = element_blank()),
+  fig.Biome.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile +
+    theme(axis.title.x = element_blank()),  
+  fig.Ecoregion.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile,
+  fig.Ecoregion.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile,
+  fig.Ecoregion.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile,
+  labels = c("A", "B", "C", 
+             "D", "E", "F",
+             "G", "H", "I", 
+             "J", "K", "L",
+             "M", "N", "O",
+             "P", "Q", "R"
+  ),
+  ncol = 3, nrow = 6,
+  widths = c(1, 1),
+  heights = c(0.9, 1),
+  align = "v",
+  font.label = list(size = 28)
+)
+)
+```
+
+
+\newpage
+
+\blandscape
+
+\noindent 
+**Figure S5.4.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial sampling frame extents.
+The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each sampling frame extent.
+*In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
+Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature or logarithm of the mean annual precipitation from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
+Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($\mathsf{NRI_{rob}}$ and $\mathsf{NTI_{rob}}$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and average *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
+
+```{r boot-logistic-binary-outcome-09-phylostr-phylo-sampling-paleoclim-stab-net-div, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
+
+# Bootstrap approach
+
+glm.boot.Global.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                           X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                 "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                 "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                           dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                             filter(SamplingPool == "Global sampling") %>%
+                                                                                             dplyr::select(c("nri.mean.samp", 
+                                                                                                             "diff.AnnTemp.LGM_cur", 
+                                                                                                             "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                           quantiles = c(0.75, 0.90), 
+                                                                                           n.boot = 100,
+                                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Hemispheric.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                                X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                      "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                      "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                                dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                                  filter(SamplingPool == "Hemispheric sampling") %>%
+                                                                                                  dplyr::select(c("nri.mean.samp", 
+                                                                                                                  "diff.AnnTemp.LGM_cur", 
+                                                                                                                  "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                                  "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                                  drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                                quantiles = c(0.75, 0.90), 
+                                                                                                n.boot = 100,
+                                                                                                boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Realm.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Realm sampling") %>%
+                                                                                            dplyr::select(c("nri.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Plate.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Plate sampling") %>%
+                                                                                            dplyr::select(c("nri.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Biome.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Biome sampling") %>%
+                                                                                            dplyr::select(c("nri.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Ecoregion.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri.mean.samp",
+                                                                                              X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                    "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                    "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                              dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                                filter(SamplingPool == "Ecoregion sampling") %>%
+                                                                                                dplyr::select(c("nri.mean.samp", 
+                                                                                                                "diff.AnnTemp.LGM_cur", 
+                                                                                                                "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                                "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                                drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                              quantiles = c(0.75, 0.90), 
+                                                                                              n.boot = 100,
+                                                                                              boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Global.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                           X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                 "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                 "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                           dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                             filter(SamplingPool == "Global sampling") %>%
+                                                                                             dplyr::select(c("nti.mean.samp", 
+                                                                                                             "diff.AnnTemp.LGM_cur", 
+                                                                                                             "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                           quantiles = c(0.75, 0.90), 
+                                                                                           n.boot = 100,
+                                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Hemispheric.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                                X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                      "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                      "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                                dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                                  filter(SamplingPool == "Hemispheric sampling") %>%
+                                                                                                  dplyr::select(c("nti.mean.samp", 
+                                                                                                                  "diff.AnnTemp.LGM_cur", 
+                                                                                                                  "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                                  "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                                  drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                                quantiles = c(0.75, 0.90), 
+                                                                                                n.boot = 100,
+                                                                                                boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Realm.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Realm sampling") %>%
+                                                                                            dplyr::select(c("nti.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Plate.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Plate sampling") %>%
+                                                                                            dplyr::select(c("nti.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Biome.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                          X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                          dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                            filter(SamplingPool == "Biome sampling") %>%
+                                                                                            dplyr::select(c("nti.mean.samp", 
+                                                                                                            "diff.AnnTemp.LGM_cur", 
+                                                                                                            "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                            "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                            drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                          quantiles = c(0.75, 0.90), 
+                                                                                          n.boot = 100,
+                                                                                          boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Ecoregion.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti.mean.samp",
+                                                                                              X = c("diff.AnnTemp.LGM_cur", 
+                                                                                                    "diff.log.AnnPrec.log.LGM_cur",
+                                                                                                    "netDiv_CWM_std_tw_rs_1_mean"),
+                                                                                              dataset = MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                                                                                filter(SamplingPool == "Ecoregion sampling") %>%
+                                                                                                dplyr::select(c("nti.mean.samp", 
+                                                                                                                "diff.AnnTemp.LGM_cur", 
+                                                                                                                "diff.log.AnnPrec.log.LGM_cur", 
+                                                                                                                "netDiv_CWM_std_tw_rs_1_mean")) %>%
+                                                                                                drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                              quantiles = c(0.75, 0.90), 
+                                                                                              n.boot = 100,
+                                                                                              boot.size = 2500 # increase to 5000
+)
+
+```
+
+```{r echo=FALSE}
+
+##### Figure creation #####
+
+# q = 0.9 ######
+
+glm.boot.AllScales.mean.NRI.phylo.sampling.ClimStab.Div.quantiles.09 <- bind_rows(data.frame(glm.boot.Global.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Global sampling"),
+                                                                                        data.frame(glm.boot.Hemispheric.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Hemispheric sampling"),
+                                                                                        data.frame(glm.boot.Realm.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Realm sampling"),
+                                                                                        data.frame(glm.boot.Plate.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Plate sampling"),
+                                                                                        data.frame(glm.boot.Biome.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Biome sampling"),
+                                                                                        data.frame(glm.boot.Ecoregion.mean.NRI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Ecoregion sampling")
+) 
+
+glm.boot.AllScales.mean.NTI.phylo.sampling.ClimStab.Div.quantiles.09 <- bind_rows(data.frame(glm.boot.Global.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Global sampling"),
+                                                                                        data.frame(glm.boot.Hemispheric.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Hemispheric sampling"),
+                                                                                        data.frame(glm.boot.Realm.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Realm sampling"),
+                                                                                        data.frame(glm.boot.Plate.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Plate sampling"),
+                                                                                        data.frame(glm.boot.Biome.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Biome sampling"),
+                                                                                        data.frame(glm.boot.Ecoregion.mean.NTI.phylo.sampling.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                                   SamplingPool = "Ecoregion sampling")
+) 
+
+
+glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09 <- bind_rows(
+  data.frame(glm.boot.AllScales.mean.NRI.phylo.sampling.ClimStab.Div.quantiles.09[, 2:5],
+             PhyloStructure = "mean.NRI.phylo.sampling") %>%
+    reshape2::melt( 
+      id.vars = c("SamplingPool", "PhyloStructure"),
+      variable.name = "variable",
+      value.name = "estimate"),
+  
+  data.frame(glm.boot.AllScales.mean.NTI.phylo.sampling.ClimStab.Div.quantiles.09[, 2:5],
+             PhyloStructure = "mean.NTI.phylo.sampling") %>%
+    reshape2::melt( 
+      id.vars = c("SamplingPool", "PhyloStructure"),
+      variable.name = "variable",
+      value.name = "estimate")
+)
+
+
+glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$SamplingPool <- factor(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$SamplingPool,
+                                                                                                      levels = c(
+                                                                                                        "Global sampling",
+                                                                                                        "Hemispheric sampling",
+                                                                                                        "Realm sampling",
+                                                                                                        "Plate sampling",
+                                                                                                        "Biome sampling",
+                                                                                                        "Ecoregion sampling"),
+                                                                                                      labels = c(
+                                                                                                        "Global~sampling",
+                                                                                                        "Hemispheric~sampling",
+                                                                                                        "Realm~sampling",
+                                                                                                        "Plate~sampling",
+                                                                                                        "Biome~sampling",
+                                                                                                        "Ecoregion~sampling"
+                                                                                                      )
+)
+
+
+glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$PhyloStructure <- as.factor(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$PhyloStructure)
+
+# levels(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$PhyloStructure) 
+
+levels(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$PhyloStructure) <- c(TeX("$Pr(NRI_{rob}_{Q90}=1)$",  output = c("expression")), 
+                                                                                                           TeX("$Pr(NTI_{rob}_{Q90}=1)$", output = c("expression"))
+                                                                                                           )
+
+# levels(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$PhyloStructure) 
+# TeX('$Pr(NRI_{Q_{90}}=1)$')
+```
+
+
+```{r echo=FALSE, fig.dim=c(5*6, 5), message=FALSE, warning=FALSE, fig.align = 'center', dpi = 250}
+ggplot(data = glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09,
+                                                                    aes(x = estimate,
+                                                                        y = variable)
+) +
+    # geom_tile(data = glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09,
+    #           aes(fill = SamplingPool),
+    #           alpha = 1) +
+    geom_boxplot(
+      lwd = 0.2,
+      outlier.size = 0.5,
+      outlier.stroke = 0.2,
+      aes(fill = SamplingPool, 
+          colour = SamplingPool
+      )
+      )  +
+    ggsci::scale_fill_uchicago(alpha = 0.7) +
+    ggsci::scale_colour_uchicago() +
+    labs(y = "",
+         x = "Partial bootstrapped coefficients") +
+    scale_y_discrete(
+      labels = c("diff.AnnTemp.LGM_cur" = "Historical change in temperature", 
+                 "diff.log.AnnPrec.log.LGM_cur" = "Historical change in precipitation",
+                 "netDiv_CWM_std_tw_rs_1_mean" = "Average _in situ_ diversification rates")
+    ) +
+    
+    # Add white line on top (Inf) of the plot (ie, betweem plot and facet)
+    # geom_vline(xintercept = Inf, 
+    #            color = "white", 
+    #            size = 10) +
+    geom_vline(xintercept = 0,
+               alpha = 0.4) +
+    facet_grid(PhyloStructure ~ SamplingPool,
+               # scales = "free",
+               switch = "y",
+               labeller = label_parsed
+    ) +
+    # facet_wrap(SamplingPool~PhyloStructure,
+    #            nrow = 6,
+    #            ncol = 2,
+    #            strip.position = c("top",
+    #                               "right")) +
+    
+    theme_boot_quant(base_size = 20) +
+    theme(
+      plot.margin = unit(
+        c(1.2, # top
+          1, 
+          1.2,
+          0.5), "lines"),
+      panel.spacing.x = unit(1, "lines"),
+      panel.spacing.y = unit(1.5, "lines"),
+      strip.placement = "outside",
+      #      strip.background = element_rect(size = 1),
+      strip.text.y = element_text(margin = margin(t = 0, 
+                                                  r = 2, 
+                                                  b = 0, 
+                                                  l = 2, "mm")),
+      strip.text.x = element_text(margin = margin(t = 0, 
+                                                  r = 0, 
+                                                  b = 2, 
+                                                  l = 0, "mm"),
+                                  size = 17),
+      axis.text.x = ggtext::element_markdown( 
+        size = 15,
+        # angle = 90, 
+        vjust = 1, 
+        hjust = 0.5,
+        face = "bold"),
+      axis.text.y = ggtext::element_markdown( 
+        size = 15,
+        hjust = 1),
+      axis.title = element_text(size = 16),
+      legend.position = "none"
+      
+    )
+```
+\def\fillandplacepagenumber{%
+ \par\pagestyle{empty}%
+ \vbox to 0pt{\vss}\vfill
+ \vbox to 0pt{\baselineskip0pt
+   \hbox to\linewidth{\hss}%
+   \baselineskip\footskip
+   \hbox to\linewidth{%
+     \hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape

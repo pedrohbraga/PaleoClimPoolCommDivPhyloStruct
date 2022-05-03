@@ -2,7 +2,7 @@
 ### Climate dataset preparation and complementary analyses                      ######
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
-# Last Update: "2019-01-28"                                                          #
+# Last Update: "2022-03-28"                                                          #
 #                                                                                    #
 ######################################################################################
 
@@ -162,6 +162,8 @@ MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff$ID_Realm <- factor(MPD.MN
                                                                   "Oceanic"
                                                                 )
 )
+
+# Explore the outcomes
 
 head(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff)
 dim(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff)

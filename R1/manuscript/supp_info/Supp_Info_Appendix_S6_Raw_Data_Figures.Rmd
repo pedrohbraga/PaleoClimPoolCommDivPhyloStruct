@@ -51,6 +51,7 @@ MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.worldClimate.diff <- readRDS("~/chapt
 
 ### Appendix S6. Raw data representation
 
+
 ```{r eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
 # Refactor data
 

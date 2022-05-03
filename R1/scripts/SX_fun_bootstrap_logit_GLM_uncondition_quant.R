@@ -6,8 +6,9 @@ quantile.XY <- function(dataset = dataset,
                         lab_x = "X", 
                         lab_y = "Y") {
   
-  X = dataset[, X]
-  Y = dataset[, Y]
+
+  X = dataset %>% as.data.frame() %>% pull(X)
+  Y = dataset %>% as.data.frame() %>% pull(Y)
   
   # divide X into n.classes quantiles and then calculate the variance of Y in
   # each interval.
