@@ -1,12 +1,12 @@
 ######################################################################################
-## Utility functions to compute the phylogenetic relatedness of communities
-## using the traditional and a new rarefaction approach based on the
-## standardized effect sizes of mean phylogenetic pairwise and mean nearest
-## taxon distances (based on PhyloMeasures::mpd.query() and
-## PhyloMeasures::mntd.query()).
+## Utility functions to compute the phylogenetic relatedness of communities         ##   
+## using the traditional and a new rarefaction approach based on the                ##  
+## standardized effect sizes of mean phylogenetic pairwise and mean nearest         ##
+## taxon distances (based on PhyloMeasures::mpd.query() and                         ##
+## PhyloMeasures::mntd.query()).                                                    ##
 ######################################################################################
 
-# mpd
+# Mean pair-wise distances ----
 
 opt.rarefaction.mpd <- function(phylo.tree,
                                 species.data,
@@ -22,9 +22,18 @@ opt.rarefaction.mpd <- function(phylo.tree,
   # we compute the square-root of the cophenetic distances of phylo.tree, and
   # then convert the distances back to a phylogenetic tree
   
-  ses.mpd.z.query <- mpd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree))))),
-                               species.data,
-                               standardize = TRUE)
+  ses.mpd.z.query <- mpd.query(
+    as.phylo(
+      hclust(
+        as.dist(
+          sqrt(
+            cophenetic(phylo.tree)
+          )
+        )
+      )
+    ),
+    species.data,
+    standardize = TRUE)
   
   names(ses.mpd.z.query) <- row.names(species.data)
   
@@ -57,14 +66,23 @@ opt.rarefaction.mpd <- function(phylo.tree,
   values.rarefac <- foreach(i = 1:n.rep, 
                             #.noexport = ls()
                             .packages = c("ape", "PhyloMeasures")
-                            ) %dopar% {
+  ) %dopar% {
     choose.species.rarefac <- species.names[sample(n.species)[1:n.species.rarefac]]
     species.data.rarefac <- species.data[, choose.species.rarefac]
     phylo.tree.rarefac <- keep.tip(phylo.tree, 
                                    choose.species.rarefac)
-    mpd <- mpd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree.rarefac))))), 
-                     species.data.rarefac, 
-                     standardize = TRUE)
+    mpd <- mpd.query(as.phylo(
+      hclust(
+        as.dist(
+          sqrt(
+            cophenetic(
+              phylo.tree.rarefac)
+          )
+        )
+      )
+    ), 
+    species.data.rarefac, 
+    standardize = TRUE)
     
     names(mpd) <- row.names(species.data)
     
@@ -109,7 +127,7 @@ opt.rarefaction.mpd <- function(phylo.tree,
   return(output)
 }
 
-# mntd
+# Mean nearest taxon distances ----
 
 opt.rarefaction.mntd <- function(phylo.tree,
                                  species.data,
@@ -125,9 +143,17 @@ opt.rarefaction.mntd <- function(phylo.tree,
   # we compute the square-root of the cophenetic distances of phylo.tree, and
   # then convert the distances back to a phylogenetic tree
   
-  ses.mntd.z.query <- mntd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree))))),
-                                 species.data,
-                                 standardize = TRUE)
+  ses.mntd.z.query <- mntd.query(    as.phylo(
+    hclust(
+      as.dist(
+        sqrt(
+          cophenetic(phylo.tree)
+        )
+      )
+    )
+  ),
+  species.data,
+  standardize = TRUE)
   
   names(ses.mntd.z.query) <- row.names(species.data)
   
@@ -165,9 +191,18 @@ opt.rarefaction.mntd <- function(phylo.tree,
     species.data.rarefac <- species.data[, choose.species.rarefac]
     phylo.tree.rarefac <- keep.tip(phylo.tree, 
                                    choose.species.rarefac)
-    mntd <- mntd.query(as.phylo(hclust(as.dist(sqrt(cophenetic(phylo.tree.rarefac))))), 
-                       species.data.rarefac, 
-                       standardize = TRUE)
+    mntd <- mntd.query(
+      as.phylo(
+        hclust(
+          as.dist(
+            sqrt(
+              cophenetic(phylo.tree.rarefac)
+            )
+          )
+        )
+      ), 
+      species.data.rarefac, 
+      standardize = TRUE)
     
     names(mntd) <- row.names(species.data)
     

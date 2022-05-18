@@ -1,0 +1,1435 @@
+---
+output:
+  bookdown::pdf_document2:
+      latex_engine: xelatex
+      number_sections: false
+      toc: false
+mainfont: "Times New Roman"
+geometry: margin = 1in
+spacing: double
+fontsize: 11pt
+editor_options:
+  markdown:
+    wrap: sentence
+bibliography: "supp_info_s4.bib"
+csl: https://raw.githubusercontent.com/marlonecobos/kuenm/master/ecography.csl
+link-citations: yes
+header-includes:
+   - \usepackage{lineno}
+   - \linenumbers
+   - \usepackage{setspace}\doublespacing
+   - \usepackage{parskip}
+   - \setlength{\parindent}{4em}
+   - \setlength{\parskip}{0em}
+   - \usepackage{caption}
+   - \usepackage{pdflscape}
+   - \newcommand{\blandscape}{\begin{landscape}}
+   - \newcommand{\elandscape}{\end{landscape}}
+   - \usepackage{caption}   
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(ggpubr)
+library(sf)
+library(raster)
+library(exactextractr)
+library(data.table)
+library(phytools)
+library(PhyloMeasures)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(scales)
+library(purrr)
+library(robust)
+library(latex2exp)
+
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      fig.height = 5,
+                      fig.width = 5,
+                      fig.align = "center")
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
+
+
+projectDir <- "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/"
+
+```
+
+```{r extract_clim_change_veloc, message=FALSE, warning=FALSE, include=FALSE}
+# Load the world projection grid shapefile
+
+projectDir <- "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/"
+
+world_grid_50km <- st_read(paste0(projectDir, 
+                                  "data/grids/world_grid_prev_50km.shp"))
+world_grid_50km$CRI <- NULL
+
+equal_area_projection <- st_crs(world_grid_50km)
+
+world_grid_50km$id <- 1:nrow(world_grid_50km)
+```
+
+```{r load_phylo_clim_diff_object, include = FALSE}
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
+```
+
+```{r load_gVoCC_join_phylo_data, include = FALSE}
+extract.gVoCC.CHELSA_TraCE21k.bio_1_bio_12_ext_50km <- read.csv(
+  paste0(
+    projectDir, 
+    "data/matrices/extract.gVoCC.CHELSA_TraCE21k.bio_1_bio_12_500yr_ext_50km.csv"), 
+  h = T)
+extract.gVoCC.CHELSA_TraCE21k.bio_1_bio_12_ext_50km$ID <- 1:nrow(world_grid_50km)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  left_join(extract.gVoCC.CHELSA_TraCE21k.bio_1_bio_12_ext_50km,
+            by = "ID") %>%
+  mutate(inv_voccMag_bio_1 = voccMag_bio_1*-1,
+         inv_voccMag_bio_12 = voccMag_bio_12*-1,
+         inv_voccMag_log_bio_12 = voccMag_log_bio_12*-1)
+```
+
+
+```{r cor_ClimVelocity_diff.AnnTemp.LGM_cur, echo = FALSE}
+cor_gVoCC_diff.AnnTemp.LGM_cur <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+  drop_na(inv_voccMag_bio_1, diff.AnnTemp.LGM_cur) %>%
+  group_by(SamplingPool) %>%
+  dplyr::summarise(cor(inv_voccMag_bio_1, diff.AnnTemp.LGM_cur))
+
+cor_gVoCC_inv_voccMag_bio_12_diff.AnnPrec.LGM_cur <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+  drop_na(inv_voccMag_bio_12, diff.AnnPrec.LGM_cur) %>%
+  group_by(SamplingPool) %>%
+  dplyr::summarise(cor(inv_voccMag_bio_12, diff.AnnPrec.LGM_cur, method = "pearson"))
+
+cor_gVoCC_inv_voccMag_log_bio_12_diff.AnnPrec.LGM_cur <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+  drop_na(inv_voccMag_log_bio_12, diff.AnnPrec.LGM_cur) %>%
+  group_by(SamplingPool) %>%
+  dplyr::summarise(cor(inv_voccMag_log_bio_12, diff.AnnPrec.LGM_cur, method = "pearson"))
+
+```
+
+\doublespacing
+
+## Study
+
+### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities\
+
+### Supplementary Information 4
+
+### Assessing the effects of climate change velocity on the phylogenetic relatedness of bat communities
+
+### Implementation
+
+The approach we used for calculating climatic historical stability comes with several assumptions. An important one is that changes in climate between the last glacial maximum (LGM) and the contemporary period are constant, so that the differences between climate estimates between both periods are informative. Delgado-Baquerizo _et al_. [-@delgado-baquerizoPalaeoclimateExplainsUnique2017] have shown that climatic changes during the last 21,000 years were indeed largely unidirectional and often linear at the resolution of hundreds of years, supporting that calculating differences between the climate from the last glacial maximum and the contemporary period can account for the largest changes in temperature and precipitation over the last 21,000 years.
+
+To further support our approach, we also assessed if the patterns we observed for the effects of climatic historical stability (measured as the difference between the snapshots of climate estimates for the last glacial maximum (LGM) and climate observations for the contemporary period; see Methods) on the phylogenetic community structure of bats would be congruent to those expected using a complementary metric for climatic stability, the index for velocity of climate change proposed by Loarie _et al_. [-@loarie2009n]. This index has been used combines spatial and temporal gradients of change in climate to provide information on how much local climate changes in space across time periods (see examples of its usage in Sandel _et al_. [-@sandelInfluenceLateQuaternary2011]).
+
+For this, we downloaded high-resolution rasters containing worldwide bioclimatic variables for mean annual temperature and mean annual precipitation for every 500 years before present (BP) until the LGM from the [CHELSA-TraCE21k](https://chelsa-climate.org/chelsa-trace21k/) paleoclimatic data base [@karger2021cpd]. CHELSA-TraCE21k provides downscaled averages from global monthly climatologies for temperature and precipitation at the resolution of 30 arc-seconds in 100-year time steps for the last 21,000 years [@karger2021cpd]. 
+
+We projected and aggregated each raster (by calculating the average of all pixels occurring in each cell, weighted by the coverage overlapping area of cells) to the 50 km × 50 km equal-area cell-grid we used in this study (see Methods). Our final data set consisted of 22 geographical raster layers for each climatic variable, with each layer containing the climatic data estimated at every 500-year step, from the 2,000s to the 21,000 years BP. We log-transformed precipitation values to decrease its skewness and to improve the resolution of dry and very dry climates.
+
+We then computed gradient-based change velocities in temperature and in precipitation following Loarie _et al_. [-@loarie2009n] and Burrows _et al_. [-@burrows2011s]. For each cell, we: (i) calculated the long-term temporal trend in climate by extracting the coefficients of simple linear regressions performed between each climatic variable and the time period; (ii) calculated the local spatial gradient in climate for each cell by determining the magnitude of the differences in each climatic variable over its surrounding neighbouring cells (3 × 3); and, then (iii) obtaining the climate change velocity for each variable by dividing its temporal trend by its spatial gradient.
+
+This climate change velocity index derived from both spatial and temporal gradients informs how much climate change in space across time, _i.e._ here, in metres (m) per year. Attractively, this index can be both negative and positive, as the temporal trend provides the direction for the magnitude of climate change velocity.
+
+To make the interpretation congruent to our initial measure of historical change in climate using differences between the climate from the contemporary period and the LGM, we multiplied the climate change velocity index by minus one. With this, large negative values of temperature change velocity represents an accelerated increase in temperature since the LGM, while large positive temperature change velocities indicate accelerated decreases in temperature since the LGM. Similarly, low negative values of precipitation change velocity represent an slow increase in precipitation since the LGM, while low positive precipitation change velocities indicate slow decreases in precipitation since the LGM.
+
+Finally, we applied the same approaches used to test the predictions that phylogenetically clustered communities are more frequent in historically climatically stable regions (H2) and that increased _in situ_ diversification rates generate regional clusters of closely-related species (H3) (see Methods). 
+
+We independently represented the average phylogenetic relatedness of bat communities [*i.e.* for both the net relatedness index (NRI) and the nearest taxon index (NTI)] across each one of the 100-quantiles (percentiles) of temperature change velocity, precipitation change velocity and _in situ_ net diversification rates (see Figures S4.1 and S4.2).
+
+We also applied bootstrapping robust logistic generalized linear models using binary outcomes for the indices for phylogenetic community relatedness as response variables (NRI and NTI; in separate models; at the 90% percentile cut-off), and the z-score standardized temperature change velocity, precipitation change velocity and _in situ_ net diversification rates as predictive variables (_i.e._, NRI or NTI ~ temperature change velocity + precipitation change velocity + community-weighted net diversification rates means) (see Figure S4.3).
+
+### Results
+
+Temperature change velocity was highly correlated with the measure of historical climatic stability in temperature we used in our study (Pearson's $r$ of `r round(cor_gVoCC_diff.AnnTemp.LGM_cur[1, 2, drop = TRUE], 2)`), while precipitation change velocity was marginally correlated with the measure of historical change in precipitation (Pearson's $r$ of `r round(cor_gVoCC_inv_voccMag_log_bio_12_diff.AnnPrec.LGM_cur[1, 2, drop = TRUE], 2)`).
+
+Both velocities of change in temperature and in precipitation drove the phylogenetic relatedness of bat communities at both overall phylogenetic structure (net relatedness index; NRI) and tip-level phylogenetic structure (nearest taxon index; NTI) of bat communities. Departures in precipitation change velocity from stability (i.e. slow or zero velocity of change in climate) generally caused NRI and NTI values to decrease. Nevertheless, the effects of increases in temperature change velocity towards stability in NRI and NTI was less uniform and varied across the gradient of velocity of change and across spatial scales (see Figures S4.1, S4.2 and S4.3).
+
+At the global scale, increases in temperature change velocity towards climatic stability (i.e. towards no or zero velocity of change in climate) were associated with increases in the odds of highly phylogenetically related bat communities. At the more restricted geographical extents, increases in temperature change velocity towards stability were associated with decreases in the odds of highly phylogenetically related bat communities (see Figure S4.3). 
+
+Increases in precipitation change velocity consistently increased the odds of highly phylogenetically related communities (those belonging to the 90th-percentile of both NRI and NTI); except at the global geographical extent, where it was associated with marginal decreases in the odds of NRI (see Figure S4.3). 
+
+The effects of velocities of climate change generally coincided with the ones we observed using historical climatic change.
+
+
+### References for Supporting Information 4
+
+<div id="refs"></div>
+
+### Figures
+\noindent 
+**Figure S4.1** Average net relatedness index (NRI) of bat communities across the percentiles of temperature change velocity, precipitation change velocity and _in situ_ net diversification rates across geographical extents. _In situ_ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Climate change velocities were derived from spatial gradients rates of climate change over time from  from the contemporary period until 21,000 years before present (BP).
+
+
+```{r NRI-paleoclim-stab-inv-log-vocc-net-div, eval=TRUE, echo = FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
+
+scientific_10 <- function(x) {
+  ifelse(x==0, 
+         "0",
+         parse(text = gsub("[+]", 
+                           "", 
+                           gsub("e", 
+                                " %*% 10^", 
+                                scientific_format()(x)
+                           )
+         )
+         )
+  )
+} 
+
+#### NRI ####
+
+fig.Global.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    dplyr::filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Global"]]))
+)
+
+fig.Hemispheric.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Ecoregion"]]))
+)
+
+
+###
+
+fig.Global.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Global"]]))
+)
+
+
+fig.Hemispheric.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NRI")[""["Ecoregion"]]))
+)
+
+
+fig.Global.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Global"]]))
+)
+
+fig.Hemispheric.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nri",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nri") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NRI")[""["Ecoregion"]]))
+)
+
+# Combining plots --------------------------------------------
+
+(fig.quantile.SamplingPool.NRI.diffTemp.diffPrec.netDiv <- ggpubr::ggarrange(
+  fig.Global.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Global.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Global.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Hemispheric.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Hemispheric.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Hemispheric.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Realm.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Realm.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Realm.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Plate.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Plate.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Plate.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Biome.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Biome.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Biome.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Ecoregion.mean.NRI.gVoCC.inv_voccMag_bio_1.quantile + scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Ecoregion.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile +  scale_x_continuous(label = scientific_10, n.breaks = 9) +  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Ecoregion.mean.NRI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  labels = c("A", "B", "C", 
+             "D", "E", "F",
+             "G", "H", "I", 
+             "J", "K", "L",
+             "M", "N", "O",
+             "P", "Q", "R"
+  ),
+  ncol = 3, nrow = 6,
+  widths = c(1, 1),
+  heights = c(0.9, 1),
+  align = "v",
+  font.label = list(size = 28)
+)
+)
+```
+
+\noindent 
+**Figure S4.2** Average net relatedness index (NTI) of bat communities across the percentiles of temperature change velocity, precipitation change velocity and _in situ_ net diversification rates across geographical extents. _In situ_ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Climate change velocities were derived from spatial gradients rates of climate change over time from  from the contemporary period until 21,000 years before present (BP).
+
+
+```{r NTI-paleoclim-stab-inv-log-vocc-net-div, eval=TRUE, echo = FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
+
+scientific_10 <- function(x) {
+  ifelse(x==0, 
+         "0",
+         parse(text = gsub("[+]", 
+                           "", 
+                           gsub("e", 
+                                " %*% 10^", 
+                                scientific_format()(x)
+                           )
+         )
+         )
+  )
+} 
+
+#### NTI ####
+
+fig.Global.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    dplyr::filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Global"]]))
+)
+
+fig.Hemispheric.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity) (°C)",
+    "(m/year since 22,000 years BP)" 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_bio_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_bio_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Temperature Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Ecoregion"]]))
+)
+
+
+###
+
+fig.Global.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Global"]]))
+)
+
+
+fig.Hemispheric.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "inv_voccMag_log_bio_12",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti") %>%
+    drop_na("inv_voccMag_log_bio_12"),
+  lab_x =  c(expression(atop(
+    ~italic(Q)*"(Precipitation Change Velocity)",
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP") 
+  ))),
+  lab_y = c(expression(bar("NTI")[""["Ecoregion"]]))
+)
+
+
+fig.Global.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Global sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Global"]]))
+)
+
+fig.Hemispheric.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Hemispheric"]]))
+)
+
+
+fig.Realm.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Realm sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Realm"]]))
+)
+
+
+fig.Plate.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Plate sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Plate"]]))
+)
+
+
+fig.Biome.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Biome sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Biome"]]))
+)
+
+
+fig.Ecoregion.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
+  n.classes = 100,
+  Y = "nti",
+  X = "netDiv_CWM_std_tw_rs_1",
+  dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+    filter(SamplingPool == "Ecoregion sampling") %>%
+    drop_na("nti") %>%
+    drop_na("netDiv_CWM_std_tw_rs_1"),
+  lab_x = c(expression(atop(
+    ~italic(Q)*"(Local Net Diversification Rate)",
+    scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
+  lab_y = c(expression(bar("NTI")[""["Ecoregion"]]))
+)
+
+# Combining plots --------------------------------------------
+
+(fig.quantile.SamplingPool.NTI.diffTemp.diffPrec.netDiv <- ggpubr::ggarrange(
+  fig.Global.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Global.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Global.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Hemispheric.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Hemispheric.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + 
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Hemispheric.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Realm.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Realm.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Realm.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Plate.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Plate.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Plate.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Biome.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Biome.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +
+    scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Biome.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  fig.Ecoregion.mean.NTI.gVoCC.inv_voccMag_bio_1.quantile + scale_x_continuous(label = scientific_10, n.breaks = 9) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Ecoregion.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile +  scale_x_continuous(label = scientific_10, n.breaks = 9) +  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)),
+  fig.Ecoregion.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), plot.margin = unit(c(0.5, 0.5, 1, 0.5), "cm")),
+  labels = c("A", "B", "C", 
+             "D", "E", "F",
+             "G", "H", "I", 
+             "J", "K", "L",
+             "M", "N", "O",
+             "P", "Q", "R"
+  ),
+  ncol = 3, nrow = 6,
+  widths = c(1, 1),
+  heights = c(0.9, 1),
+  align = "v",
+  font.label = list(size = 28)
+)
+)
+```
+
+
+\newpage
+
+\blandscape
+
+\noindent 
+**Figure S4.3.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial geographical extents.
+The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent extent.
+*In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
+Climate change velocities were derived from spatial gradients rates of climate change over time from  from the contemporary period until 21,000 years before present (BP) (see Methods).
+Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and average *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
+
+```{r boot-logistic-binary-outcome-09-phylostr-log-inv-gVoCC-paleoclim-stab-net-div, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
+
+# Bootstrap approach
+
+glm.boot.Global.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                            X = c("inv_voccMag_bio_1", 
+                                                                                  "inv_voccMag_log_bio_12",
+                                                                                  "netDiv_CWM_std_tw_rs_1"),
+                                                                            dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                              filter(SamplingPool == "Global sampling") %>%
+                                                                              dplyr::select(c("nri", 
+                                                                                              "inv_voccMag_bio_1", 
+                                                                                              "inv_voccMag_log_bio_12", 
+                                                                                              "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                              drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                            quantiles = c(0.75, 0.90), 
+                                                                            n.boot = 1000,
+                                                                            boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Hemispheric.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                                 X = c("inv_voccMag_bio_1", 
+                                                                                       "inv_voccMag_log_bio_12",
+                                                                                       "netDiv_CWM_std_tw_rs_1"),
+                                                                                 dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                                   filter(SamplingPool == "Hemispheric sampling") %>%
+                                                                                   dplyr::select(c("nri", 
+                                                                                                   "inv_voccMag_bio_1", 
+                                                                                                   "inv_voccMag_log_bio_12", 
+                                                                                                   "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                                   drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                 quantiles = c(0.75, 0.90), 
+                                                                                 n.boot = 1000,
+                                                                                 boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Realm.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Realm sampling") %>%
+                                                                             dplyr::select(c("nri", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Plate.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Plate sampling") %>%
+                                                                             dplyr::select(c("nri", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Biome.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Biome sampling") %>%
+                                                                             dplyr::select(c("nri", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Ecoregion.mean.NRI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nri",
+                                                                               X = c("inv_voccMag_bio_1", 
+                                                                                     "inv_voccMag_log_bio_12",
+                                                                                     "netDiv_CWM_std_tw_rs_1"),
+                                                                               dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                                 filter(SamplingPool == "Ecoregion sampling") %>%
+                                                                                 dplyr::select(c("nri", 
+                                                                                                 "inv_voccMag_bio_1", 
+                                                                                                 "inv_voccMag_log_bio_12", 
+                                                                                                 "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                                 drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                               quantiles = c(0.75, 0.90), 
+                                                                               n.boot = 1000,
+                                                                               boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Global.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                            X = c("inv_voccMag_bio_1", 
+                                                                                  "inv_voccMag_log_bio_12",
+                                                                                  "netDiv_CWM_std_tw_rs_1"),
+                                                                            dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                              filter(SamplingPool == "Global sampling") %>%
+                                                                              dplyr::select(c("nti", 
+                                                                                              "inv_voccMag_bio_1", 
+                                                                                              "inv_voccMag_log_bio_12", 
+                                                                                              "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                              drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                            quantiles = c(0.75, 0.90), 
+                                                                            n.boot = 1000,
+                                                                            boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Hemispheric.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                                 X = c("inv_voccMag_bio_1", 
+                                                                                       "inv_voccMag_log_bio_12",
+                                                                                       "netDiv_CWM_std_tw_rs_1"),
+                                                                                 dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                                   filter(SamplingPool == "Hemispheric sampling") %>%
+                                                                                   dplyr::select(c("nti", 
+                                                                                                   "inv_voccMag_bio_1", 
+                                                                                                   "inv_voccMag_log_bio_12", 
+                                                                                                   "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                                   drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                                 quantiles = c(0.75, 0.90), 
+                                                                                 n.boot = 1000,
+                                                                                 boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Realm.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Realm sampling") %>%
+                                                                             dplyr::select(c("nti", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Plate.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Plate sampling") %>%
+                                                                             dplyr::select(c("nti", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+glm.boot.Biome.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                           X = c("inv_voccMag_bio_1", 
+                                                                                 "inv_voccMag_log_bio_12",
+                                                                                 "netDiv_CWM_std_tw_rs_1"),
+                                                                           dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                             filter(SamplingPool == "Biome sampling") %>%
+                                                                             dplyr::select(c("nti", 
+                                                                                             "inv_voccMag_bio_1", 
+                                                                                             "inv_voccMag_log_bio_12", 
+                                                                                             "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                           quantiles = c(0.75, 0.90), 
+                                                                           n.boot = 1000,
+                                                                           boot.size = 2500 # increase to 5000
+)
+
+
+glm.boot.Ecoregion.mean.NTI.gVoCC.ClimStab.Div.quantiles <- logistic.Phylo.Env(community.phylo.variable = "nti",
+                                                                               X = c("inv_voccMag_bio_1", 
+                                                                                     "inv_voccMag_log_bio_12",
+                                                                                     "netDiv_CWM_std_tw_rs_1"),
+                                                                               dataset = MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.gVoCC %>%
+                                                                                 filter(SamplingPool == "Ecoregion sampling") %>%
+                                                                                 dplyr::select(c("nti", 
+                                                                                                 "inv_voccMag_bio_1", 
+                                                                                                 "inv_voccMag_log_bio_12", 
+                                                                                                 "netDiv_CWM_std_tw_rs_1")) %>%
+                                                                                 drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
+                                                                               quantiles = c(0.75, 0.90), 
+                                                                               n.boot = 1000,
+                                                                               boot.size = 2500 # increase to 5000
+)
+
+```
+
+```{r log-inv-vocc-bind-data, echo=FALSE}
+
+##### Figure creation #####
+
+# q = 0.9 ######
+
+glm.boot.AllScales.mean.NRI.gVoCC.ClimStab.Div.quantiles.09 <- bind_rows(data.frame(glm.boot.Global.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Global sampling"),
+                                                                         data.frame(glm.boot.Hemispheric.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Hemispheric sampling"),
+                                                                         data.frame(glm.boot.Realm.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Realm sampling"),
+                                                                         data.frame(glm.boot.Plate.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Plate sampling"),
+                                                                         data.frame(glm.boot.Biome.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Biome sampling"),
+                                                                         data.frame(glm.boot.Ecoregion.mean.NRI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Ecoregion sampling")
+) 
+
+glm.boot.AllScales.mean.NTI.gVoCC.ClimStab.Div.quantiles.09 <- bind_rows(data.frame(glm.boot.Global.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Global sampling"),
+                                                                         data.frame(glm.boot.Hemispheric.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Hemispheric sampling"),
+                                                                         data.frame(glm.boot.Realm.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Realm sampling"),
+                                                                         data.frame(glm.boot.Plate.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Plate sampling"),
+                                                                         data.frame(glm.boot.Biome.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Biome sampling"),
+                                                                         data.frame(glm.boot.Ecoregion.mean.NTI.gVoCC.ClimStab.Div.quantiles$boot.coefs[[2]],
+                                                                                    SamplingPool = "Ecoregion sampling")
+) 
+
+
+glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09 <- bind_rows(
+  data.frame(glm.boot.AllScales.mean.NRI.gVoCC.ClimStab.Div.quantiles.09[, 2:5],
+             PhyloStructure = "mean.NRI.gVoCC") %>%
+    reshape2::melt( 
+      id.vars = c("SamplingPool", "PhyloStructure"),
+      variable.name = "variable",
+      value.name = "estimate"),
+  
+  data.frame(glm.boot.AllScales.mean.NTI.gVoCC.ClimStab.Div.quantiles.09[, 2:5],
+             PhyloStructure = "mean.NTI.gVoCC") %>%
+    reshape2::melt( 
+      id.vars = c("SamplingPool", "PhyloStructure"),
+      variable.name = "variable",
+      value.name = "estimate")
+)
+
+
+glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$SamplingPool <- factor(glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$SamplingPool,
+                                                                                       levels = c(
+                                                                                         "Global sampling",
+                                                                                         "Hemispheric sampling",
+                                                                                         "Realm sampling",
+                                                                                         "Plate sampling",
+                                                                                         "Biome sampling",
+                                                                                         "Ecoregion sampling"),
+                                                                                       labels = c(
+                                                                                         "Global~sampling",
+                                                                                         "Hemispheric~sampling",
+                                                                                         "Realm~sampling",
+                                                                                         "Plate~sampling",
+                                                                                         "Biome~sampling",
+                                                                                         "Ecoregion~sampling"
+                                                                                       )
+)
+
+
+glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$PhyloStructure <- as.factor(glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$PhyloStructure)
+
+# levels(glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$PhyloStructure) 
+
+levels(glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$PhyloStructure) <- c(TeX("$Pr(NRI_{rob}_{Q90}=1)$",  output = c("expression")), 
+                                                                                            TeX("$Pr(NTI_{rob}_{Q90}=1)$", output = c("expression"))
+)
+
+# levels(glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09$PhyloStructure) 
+# TeX('$Pr(NRI_{Q_{90}}=1)$')
+```
+
+
+```{r inv-log-vocc-coef-ggplot, echo=FALSE, fig.dim=c(5*6, 5), message=FALSE, warning=FALSE, fig.align = 'center', dpi = 250}
+ggplot(data = glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09,
+       aes(x = estimate,
+           y = variable)
+) +
+  # geom_tile(data = glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09,
+  #           aes(fill = SamplingPool),
+  #           alpha = 1) +
+  geom_boxplot(
+    lwd = 0.2,
+    outlier.size = 0.5,
+    outlier.stroke = 0.2,
+    aes(fill = SamplingPool, 
+        colour = SamplingPool
+    )
+  )  +
+  ggsci::scale_fill_uchicago(alpha = 0.7) +
+  ggsci::scale_colour_uchicago() +
+  labs(y = "",
+       x = "Partial bootstrapped coefficients") +
+  scale_y_discrete(
+    labels = c("inv_voccMag_bio_1" = "Temperature Change Velocity", 
+               "inv_voccMag_log_bio_12" = "Precipitation Change Velocity",
+               "netDiv_CWM_std_tw_rs_1" = "_In situ_ diversification rates")
+  ) +
+  
+  # Add white line on top (Inf) of the plot (ie, betweem plot and facet)
+  # geom_vline(xintercept = Inf, 
+  #            color = "white", 
+  #            size = 10) +
+  geom_vline(xintercept = 0,
+             alpha = 0.4) +
+  facet_grid(PhyloStructure ~ SamplingPool,
+             # scales = "free",
+             switch = "y",
+             labeller = label_parsed
+  ) +
+  # facet_wrap(SamplingPool~PhyloStructure,
+  #            nrow = 6,
+  #            ncol = 2,
+  #            strip.position = c("top",
+  #                               "right")) +
+  
+  theme_boot_quant(base_size = 20) +
+  theme(
+    plot.margin = unit(
+      c(1.2, # top
+        1, 
+        1.2,
+        0.5), "lines"),
+    panel.spacing.x = unit(1, "lines"),
+    panel.spacing.y = unit(1.5, "lines"),
+    strip.placement = "outside",
+    #      strip.background = element_rect(size = 1),
+    strip.text.y = element_text(margin = margin(t = 0, 
+                                                r = 2, 
+                                                b = 0, 
+                                                l = 2, "mm")),
+    strip.text.x = element_text(margin = margin(t = 0, 
+                                                r = 0, 
+                                                b = 2, 
+                                                l = 0, "mm"),
+                                size = 17),
+    axis.text.x = ggtext::element_markdown( 
+      size = 15,
+      # angle = 90, 
+      vjust = 1, 
+      hjust = 0.5,
+      face = "bold"),
+    axis.text.y = ggtext::element_markdown( 
+      size = 15,
+      hjust = 1),
+    axis.title = element_text(size = 16),
+    legend.position = "none"
+    
+  )
+```
+\def\fillandplacepagenumber{%
+  \par\pagestyle{empty}%
+  \vbox to 0pt{\vss}\vfill
+  \vbox to 0pt{\baselineskip0pt
+    \hbox to\linewidth{\hss}%
+    \baselineskip\footskip
+    \hbox to\linewidth{%
+      \hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape
+
+
+\newpage
+
+\blandscape
+
+\noindent 
+**Table S4.1. ** Partial bootstrapped coefficients for the effects of velocities of change in temperature and in precipitation and _in situ_ diversification rates in the phylogenetic structure of bat communities across spatial geographical extents. The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. In situ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and in situ net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions; see Table 2).
+
+\captionsetup[table]{labelformat=empty}
+```{r log-inv-res-table, echo=FALSE, message=FALSE, warning = FALSE}
+library(gtsummary)
+library(huxtable)
+
+mean_exp <- function(data, ...){
+  dplyr::tibble(
+    mean_exp. = exp(mean(data$estimate, na.rm = TRUE)),
+    mean = mean(data$estimate, na.rm = TRUE),
+    ci.lower = confit(data$estimate, 
+                      level = 0.95)[1],
+    ci.upper = confit(data$estimate, 
+                      level = 0.95)[2]
+    
+  )
+}
+
+tbl_stack(
+  list(
+    data.frame(glm.boot.AllScales.mean.NRI.gVoCC.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NRI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "inv_voccMag_bio_1" = "Temperature change velocity",
+                                                   "inv_voccMag_log_bio_12" = "Precipitation change velocity",
+                                                   "netDiv_CWM_std_tw_rs_1" = "In situ diversification rates")),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor(Variables, 
+                                levels = c("Intercept",
+                                           "Temperature change velocity",
+                                           "Precipitation change velocity",
+                                           "In situ diversification rates"))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({mean_exp.})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Odds Ratio)") %>%
+      bold_labels(),
+    
+    #
+    #
+    
+    data.frame(glm.boot.AllScales.mean.NTI.gVoCC.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NTI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "inv_voccMag_bio_1" = "Temperature change velocity",
+                                                   "inv_voccMag_log_bio_12" = "Precipitation change velocity",
+                                                   "netDiv_CWM_std_tw_rs_1" = "In situ diversification rates")),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor( Variables, 
+                                 levels = c("Intercept",
+                                            "Temperature change velocity",
+                                            "Precipitation change velocity",
+                                            "In situ diversification rates"))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({mean_exp.})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Odds Ratio)") %>%
+      modify_caption(caption = "") %>%
+      bold_labels() 
+  ),
+  group_header = c("NRI", 
+                   "NTI")
+) %>% 
+  bold_labels() %>%
+  as_hux_table() %>%      
+  set_width(1.3) %>% 
+  set_font_size(8) %>% 
+  huxtable::theme_article(header_rows = TRUE, header_cols = TRUE) %>%
+  set_caption(NA) %>%
+  set_caption_pos("topleft")
+# as_flex_table() %>%
+# flextable::fontsize(size = 7, part = "all") %>%
+# set_table_properties(layout = "autofit") %>%
+# flextable::autofit() %>%
+# flextable::fit_to_width(7.5)
+
+```
+
+\def\fillandplacepagenumber{%
+  \par\pagestyle{empty}%
+  \vbox to 0pt{\vss}\vfill
+  \vbox to 0pt{\baselineskip0pt
+    \hbox to\linewidth{\hss}%
+    \baselineskip\footskip
+    \hbox to\linewidth{%
+      \hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape

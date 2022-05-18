@@ -1,6 +1,45 @@
+##################################################################################
+##################################################################################
 
 
-################
+# To describe how phylogenetic relatedness of bat communities (for both NRI and
+# NTI) changed as a function of historical change in temperature, historical
+# change in precipitation and in situ net diversification rates, we started by
+# estimating their percentiles (i.e., 100-quantiles). We plotted the mean
+# phylogenetic relatedness of bat communities (for both NRI and NTI) for each of
+# 100-quantiles (percentiles) of the predictor variables of interest (i.e.,
+# historical change in temperature, historical change in precipitation and in
+# situ net diversification rates; see Figures 3 and 4). These representations
+# allowed us to describe how phylogenetic structure varies as a response to the
+# predictors of interests.
+
+# To test hypotheses H2 and H3 inferentially, we started by calculating for each
+# local community whether its phylogenetic structure (either NRI or NTI) was
+# greater than its upper unconditional proportional 90th percentile (we also
+# fitted models based on its 75th percentile) across all communities; if
+# greater, a value of one was assigned to that community and, if smaller, a
+# value of zero was assigned instead. We then applied conditionally unbiased
+# bounded influence robust logistic regressions (i.e., robust to reduce the
+# influence of potential outliers; see Kunsch et al., 1989) in which the
+# response variable was the vector of binary outcomes (ones and zeros)
+# representing relatively high or low phylogenetic structure (separately for NRI
+# and NTI) and the predictors were z-score standardized values (i.e., to have
+# mean zero and variance one) of historical change in temperature, historical
+# change in precipitation and in situ net diversification rates. With this, we
+# could estimate the relative importance of each predictor within a single
+# model. To estimate confidence intervals for each predictor, we used a
+# bootstrap approach based on 1000 resamples of 2500 random communities each.
+# This approach allowed us to explicitly test how changes in historical climatic
+# stability and in situ diversification rates independently increased (or
+# decreased) the log-odds (the logistic response) of a community being composed
+# of highly phylogenetically related species.
+
+# We repeated these analyses for each sampling frame extent to assess whether
+# the influence of historical changes in temperature and precipitation and in
+# situ net diversification rates on the phylogenetic structure of bat
+# communities was consistent across spatial scales.
+
+##################################################################################
 
 ragg::agg_png("figures/fig.quantile.SamplingPool.NRI.diffTemp.diffPrec.netDiv.png", 
               width = 8*3, 
@@ -496,7 +535,12 @@ as_flex_table() %>%
 mean_exp <- function(data, ...){
   dplyr::tibble(
     mean_exp. = exp(mean(data$estimate, na.rm = TRUE)),
-    mean = mean(data$estimate, na.rm = TRUE)
+    mean = mean(data$estimate, na.rm = TRUE),
+    ci.lower = confit(data$estimate, 
+                      level = 0.95)[1],
+    ci.upper = confit(data$estimate, 
+                      level = 0.95)[2]
+    
   )
 }
 
@@ -607,9 +651,160 @@ tbl_stack(
       tbl_stack() %>%
       modify_footnote(all_stat_cols() ~ "Mean (Odds Ratio)") %>%
       bold_labels() 
-    ),
-    group_header = c("NRI", 
-                     "NTI")
-  )  %>%
-as_flex_table() %>%
+  ),
+  group_header = c("NRI", 
+                   "NTI")
+)  %>%
+  as_flex_table() %>%
   flextable::save_as_docx(path = "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/manuscript/supp_info/supp_info_S1_table_S2.3.docx")
+
+
+
+mean_exp <- function(data, ...){
+  dplyr::tibble(
+    mean_exp. = exp(mean(data$estimate, 
+                         na.rm = TRUE)),
+    mean = mean(data$estimate, na.rm = TRUE),
+    ci.lower = confint(data$estimate,
+                       level = 0.95,
+                       method = "stderr")[,1],
+    ci.upper = confint(data$estimate, 
+                       level = 0.95,
+                       method = "stderr")[,2]
+    
+  )
+}
+
+tbl_stack(
+  list(
+    data.frame(glm.boot.AllScales.NRI.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NRI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "diff.AnnTemp.LGM_cur" = "Historical change in temperature", 
+                                                   "diff.log.AnnPrec.log.LGM_cur" = "Historical change in precipitation",
+                                                   "netDiv_CWM_std_tw_rs_1" = "In situ diversification rates"
+                                                 )
+             ),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor(Variables, 
+                                levels = c("Intercept",
+                                           "Historical change in temperature",
+                                           "Historical change in precipitation",
+                                           "In situ diversification rates"
+                                ))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Lower CI; Upper CI)") %>%
+      bold_labels(),
+    
+    #
+    #
+    
+    data.frame(glm.boot.AllScales.mean.NTI.rarefaction.relative.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NTI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "diff.AnnTemp.LGM_cur" = "Historical change in temperature", 
+                                                   "diff.log.AnnPrec.log.LGM_cur" = "Historical change in precipitation",
+                                                   "netDiv_CWM_std_tw_rs_1" = "In situ diversification rates"
+                                                   
+                                                 )),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor( Variables, 
+                                 levels = c("Intercept",
+                                            "Historical change in temperature",
+                                            "Historical change in precipitation",
+                                            "In situ diversification rates"
+                                 ))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Lower CI; Upper CI)") %>%
+      modify_caption(caption = "") %>%
+      bold_labels() 
+  ),
+  group_header = c("NRI", 
+                   "NTI")
+) %>% 
+  bold_labels() %>%
+  # as_hux_table() %>%      
+  # set_width(1.3) %>% 
+  # set_font_size(8) %>% 
+  # huxtable::theme_article(header_rows = TRUE, header_cols = TRUE) %>%
+  # set_caption(NA) %>%
+  # set_caption_pos("topleft") %>%
+  #  
+  as_flex_table() %>%
+  flextable::fontsize(size = 7, part = "all") %>%
+  # flextable::autofit() %>%
+  # flextable::set_table_properties(layout = "autofit") %>%
+  # flextable::fit_to_width(7.5) %>%
+  flextable::save_as_docx(path = "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/manuscript/supp_info/supp_info_S1_table_S2.3.docx")
+
+

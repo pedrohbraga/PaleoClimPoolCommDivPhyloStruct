@@ -39,9 +39,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 5,
                       fig.align = "center")
 
-MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.rds")
-
-MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.worldClimate.diff <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.worldClimate.diff.rds")
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 ```
 
 ### Study
@@ -51,38 +49,40 @@ MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div.worldClimate.diff <- readRDS("~/chapt
 
 ### Appendix S6. Raw data representation
 
-
 ```{r eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
 # Refactor data
 
-MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Realm <- factor(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Realm,
-                                              levels = c(
-                                                "Neotropical",
-                                                "Nearctic",
-                                                "Afrotropical",
-                                                "Palearctic",
-                                                "Indomalay",
-                                                "Australasian"
-                                              )
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm,
+                                                              levels = c(
+                                                                "Neotropical",
+                                                                "Nearctic",
+                                                                "Afrotropical",
+                                                                "Palearctic",
+                                                                "Indomalay",
+                                                                "Australasian"
+                                                              )
 )
 
-MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$SamplingPool <- factor(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$SamplingPool,
-                                                  levels = c(
-                                                    "Global sampling",
-                                                    "Hemispheric sampling",
-                                                    "Realm sampling",
-                                                    "Plate sampling",
-                                                    "Biome sampling",
-                                                    "Ecoregion sampling"
-                                                  )
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool,
+                                                                  levels = c(
+                                                                    "Global sampling",
+                                                                    "Hemispheric sampling",
+                                                                    "Realm sampling",
+                                                                    "Plate sampling",
+                                                                    "Biome sampling",
+                                                                    "Ecoregion sampling"
+                                                                  )
 )
 
-MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Biome_Acronym <- factor(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Biome,
-                                                      labels = abbreviate(gsub(
-                                                        "_",
-                                                        " ",
-                                                        levels(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Biome)
-                                                      ))
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome <- as.factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome_Acronym <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome,
+                                                                      labels = abbreviate(gsub(
+                                                                        "_",
+                                                                        " ",
+                                                                        levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome)
+                                                                      )
+                                                                      )
 )
 ```
 
@@ -95,10 +95,10 @@ MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$ID_Biome_Acronym <- factor(MPD.MNTD.C
 
 # Representing NRI wrapping across Realms
 
-NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
-                                                        is.na(ID_Realm) == FALSE),
-                                                 aes(x = SamplingPool, 
-                                                     y = nri)
+NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE),
+                            aes(x = SamplingPool, 
+                                y = nri)
 ) +
   geom_jitter(aes(fill = SamplingPool, 
                   colour = SamplingPool), size = 0.01, alpha = 0.05) +
@@ -116,14 +116,14 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
   #                    name="Sampling Pool") +
   scale_y_continuous(breaks = round(
     #pretty(MPD.LatLong.AllScales.rarefaction$NRI, n = 7)
-    c(min(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nri, na.rm = T),
+    c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nri, na.rm = T),
       0,
       5,
       10,
       15,
-      max(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nri, na.rm = T))),
-    limits = c(min(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nri, na.rm = T) - 0.1,
-               max(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nri, na.rm = T) + 0.1)
+      max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nri, na.rm = T))),
+    limits = c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nri, na.rm = T) - 0.1,
+               max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nri, na.rm = T) + 0.1)
   ) +
   geom_hline(yintercept = 0,
              alpha = 0.4) +
@@ -154,9 +154,9 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
                              title = "Lower  ⬅  Sampling Prame Restriction  ➡  Higher",)
   )
 
-NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
-                                                        is.na(ID_Realm) == FALSE),
-                                                 aes(x = SamplingPool, y = nti)) +
+NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE),
+                            aes(x = SamplingPool, y = nti)) +
   geom_jitter(aes(fill = SamplingPool, colour = SamplingPool), size = 0.01, alpha = 0.2) +
   geom_boxplot(aes(fill = SamplingPool), alpha = 0.7) +
   facet_wrap(~ID_Realm,
@@ -165,15 +165,15 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
   ) +
   ggsci::scale_fill_uchicago() +
   ggsci::scale_colour_uchicago() +
-  scale_y_continuous(breaks = pretty(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nti, n = 5),
-                     # round(c(min(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nti, na.rm = T),
+  scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, n = 5),
+                     # round(c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T),
                      #   0,
                      #   5,
                      #   10,
                      #   15,
-                     #   max(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nti, na.rm = T)))),
-                     limits = c(min(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nti, na.rm = T) - 0.1,
-                                max(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div$nti, na.rm = T) + 0.1)
+                     #   max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T)))),
+                     limits = c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T) - 0.1,
+                                max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T) + 0.1)
   ) +
   geom_hline(yintercept = 0,
              alpha = 0.4) +
@@ -219,4 +219,6 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.Chiroptera.Comm.AllScales.CWM.Div,
   legend = "bottom")
 )
 ```
+
+
 

@@ -1,3 +1,30 @@
+######################################################################################
+#### Code to apply a null-model framework to compute the phylogenetic structure   ####
+#### of communities across a gradient of restrictive sampling pools               ####
+#                                                                                    #
+# Description: To assess how patterns of phylogenetic community structure change     #
+# as a function of spatial scale, we applied commonly used null-models to            #
+# estimate standardized effect sizes for both metrics (MPDSES and MNTDSES,           #
+# respectively) (Kembel et al., 2010). Each null-model simulated random              #
+# assemblages by permuting species names across the phylogeny tips 999 times for     #
+# a given species pool (i.e., the sampling pool in which species were sampled to     #
+# compose random assemblages): global (all species in the phylogeny), east-west      #
+# hemispherical (i.e., Old World and New World species pools), biogeographical       #
+# realms, tectonic plates, within-realm biomes, and within-realm                     #
+# terrestrial-ecoregion scales. NRI and NTI were obtained by multiplying minus       #
+# one to MPDSES and MNTDSES, respectively.                                           #
+#                                                                                    #
+# The framework used here uses the sf.ses.mpd() function, which modifies the         #
+# picante::ses.mpd() function to allow for parallel computation using SNOW           #
+# (snowfall).                                                                        #
+#                                                                                    #
+# Author: Pedro Henrique Pereira Braga                                               #
+# Last Update: "2022-01-15"                                                          #
+#                                                                                    # 
+######################################################################################
+
+set.seed(15145562)
+
 # Deciding on species pool sizes
 
 # Determine the how many species will compose the new sampling pool   
@@ -521,7 +548,7 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome_Acronym = factor(MPD.MN
 # write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative, 
 #          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv")
 
-# MPD.MNTD.LatLong.AllScales.rarefaction.relative <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T, row.names = 1)
+# MPD.MNTD.LatLong.AllScales.rarefaction.relative <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.csv", h = T, row.names = 1)
 
 # MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T)
 
@@ -582,7 +609,7 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome_Acronym = factor(MPD.MN
    ) +   
    guides(fill = guide_legend(nrow = 1, byrow = TRUE,
                               title.position = "bottom",
-                              title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+                              title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
    )
 )
 
@@ -629,7 +656,7 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome_Acronym = factor(MPD.MN
     ) +
     guides(fill = guide_legend(nrow = 1, byrow = TRUE,
                                title.position = "bottom",
-                               title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+                               title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
     )
 )
 
@@ -660,6 +687,10 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.rarefaction.relative.boxplot_1_3.sa
 
 ####
 
-
-MPD.MNTD.LatLong.AllScales
-
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  select(-c("nri.rarefac.mean", "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean" )) %>%
+  left_join(MPD.MNTD.LatLong.AllScales.rarefaction.relative %>%
+              select(c("ID_SamplingPool", "nri.rarefac.mean",
+                       "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean" )),
+            by = "ID_SamplingPool"
+            )

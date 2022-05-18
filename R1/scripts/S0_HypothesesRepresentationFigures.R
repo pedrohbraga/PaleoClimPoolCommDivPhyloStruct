@@ -38,7 +38,7 @@ Hypothesis.1.alt <- data.frame(SamplingPool = factor(rep(c("Broad scale",
     theme_minimal() +
     ylim(1, 20) +
     #    geom_hline(yintercept = 0, alpha = 0.4) +
-    labs(x = "⬅ Sampling Pool Restriction ➡",
+    labs(x = "⬅ Geographical Extent Restriction ➡",
          y = "Phylogenetic Relatedness") +
     theme(strip.background=element_rect(fill = "white",
                                         linetype = NULL,
@@ -62,8 +62,8 @@ Hypothesis.1.alt <- data.frame(SamplingPool = factor(rep(c("Broad scale",
 
 
 ggsave(filename = "figures/Hypothesis.1.alt.png", 
-       dpi = 300, 
-       width = 4.5, height = 5, 
+       dpi = 350, 
+       width = 5, height = 5, 
        units = "in")
 
 # Null H1 - Strong dispersal barriers between regions lead to within-realm diversification --------
@@ -95,7 +95,7 @@ Hypothesis.1.null <- data.frame(SamplingPool = factor(rep(c("Broad scale",
     theme_minimal() +
     ylim(0, 20) +
     #    geom_hline(yintercept = 0, alpha = 0.4) +
-    labs(x = "⬅ Sampling Pool Restriction ➡",
+    labs(x = "⬅ Geographical Extent Restriction ➡",
          y = "Phylogenetic Relatedness") +
     theme(strip.background=element_rect(fill = "white",
                                         linetype = NULL,
@@ -120,7 +120,7 @@ Hypothesis.1.null <- data.frame(SamplingPool = factor(rep(c("Broad scale",
 
 ggsave(filename = "figures/Hypothesis.1.null.plot.png", 
        dpi = 300, 
-       width = 4.5, height = 5, 
+       width = 5, height = 5, 
        units = "in")
 
 
@@ -206,3 +206,4 @@ ggsave(filename = "figures/Hypothesis.3.alt.png",
        dpi = 300, 
        width = 5, height = 5, 
        units = "in")
+

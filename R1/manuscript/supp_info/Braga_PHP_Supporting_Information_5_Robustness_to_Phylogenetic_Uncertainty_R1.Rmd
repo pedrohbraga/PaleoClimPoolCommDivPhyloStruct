@@ -83,7 +83,7 @@ These results were qualitately similar to the ones computed on the maximum credi
 ### Figures
 
 \noindent
-**Figure S5.1.** Realm-comparison of the phylogenetic structure of bat assemblages – measured through the averages of (A) net relatedness index ($\mathsf{NRI_{rob}}$) and (B) nearest taxon index ($\mathsf{NTI_{rob}}$) across computations on a subset of 50 phylogenetic trees sampled from the posterior distribution of phylogenetic trees available in Faurby and Svenning (2015) – across a gradient of sampling frame spatial restrictions (see Methods). Sampling frames were restricted for the (i) global, (ii) east-west hemispheric (New World vs. Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents. Bat communities with positive values of NRI and NTI indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent. On the other hand, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+**Figure S5.1.** Realm-comparison of the phylogenetic structure of bat assemblages – measured through the averages of (A) net relatedness index ($\mathsf{NRI_{rob}}$) and (B) nearest taxon index ($\mathsf{NTI_{rob}}$) across computations on a subset of 50 phylogenetic trees sampled from the posterior distribution of phylogenetic trees available in Faurby and Svenning (2015) – across a gradient of geographical extent restrictions (see Methods). Spatial extents were restricted for the (i) global, (ii) east-west hemispheric (New World vs. Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents. Bat communities with positive values of NRI and NTI indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent. On the other hand, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent.
 
 ```{r include=FALSE}
 # Recursively read all MPD MNTD files from the phylo sampling procedure
@@ -276,12 +276,12 @@ NTI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_su
 ```
 
 \noindent 
-**Figure S5.2.** Average net relatedness index ($\mathsf{NRI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and average _in situ_ net diversification rates across sampling frame extents.
+**Figure S5.2.** Average net relatedness index ($\mathsf{NRI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and average _in situ_ net diversification rates across geographical extents.
 Average *in situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
-$\mathsf{NRI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
-Bat communities with positive values of $\mathsf{NRI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent.
-Conversely, negative values of $\mathsf{NRI_{rob}}$ indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+$\mathsf{NRI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional geographical extents.
+Bat communities with positive values of $\mathsf{NRI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent.
+Conversely, negative values of $\mathsf{NRI_{rob}}$ indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent.
 
 ```{r NRI-phylo-sampling-quantiles-paleoclim-stab-net-div, eval=TRUE, echo = FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
 #### NRI ####
@@ -622,12 +622,12 @@ fig.Ecoregion.mean.NRI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- qu
 ```
 
 \noindent 
-**Figure S5.3.** Average bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across sampling frame extents.
+**Figure S5.3.** Average bias-corrected rarefied nearest taxon index ($\mathsf{NTI_{rob}}$) of worldwide bat communities across the percentiles of historical change in temperature, historical change in precipitation and in situ net diversification rates across geographical extents.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature (MAT) or logarithm of the mean annual precipitation (MAP) from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
-$\mathsf{NTI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional sampling frame extents.
-Bat communities with positive values of $\mathsf{NTI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given sampling frame extent.
-Conversely, negative values of NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given sampling frame extent.
+$\mathsf{NTI_{rob}}$ was measured at the (A, B and C) global, (D, E and F) east-west hemispheric (New World vs. Old World), (G, H and I) biogeographical realm, (K, L and M) tectonic plate, (N, O and P) within-realm biome, and (Q, R and S) ecoregional geographical extents.
+Bat communities with positive values of $\mathsf{NTI_{rob}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent.
+Conversely, negative values of NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent.
 
 ```{r NTI-phylo-sampling-quantiles-paleoclim-stab-net-div, eval=TRUE, echo=FALSE, fig.align="center", fig.height=7.5*6, fig.width=7.5*3, message=FALSE, warning=FALSE}
 
@@ -973,8 +973,8 @@ fig.Ecoregion.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- qu
 \blandscape
 
 \noindent 
-**Figure S5.4.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial sampling frame extents.
-The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each sampling frame extent.
+**Figure S5.4.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial geographical extents.
+The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature or logarithm of the mean annual precipitation from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
 Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($\mathsf{NRI_{rob}}$ and $\mathsf{NTI_{rob}}$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and average *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
