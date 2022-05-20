@@ -21,6 +21,10 @@ header-includes:
    - \usepackage{parskip}
    - \setlength{\parindent}{4em}
    - \setlength{\parskip}{0em}
+   - \usepackage{caption}
+   - \usepackage{pdflscape}
+   - \newcommand{\blandscape}{\begin{landscape}}
+   - \newcommand{\elandscape}{\end{landscape}}
 ---
 
 ```{r setup, include=FALSE}
@@ -35,19 +39,29 @@ library(scales)
 
 knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE,
-                      fig.height = 5,
-                      fig.width = 5,
-                      fig.align = "center")
+                      fig.align = "center",
+                      optipng = knitr::hook_optipng
+                      )
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 ```
 
 ### Study
-### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities/
+### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities
 
 ### Supplementary Information 6
 
-### Appendix S6. Raw data representation
+### Raw data representation
+
+
+## Figures
+
+\noindent 
+**Figure S6.1.** Realm-comparison of the geographical extent size bias-corrected phylogenetic structure of bat assemblages -- measured through the (A) rarefied net relatedness index ($\mathsf{NRI}$) and (B) nearest taxon index ($\mathsf{NTI}$) -- across a gradient of geographical extent restrictions (see Methods).
+Geographical extents were restricted for the (i) global, (ii) east-west hemispheric (New World *versus* Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents.
+Bat communities with positive values of $\mathsf{NRI}$ and $\mathsf{NTI}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent.
+Conversely, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent. Boxplots overlay raw data values with added horizontal jitter for visibility.
+
 
 ```{r eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
 # Refactor data
@@ -86,8 +100,11 @@ MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome_Acronym 
 )
 ```
 
+\newpage
 
-```{r fig_1, eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
+\blandscape
+
+```{r fig_1, fig.align="center", fig.height=10, fig.width=16.5, message=FALSE, warning=FALSE, dev='png', dpi=300, include=FALSE, optipng=''}
 ############################################################################ 
 ### Representing the phylogenetic community structure of bats across the ###
 ### gradient of sampling pool (or species pool) restriction              ###
@@ -108,7 +125,7 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
              strip.position = "bottom"
   ) +
   ggsci::scale_fill_uchicago() +
-  ggsci::scale_colour_uchicago() +
+  ggsci::scale_colour_uchicago(guide = "none") +
   # scale_fill_nord("baie_mouton", reverse = TRUE) +
   # scale_fill_okabeito(reverse = TRUE) +
   # scale_fill_brewer(palette = "Dark2") +
@@ -151,7 +168,7 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
   guides(fill = guide_legend(nrow = 1, 
                              byrow = TRUE,
                              title.position = "bottom",
-                             title = "Lower  ⬅  Sampling Prame Restriction  ➡  Higher",)
+                             title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
   )
 
 NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
@@ -164,7 +181,7 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
              strip.position = "bottom"
   ) +
   ggsci::scale_fill_uchicago() +
-  ggsci::scale_colour_uchicago() +
+  ggsci::scale_colour_uchicago(guide = "none") +
   scale_y_continuous(breaks = pretty(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, n = 5),
                      # round(c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T),
                      #   0,
@@ -200,7 +217,7 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
   guides(fill = guide_legend(nrow = 1, 
                              byrow = TRUE,
                              title.position = "bottom",
-                             title = "Lower  ⬅  Sampling Frame Restriction  ➡  Higher",)
+                             title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
   )
 
 
@@ -220,5 +237,19 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
 )
 ```
 
+\noindent
+![]("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/manuscript/supp_info/Braga_PHP_Supporting_Information_6_Raw_Data_Figures_files/figure-latex/fig_1-1.png")
 
 
+\def\fillandplacepagenumber{%
+  \par\pagestyle{empty}%
+  \vbox to 0pt{\vss}\vfill
+  \vbox to 0pt{\baselineskip0pt
+    \hbox to\linewidth{\hss}%
+    \baselineskip\footskip
+    \hbox to\linewidth{%
+      \hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape

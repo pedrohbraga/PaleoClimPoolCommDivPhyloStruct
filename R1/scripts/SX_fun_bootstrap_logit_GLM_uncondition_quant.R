@@ -155,14 +155,14 @@ quantile.XY <- function(dataset = dataset,
         axis.text.x = element_text(size = 17 * 1.6),
         axis.text.y = element_text(size = 17 * 1.6),
         axis.title.y = element_text(
-          size = 17 * 1.9,
+          size = 17 * 2,
           face = "bold"
         ),
         axis.title.x = element_text(
-          size = 17 * 1.3,
+          size = 17 * 1.4,
           face = "bold"
         ),
-        plot.margin = unit(c(0.5, 0.5, 0, 0.5), "cm")
+        plot.margin = unit(c(0.5, 0.6, 0, 0.6), "cm")
       ) +
       guides(colour = guide_legend(nrow = 1))
   )

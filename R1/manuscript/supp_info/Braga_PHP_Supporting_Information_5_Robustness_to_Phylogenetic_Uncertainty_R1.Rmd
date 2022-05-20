@@ -63,19 +63,19 @@ netDiv.CWM.Chiroptera.rs_5.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhylo
 netDiv.CWM.Chiroptera.rs_1.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_1.mean.csv")[, -1]
 ```
 
-### Study
+## Study
 
-### The historical and contemporary processes driving global phylogenetic structure – the case of bat communities\
+## The historical and contemporary processes driving global phylogenetic structure – the case of bat communities\
 
-### Supplementary Information 5
+## Supplementary Information 5
 
 ### Appendix S5. Robustness to phylogenetic uncertainty
 
-To account for phylogenetic uncertainty, we recalculated the phylogenetic relatedness and the _in situ_ diversification rates of bat communities on a subset of randomly sampled trees from the posterior distribution of phylogenetic trees from Faurby and Svenning (-@faurby2015mpae) [see @donoghue1996ptrslbbs]. We then took the average net relatedness index, nearest taxon index and community-weighted net diversification rates across the calculations done of the phylogenetic sampled and used these averages to reproduce the figures testing each hypothesis from our study.
+To account for phylogenetic uncertainty, we recalculated the phylogenetic relatedness and the _in situ_ diversification rates of bat communities on a subset of randomly sampled trees from the posterior distribution of phylogenetic trees from Faurby and Svenning [-@faurby2015mpae] [see @donoghue1996ptrslbbs]. The phylogenetic relatedness of bat communities was calculated across 50 randomly sampled phylogenetic trees, while diversification rates were estimated on 100 randomly sampled phylogenetic trees. We were limited from including higher sample sizes because of restrictions in computational resources. We then computed the average net relatedness index, average nearest taxon index and average community-weighted net diversification rates across the calculations done with the sampled phylogenetic trees and used these averages to reproduce the figures testing each hypothesis from our study.
 
-These results were qualitately similar to the ones computed on the maximum credibility clade phylogenetic tree (see Figures 2, 3, 4 and 5, and Figures S5.1, S5.2, S5.3 and S5.4), allowing us to consider that our inferences are robust to the uncertainty of phylogenetic hypotheses from the posterior distribution of the phylogenetic relationships we used in our study.
+These results were qualitatively similar to the ones computed on the maximum credibility clade phylogenetic tree (see Figures 2, 3, 4 and 5, and Figures S5.1, S5.2, S5.3 and S5.4), providing evidence that our inferences are robust the uncertainty of phylogenetic hypotheses from the posterior distribution of the phylogenetic relationships we used in our study.
 
-## References for Supporting Information 5
+### References for Supporting Information 5
 
 ::: {#refs}
 :::
@@ -195,7 +195,7 @@ NRI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_su
   ) +   
   guides(fill = guide_legend(nrow = 1, byrow = TRUE,
                              title.position = "bottom",
-                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+                             title="Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
   )
 
 # Representing NTI wrapping across Realms
@@ -252,7 +252,7 @@ NTI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_su
   ) +   
   guides(fill = guide_legend(nrow = 1, byrow = TRUE,
                              title.position = "bottom",
-                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+                             title="Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
   )
 
 
@@ -660,7 +660,7 @@ fig.Hemispheric.mean.NTI.phylo.sampling.diff.AnnTemp.LGM_cur.quantile <- quantil
     ~italic(Q)*"(Historical Change in Temperature) (°C)",
     scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
   ))),
-  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+  lab_y =c(expression(bar("NTI")["rob"["Hemispheric"]]))
 )
 
 
@@ -758,7 +758,7 @@ fig.Hemispheric.mean.NTI.phylo.sampling.diff.log.AnnPrec.log.LGM_cur.quantile <-
     ~italic(Q)*"(Historical Change in Precipitation)",
     scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
   ))),
-  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+  lab_y =c(expression(bar("NTI")["rob"["Hemispheric"]]))
 )
 
 
@@ -851,7 +851,7 @@ fig.Hemispheric.mean.NTI.phylo.sampling.netDiv_CWM_std_tw_rs_1_mean.quantile <- 
   lab_x = c(expression(atop(
     ~italic(Q)*"(Local Net Diversification Rate)",
     scriptstyle(lambda[CWM[STD[tw]]] - mu[CWM[STD[tw]]])))),
-  lab_y =c(expression(bar("NTI")["rar"["Hemispheric"]]))
+  lab_y =c(expression(bar("NTI")["rob"["Hemispheric"]]))
 )
 
 
@@ -979,7 +979,7 @@ The phylogenetic structure of bat communities is measured through the net relate
 Paleoclimatic legacies for each bat community were obtained as the historical change in climate since the last glacial maximum (LGM); specifically, the mean annual temperature or logarithm of the mean annual precipitation from the contemporary period minus the estimated mean annual temperature or logarithm of the mean annual precipitation from 22,000 years ago (see Methods).
 Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($\mathsf{NRI_{rob}}$ and $\mathsf{NTI_{rob}}$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and average *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
 
-```{r boot-logistic-binary-outcome-09-phylostr-phylo-sampling-paleoclim-stab-net-div, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
+```{r boot-logistic-binary-outcome-09-phylostr-phylo-sampling-paleoclim-stab-net-div-i, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
 
 # Bootstrap approach
 
@@ -995,7 +995,7 @@ glm.boot.Global.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo
                                                                                                              "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                              drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                            quantiles = c(0.75, 0.90), 
-                                                                                           n.boot = 100,
+                                                                                           n.boot = 1000,
                                                                                            boot.size = 2500 # increase to 5000
 )
 
@@ -1011,7 +1011,7 @@ glm.boot.Hemispheric.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.
                                                                                                                   "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                                   drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                                 quantiles = c(0.75, 0.90), 
-                                                                                                n.boot = 100,
+                                                                                                n.boot = 1000,
                                                                                                 boot.size = 2500 # increase to 5000
 )
 
@@ -1027,7 +1027,7 @@ glm.boot.Realm.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1043,7 +1043,7 @@ glm.boot.Plate.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1059,7 +1059,7 @@ glm.boot.Biome.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1076,7 +1076,7 @@ glm.boot.Ecoregion.mean.NRI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Ph
                                                                                                                 "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                                 drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                               quantiles = c(0.75, 0.90), 
-                                                                                              n.boot = 100,
+                                                                                              n.boot = 1000,
                                                                                               boot.size = 2500 # increase to 5000
 )
 
@@ -1093,7 +1093,7 @@ glm.boot.Global.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo
                                                                                                              "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                              drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                            quantiles = c(0.75, 0.90), 
-                                                                                           n.boot = 100,
+                                                                                           n.boot = 1000,
                                                                                            boot.size = 2500 # increase to 5000
 )
 
@@ -1109,7 +1109,7 @@ glm.boot.Hemispheric.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.
                                                                                                                   "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                                   drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                                 quantiles = c(0.75, 0.90), 
-                                                                                                n.boot = 100,
+                                                                                                n.boot = 1000,
                                                                                                 boot.size = 2500 # increase to 5000
 )
 
@@ -1125,7 +1125,7 @@ glm.boot.Realm.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1141,7 +1141,7 @@ glm.boot.Plate.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1157,7 +1157,7 @@ glm.boot.Biome.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Phylo.
                                                                                                             "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                             drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                           quantiles = c(0.75, 0.90), 
-                                                                                          n.boot = 100,
+                                                                                          n.boot = 1000,
                                                                                           boot.size = 2500 # increase to 5000
 )
 
@@ -1174,13 +1174,13 @@ glm.boot.Ecoregion.mean.NTI.phylo.sampling.ClimStab.Div.quantiles <- logistic.Ph
                                                                                                                 "netDiv_CWM_std_tw_rs_1_mean")) %>%
                                                                                                 drop_na() %>% as.data.frame() %>% mutate_all(as.numeric),
                                                                                               quantiles = c(0.75, 0.90), 
-                                                                                              n.boot = 100,
+                                                                                              n.boot = 1000,
                                                                                               boot.size = 2500 # increase to 5000
 )
 
 ```
 
-```{r echo=FALSE}
+```{r glm-bind, echo=FALSE}
 
 ##### Figure creation #####
 
@@ -1264,7 +1264,7 @@ levels(glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09$
 ```
 
 
-```{r echo=FALSE, fig.dim=c(5*6, 5), message=FALSE, warning=FALSE, fig.align = 'center', dpi = 250}
+```{r plot-glm, echo=FALSE, fig.dim=c(5*6, 5), message=FALSE, warning=FALSE, fig.align = 'center', dpi = 250}
 ggplot(data = glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quantiles.09,
                                                                     aes(x = estimate,
                                                                         y = variable)
@@ -1353,3 +1353,180 @@ ggplot(data = glm.boot.AllScales.mean.NRI.NTI.phylo.sampling.ClimStab.Div.quanti
 \fillandplacepagenumber
 
 \elandscape
+
+\newpage
+
+\blandscape
+
+\noindent 
+**Table S5.1. ** Model-averaged bootstrapped coefficients for the effects of historical change in temperature and in precipitation and _in situ_ diversification rates in the rarefied phylogenetic structure of bat communities across geographical extents. The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. 
+_In situ_ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Bootstrapped partial coefficients (and their 95% confidence intervals) were extracted from robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices for phylogenetic community relatedness ($\mathsf{NRI_{rob}}$ and $\mathsf{NTI_{rob}}$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and _in situ_ net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
+
+
+\captionsetup[table]{labelformat = empty}
+```{r log-inv-res-table-1-1, echo = FALSE, message = FALSE, warning = FALSE}
+library(gtsummary)
+library(huxtable)
+library(mosaic)
+
+mean_exp <- function(data, ...){
+  dplyr::tibble(
+    mean_exp. = exp(mean(data$estimate, 
+                         na.rm = TRUE)),
+    mean = mean(data$estimate, na.rm = TRUE),
+    ci.lower = confint(data$estimate,
+                       level = 0.95,
+                       method = "stderr")[,1],
+    ci.upper = confint(data$estimate, 
+                       level = 0.95,
+                       method = "stderr")[,2]
+    
+  )
+}
+
+tbl_stack(
+  list(
+    data.frame(glm.boot.AllScales.mean.NRI.phylo.sampling.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NRI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "diff.AnnTemp.LGM_cur" = "Historical change in temperature", 
+                                                   "diff.log.AnnPrec.log.LGM_cur" = "Historical change in precipitation",
+                                                   "netDiv_CWM_std_tw_rs_1_mean" = "In situ diversification rates"
+                                                 )
+             ),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor(Variables, 
+                                levels = c("Intercept",
+                                            "Historical change in temperature",
+                                            "Historical change in precipitation",
+                                            "In situ diversification rates"
+                                ))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Lower CI; Upper CI)") %>%
+      bold_labels(),
+    
+    #
+    #
+    
+    data.frame(glm.boot.AllScales.mean.NTI.phylo.sampling.ClimStab.Div.quantiles.09,
+               PhyloStructure = "NTI") %>%
+      reshape2::melt( id.vars = c("SamplingPool", "PhyloStructure"),
+                      variable.name = "variable",
+                      value.name = "estimate") %>%
+      as.matrix() %>%
+      as.data.frame() %>%
+      mutate(estimate, estimate = as.numeric(estimate),
+             variable, Variables = plyr::revalue(variable, 
+                                                 c("X.Intercept." = "Intercept",
+                                                   "diff.AnnTemp.LGM_cur" = "Historical change in temperature", 
+                                                   "diff.log.AnnPrec.log.LGM_cur" = "Historical change in precipitation",
+                                                   "netDiv_CWM_std_tw_rs_1_mean" = "In situ diversification rates"
+                                                   
+                                                 )),
+             SamplingPool, SamplingPool = factor(SamplingPool, levels = c(
+               "Global sampling",
+               "Hemispheric sampling",
+               "Realm sampling",
+               "Plate sampling",
+               "Biome sampling",
+               "Ecoregion sampling"
+             ))) %>%
+      mutate(estimate, 
+             estimate = as.numeric(estimate),
+             Variables, 
+             Variables = factor( Variables, 
+                                 levels = c("Intercept",
+                                            "Historical change in temperature",
+                                            "Historical change in precipitation",
+                                            "In situ diversification rates"
+                                 ))) %>%
+      select(-variable, -PhyloStructure) %>%
+      group_by(Variables, SamplingPool) %>%
+      ungroup() %>%
+      group_nest(Variables) %>%
+      mutate(
+        tbl = map2(
+          Variables, data, 
+          ~tbl_custom_summary(.y, 
+                              by = SamplingPool, 
+                              type = list(estimate ~ 'continuous'),
+                              label = list(estimate = paste("", .x)), 
+                              missing = "no",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
+                              stat_fns = everything() ~ mean_exp
+          )
+        )
+      ) %>%
+      pull(tbl) %>%
+      tbl_stack() %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Lower CI; Upper CI)") %>%
+      modify_caption(caption = "") %>%
+      bold_labels() 
+  ),
+  group_header = c("NRI", 
+                   "NTI")
+) %>% 
+  bold_labels() %>%
+  as_hux_table() %>%      
+  set_width(1.3) %>% 
+  set_font_size(8) %>% 
+  huxtable::theme_article(header_rows = TRUE, header_cols = TRUE) %>%
+  set_caption(NA) %>%
+  set_caption_pos("topleft")
+# as_flex_table() %>%
+# flextable::fontsize(size = 7, part = "all") %>%
+# set_table_properties(layout = "autofit") %>%
+# flextable::autofit() %>%
+# flextable::fit_to_width(7.5)
+
+```
+
+\def\fillandplacepagenumber{%
+  \par\pagestyle{empty}%
+  \vbox to 0pt{\vss}\vfill
+  \vbox to 0pt{\baselineskip0pt
+    \hbox to\linewidth{\hss}%
+    \baselineskip\footskip
+    \hbox to\linewidth{%
+      \hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape
+
+

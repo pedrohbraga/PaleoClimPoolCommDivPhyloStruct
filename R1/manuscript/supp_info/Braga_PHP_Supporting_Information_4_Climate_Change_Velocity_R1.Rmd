@@ -127,11 +127,11 @@ cor_gVoCC_inv_voccMag_log_bio_12_diff.AnnPrec.LGM_cur <- MPD.MNTD.LatLong.AllSca
 
 The approach we used for calculating climatic historical stability comes with several assumptions. An important one is that changes in climate between the last glacial maximum (LGM) and the contemporary period are constant, so that the differences between climate estimates between both periods are informative. Delgado-Baquerizo _et al_. [-@delgado-baquerizoPalaeoclimateExplainsUnique2017] have shown that climatic changes during the last 21,000 years were indeed largely unidirectional and often linear at the resolution of hundreds of years, supporting that calculating differences between the climate from the last glacial maximum and the contemporary period can account for the largest changes in temperature and precipitation over the last 21,000 years.
 
-To further support our approach, we also assessed if the patterns we observed for the effects of climatic historical stability (measured as the difference between the snapshots of climate estimates for the last glacial maximum (LGM) and climate observations for the contemporary period; see Methods) on the phylogenetic community structure of bats would be congruent to those expected using a complementary metric for climatic stability, the index for velocity of climate change proposed by Loarie _et al_. [-@loarie2009n]. This index has been used combines spatial and temporal gradients of change in climate to provide information on how much local climate changes in space across time periods (see examples of its usage in Sandel _et al_. [-@sandelInfluenceLateQuaternary2011]).
+To further support our approach, we assessed if the patterns we observed for the effects of climatic historical stability (measured as the difference between the snapshots of climate estimates for the last glacial maximum (LGM) and climate observations for the contemporary period; see Methods) on the phylogenetic community structure of bats would be congruent to those expected using an alternative metric for climatic stability, the index for velocity of climate change proposed by Loarie _et al_. [-@loarie2009n]. This index combines spatial and temporal gradients of change in climate to provide information on how much local climate changes in space across time periods (see examples of its usage in Sandel _et al_. [-@sandelInfluenceLateQuaternary2011]).
 
-For this, we downloaded high-resolution rasters containing worldwide bioclimatic variables for mean annual temperature and mean annual precipitation for every 500 years before present (BP) until the LGM from the [CHELSA-TraCE21k](https://chelsa-climate.org/chelsa-trace21k/) paleoclimatic data base [@karger2021cpd]. CHELSA-TraCE21k provides downscaled averages from global monthly climatologies for temperature and precipitation at the resolution of 30 arc-seconds in 100-year time steps for the last 21,000 years [@karger2021cpd]. 
+We started by downloading high-resolution rasters containing worldwide bioclimatic variables for mean annual temperature and mean annual precipitation for every 500 years before present (BP) until the LGM from the [CHELSA-TraCE21k](https://chelsa-climate.org/chelsa-trace21k/) paleoclimatic data base [@karger2021cpd]. CHELSA-TraCE21k provides downscaled averages from global monthly climatologies for temperature and precipitation at the resolution of 30 arc-seconds in 100-year time steps for the last 21,000 years [@karger2021cpd]. 
 
-We projected and aggregated each raster (by calculating the average of all pixels occurring in each cell, weighted by the coverage overlapping area of cells) to the 50 km × 50 km equal-area cell-grid we used in this study (see Methods). Our final data set consisted of 22 geographical raster layers for each climatic variable, with each layer containing the climatic data estimated at every 500-year step, from the 2,000s to the 21,000 years BP. We log-transformed precipitation values to decrease its skewness and to improve the resolution of dry and very dry climates.
+We projected and aggregated each raster (by calculating the average of all pixels occurring in each cell, weighted by the coverage overlapping area of cells) to the 50 km × 50 km equal-area cell-grid we used in this study (see Methods). Our final data set consisted of 45 geographical raster layers for each climatic variable, with each layer containing the climatic data estimated at every 500-year step, from the 2,000s to the 21,000 years BP. We log-transformed precipitation values to decrease its skewness and to improve the resolution of dry and very dry climates.
 
 We then computed gradient-based change velocities in temperature and in precipitation following Loarie _et al_. [-@loarie2009n] and Burrows _et al_. [-@burrows2011s]. For each cell, we: (i) calculated the long-term temporal trend in climate by extracting the coefficients of simple linear regressions performed between each climatic variable and the time period; (ii) calculated the local spatial gradient in climate for each cell by determining the magnitude of the differences in each climatic variable over its surrounding neighbouring cells (3 × 3); and, then (iii) obtaining the climate change velocity for each variable by dividing its temporal trend by its spatial gradient.
 
@@ -149,14 +149,13 @@ We also applied bootstrapping robust logistic generalized linear models using bi
 
 Temperature change velocity was highly correlated with the measure of historical climatic stability in temperature we used in our study (Pearson's $r$ of `r round(cor_gVoCC_diff.AnnTemp.LGM_cur[1, 2, drop = TRUE], 2)`), while precipitation change velocity was marginally correlated with the measure of historical change in precipitation (Pearson's $r$ of `r round(cor_gVoCC_inv_voccMag_log_bio_12_diff.AnnPrec.LGM_cur[1, 2, drop = TRUE], 2)`).
 
-Both velocities of change in temperature and in precipitation drove the phylogenetic relatedness of bat communities at both overall phylogenetic structure (net relatedness index; NRI) and tip-level phylogenetic structure (nearest taxon index; NTI) of bat communities. Departures in precipitation change velocity from stability (i.e. slow or zero velocity of change in climate) generally caused NRI and NTI values to decrease. Nevertheless, the effects of increases in temperature change velocity towards stability in NRI and NTI was less uniform and varied across the gradient of velocity of change and across spatial scales (see Figures S4.1, S4.2 and S4.3).
+Both velocities of change in temperature and in precipitation drove the phylogenetic relatedness of bat communities at both overall phylogenetic structure (net relatedness index; NRI) and tip-level phylogenetic structure (nearest taxon index; NTI) of bat communities. Departures in precipitation change velocity from stability (_i.e._ slow or zero velocity of change in climate) generally caused NRI and NTI values to decrease. Nevertheless, the effects of increases in temperature change velocity towards stability in NRI and NTI was less uniform and varied across the gradient of velocity of change and across spatial scales (see Figures S4.1, S4.2 and S4.3).
 
-At the global scale, increases in temperature change velocity towards climatic stability (i.e. towards no or zero velocity of change in climate) were associated with increases in the odds of highly phylogenetically related bat communities. At the more restricted geographical extents, increases in temperature change velocity towards stability were associated with decreases in the odds of highly phylogenetically related bat communities (see Figure S4.3). 
+At the global scale, increases in temperature change velocity towards climatic stability (_i.e._ towards no or zero velocity of change in temperature) were associated with increases in the odds of highly phylogenetically related bat communities. At the more restricted geographical extents, increases in temperature change velocity towards stability were associated with decreases in the odds of highly phylogenetically related bat communities (see Figure S4.3).
 
 Increases in precipitation change velocity consistently increased the odds of highly phylogenetically related communities (those belonging to the 90th-percentile of both NRI and NTI); except at the global geographical extent, where it was associated with marginal decreases in the odds of NRI (see Figure S4.3). 
 
 The effects of velocities of climate change generally coincided with the ones we observed using historical climatic change.
-
 
 ### References for Supporting Information 4
 
@@ -292,7 +291,7 @@ fig.Global.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NRI")[""["Global"]]))
 )
@@ -308,7 +307,7 @@ fig.Hemispheric.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NRI")[""["Hemispheric"]]))
 )
@@ -324,7 +323,7 @@ fig.Realm.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NRI")[""["Realm"]]))
 )
@@ -340,7 +339,7 @@ fig.Plate.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NRI")[""["Plate"]]))
 )
@@ -356,7 +355,7 @@ fig.Biome.mean.NRI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NRI")[""["Biome"]]))
 )
@@ -652,7 +651,7 @@ fig.Global.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NTI")[""["Global"]]))
 )
@@ -668,7 +667,7 @@ fig.Hemispheric.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NTI")[""["Hemispheric"]]))
 )
@@ -684,7 +683,7 @@ fig.Realm.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NTI")[""["Realm"]]))
 )
@@ -700,7 +699,7 @@ fig.Plate.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NTI")[""["Plate"]]))
 )
@@ -716,7 +715,7 @@ fig.Biome.mean.NTI.gVoCC.inv_voccMag_log_bio_12.quantile <- quantile.XY(
     drop_na("inv_voccMag_log_bio_12"),
   lab_x =  c(expression(atop(
     ~italic(Q)*"(Precipitation Change Velocity)",
-    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))
+    (m%*%1000~yrs^"-1"~"since 22,000 yrs BP")
   ))),
   lab_y = c(expression(bar("NTI")[""["Biome"]]))
 )
@@ -889,11 +888,11 @@ fig.Ecoregion.mean.NTI.gVoCC.netDiv_CWM_std_tw_rs_1.quantile <- quantile.XY(
 \blandscape
 
 \noindent 
-**Figure S4.3.** Partial bootstrapped coefficients for the effects of paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial geographical extents.
+**Figure S4.3.** Influence of  paleoclimatic legacies and *in situ* diversification rates in the phylogenetic structure of bat communities across spatial geographical extents.
 The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent extent.
 *In situ* net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates.
 Climate change velocities were derived from spatial gradients rates of climate change over time from  from the contemporary period until 21,000 years before present (BP) (see Methods).
-Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90-th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and average *in situ* net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
+Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized velocity of change in temperature, velocity of change in precipitation and _in situ_ net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
 
 ```{r boot-logistic-binary-outcome-09-phylostr-log-inv-gVoCC-paleoclim-stab-net-div, echo = FALSE, eval = TRUE, message=FALSE, warning=FALSE, include=FALSE}
 
@@ -1276,21 +1275,26 @@ ggplot(data = glm.boot.AllScales.mean.NRI.NTI.gVoCC.ClimStab.Div.quantiles.09,
 \blandscape
 
 \noindent 
-**Table S4.1. ** Partial bootstrapped coefficients for the effects of velocities of change in temperature and in precipitation and _in situ_ diversification rates in the phylogenetic structure of bat communities across spatial geographical extents. The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. In situ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized historical change in temperature, historical change in precipitation and in situ net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions; see Table 2).
+**Table S4.1.** Model-averaged coefficients for the influence of velocities of change in temperature and in precipitation and _in situ_ diversification rates in the phylogenetic structure of bat communities across geographical extents. The phylogenetic structure of bat communities is measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. _In situ_ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Bootstrapped partial coefficients were extracted from robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices for phylogenetic community relatedness ($Pr(NRI_{Q90}=1)$) and $Pr(NTI_{Q90}=1)$) as response variables (in separate models) and the z-score standardized velocity of change in temperature, velocity of change in precipitation and _in situ_ net diversification rates as predictive variables (with 2,500 random samples drawn with replacement for 1,000 repetitions).
 
 \captionsetup[table]{labelformat=empty}
-```{r log-inv-res-table, echo=FALSE, message=FALSE, warning = FALSE}
+```{r log-inv-res-table-1, echo=FALSE, message=FALSE, warning = FALSE}
+
 library(gtsummary)
 library(huxtable)
+library(mosaic)
 
 mean_exp <- function(data, ...){
   dplyr::tibble(
-    mean_exp. = exp(mean(data$estimate, na.rm = TRUE)),
+    mean_exp. = exp(mean(data$estimate, 
+                         na.rm = TRUE)),
     mean = mean(data$estimate, na.rm = TRUE),
-    ci.lower = confit(data$estimate, 
-                      level = 0.95)[1],
-    ci.upper = confit(data$estimate, 
-                      level = 0.95)[2]
+    ci.lower = confint(data$estimate,
+                       level = 0.95,
+                       method = "stderr")[,1],
+    ci.upper = confint(data$estimate, 
+                       level = 0.95,
+                       method = "stderr")[,2]
     
   )
 }
@@ -1338,7 +1342,7 @@ tbl_stack(
                               type = list(estimate ~ 'continuous'),
                               label = list(estimate = paste("", .x)), 
                               missing = "no",
-                              statistic = "estimate" ~ "{mean} ({mean_exp.})",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
                               stat_fns = everything() ~ mean_exp
           )
         )
@@ -1392,14 +1396,14 @@ tbl_stack(
                               type = list(estimate ~ 'continuous'),
                               label = list(estimate = paste("", .x)), 
                               missing = "no",
-                              statistic = "estimate" ~ "{mean} ({mean_exp.})",
+                              statistic = "estimate" ~ "{mean} ({ci.lower}; {ci.upper})",
                               stat_fns = everything() ~ mean_exp
           )
         )
       ) %>%
       pull(tbl) %>%
       tbl_stack() %>%
-      modify_footnote(all_stat_cols() ~ "Mean (Odds Ratio)") %>%
+      modify_footnote(all_stat_cols() ~ "Mean (Lower CI; Upper CI)") %>%
       modify_caption(caption = "") %>%
       bold_labels() 
   ),
