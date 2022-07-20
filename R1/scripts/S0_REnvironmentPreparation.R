@@ -32,13 +32,15 @@ devtools::install_github("stamats/MKmisc")
 # Check for needed packages, and install the missing ones
 required.libraries <- c("ade4","subniche",
                         "RcppEigen", "snowfall", "rlist",
-                        "ape", "picante", "phytools", "PhyloMeasures",
+                        "letsR", 
+                        "ape", "picante", "phytools",
                         "vegan", "geiger", "Rcpp", "adephylo", "phylobase",
-                         "coda",
+                        "geiger", "hisse",
+                        "lme4", "spgwr", "dglm", "coda",
                         "devtools", "rgeos", "dplyr", "gtable", "grid", "readxl",
                         "sf", "lwgeom", "sp","raster", "maptools", "splancs",
-                        "ggplot2", "ggtree", "viridis", "magrittr",
-                        "rasterVis", "gridExtra", 
+                        "ggplot2", "ggtree",  "viridis", "magrittr",
+                        "rasterVis", "gridExtra", "PhyloMeasures",
                         "tidyverse", "wesanderson", "mosaic",
                         "broom", "tidyr", "scales",
                         "BiocManager", "ggpubr",
@@ -46,11 +48,9 @@ required.libraries <- c("ade4","subniche",
                         "BAMMtools", "coda",
                         "rgdal", "tidyverse", "rbin", 
                         "quantreg", "WRTDStidal",
-                        "ggrepel", "ggpubr",
-                        "naniar", "data.table",
-                        "robust"
+                        "ggrepel",
+                        "naniar"
 )
-
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
 
@@ -65,10 +65,9 @@ lapply(required.libraries,
 ##### Import utility functions #############################################
 
 source("scripts/SX_fun_CommWeightedMeans.R")
+source("scripts/SX_fun_sf.ses.phylostr.R")
 source("scripts/SX_fun_brokenStick.selection.R")
 source("scripts/SX_fun_make_grid_sf.R")
 source("scripts/SX_fun_ggplot_theme_map.R")
 source("scripts/SX_fun_match_phylo_comm.R")
-source("scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
-source("scripts/SX_fun_ses.phylostr.query.sf.R")
 
