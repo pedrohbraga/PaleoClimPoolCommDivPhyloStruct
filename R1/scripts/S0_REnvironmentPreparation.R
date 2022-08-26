@@ -29,12 +29,15 @@ library(ggtree); library(wesanderson)
 # install.packages("devtools")
 devtools::install_github("stamats/MKmisc")
 
+devtools::install_github("cran/PhyloMeasures")
+
+devtools::install_github("fawda123/WRTDStidal")
+
 # Check for needed packages, and install the missing ones
 required.libraries <- c("ade4","subniche",
                         "RcppEigen", "snowfall", "rlist",
                         "ape", "picante", "phytools", "PhyloMeasures",
                         "vegan", "geiger", "Rcpp", "adephylo", "phylobase",
-                         "coda",
                         "devtools", "rgeos", "dplyr", "gtable", "grid", "readxl",
                         "sf", "lwgeom", "sp","raster", "maptools", "splancs",
                         "ggplot2", "ggtree", "viridis", "magrittr",
@@ -48,7 +51,8 @@ required.libraries <- c("ade4","subniche",
                         "quantreg", "WRTDStidal",
                         "ggrepel", "ggpubr",
                         "naniar", "data.table",
-                        "robust"
+                        "robust",
+                        "latex2exp"
 )
 
 

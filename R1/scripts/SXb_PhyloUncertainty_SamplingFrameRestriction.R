@@ -59,10 +59,10 @@ MPD.MNTD.LatLong.AllScales_phyloSampling_summary
 
 # Representing NRI wrapping across Realms
 
-(NRI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+NRI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
                                         filter(!is.na(ID_Realm)),
-                                      aes(x = SamplingPool, y = nri, fill = SamplingPool)) +
-   geom_boxplot(aes(x = SamplingPool, y = nri)) +
+                                      aes(x = SamplingPool, y = nri.mean.samp, fill = SamplingPool)) +
+   geom_boxplot(aes(x = SamplingPool, y = nri.mean.samp)) +
    facet_wrap(~ID_Realm,
               nrow = 1,
               strip.position = "bottom") +
@@ -74,12 +74,12 @@ MPD.MNTD.LatLong.AllScales_phyloSampling_summary
    #                    name="Sampling Pool") +
    scale_y_continuous(breaks = round(
      #pretty(MPD.LatLong.Env.AllScales$NRI, n = 7)
-     c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri, na.rm = T),
+     c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri.mean.samp, na.rm = T),
        0,
        5,
        10,
        15,
-       max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri, na.rm = T)))
+       max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nri.mean.samp, na.rm = T)))
    ) +
    geom_hline(yintercept = 0,
               alpha = 0.4) +
@@ -108,7 +108,89 @@ MPD.MNTD.LatLong.AllScales_phyloSampling_summary
                               title.position = "bottom",
                               title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
    )
+
+############################################################################ 
+### Representing the phylogenetic community structure of bats across the ###
+### gradient of sampling pool (or species pool) restriction              ###
+############################################################################
+
+# Representing NTI wrapping across Realms
+
+NTI.Realm.sampling.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling_summary %>%
+                                       filter(!is.na(ID_Realm)),
+                                     aes(x = SamplingPool, y = nti.mean.samp, fill = SamplingPool)) +
+  geom_boxplot(aes(x = SamplingPool, y = nti)) +
+  facet_wrap(~ID_Realm,
+             nrow = 1,
+             strip.position = "bottom") +
+  ggsci::scale_fill_uchicago() +
+  # scale_fill_nord("baie_mouton", reverse = TRUE) +
+  # scale_fill_okabeito(reverse = TRUE) +
+  # scale_fill_brewer(palette = "Dark2") +
+  # scale_fill_viridis(discrete = TRUE,
+  #                    name="Sampling Pool") +
+  scale_y_continuous(
+    breaks =
+      #   pretty(MPD.MNTD.LatLong.AllScales$nti, n = 5),
+      round(
+        c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T),
+          -2,
+          0,
+          2,
+          4,
+          max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) + 0.1)
+      ),
+    limits = c(min(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) - 0.1,
+               max(MPD.MNTD.LatLong.AllScales_phyloSampling_summary$nti.mean.samp, na.rm = T) + 0.1)
+    # n.breaks = 4
+  ) +
+  geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  labs(y = "NTI", x = "") +
+  theme_minimal(base_size = 20) +
+  theme(strip.background = element_rect(fill = "white",
+                                        linetype = NULL,
+                                        color = "white"),
+        strip.text = element_text(color = "black",
+                                  face = "bold",
+                                  size = 15),
+        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_blank(),
+        axis.title = element_text(size = 16, face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        legend.title.align = 0.5,
+        legend.margin=margin(0, 0, 0, 0),
+        legend.box.margin=margin(-5, -5, 2, -5)
+  ) +   
+  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
+                             title.position = "bottom",
+                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
+  )
+
+
+
+### Combining plots into a single figure ###
+
+(fig.NRI.NTI.Realm.boxplot.phyloSampling <- ggarrange(
+  NRI.Realm.sampling.boxplot +
+    theme(axis.title.x = element_blank()), 
+  NTI.Realm.sampling.boxplot,
+  labels = c("A", "B"),
+  ncol = 1, nrow = 2,
+  widths = c(1, 1),
+  heights = c(1, 1.1),
+  align = "v",
+  common.legend = TRUE,
+  legend = "bottom"
 )
+)
+
+
+
 
 NRI.Realm.boxplot.phyloSampling.plot <- function(){
   (NRI.Realm.boxplot.phyloSampling <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling %>%
@@ -183,72 +265,6 @@ NRI.Realm.boxplot.phyloSampling.plot <- function(){
 
 NRI.Realm.boxplot.phyloSampling <- NRI.Realm.boxplot.phyloSampling.plot()
 NRI.Realm.boxplot.phyloSampling
-
-############################################################################ 
-### Representing the phylogenetic community structure of bats across the ###
-### gradient of sampling pool (or species pool) restriction              ###
-############################################################################
-
-# Representing NTI wrapping across Realms
-
-(NTI.Realm.boxplot <- ggplot(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
-                               filter(!is.na(ID_Realm)),
-                             aes(x = SamplingPool, y = nti, fill = SamplingPool)) +
-   geom_boxplot(aes(x = SamplingPool, y = nti)) +
-   facet_wrap(~ID_Realm,
-              nrow = 1,
-              strip.position = "bottom") +
-   ggsci::scale_fill_uchicago() +
-   # scale_fill_nord("baie_mouton", reverse = TRUE) +
-   # scale_fill_okabeito(reverse = TRUE) +
-   # scale_fill_brewer(palette = "Dark2") +
-   # scale_fill_viridis(discrete = TRUE,
-   #                    name="Sampling Pool") +
-   scale_y_continuous(
-     breaks =
-       #   pretty(MPD.MNTD.LatLong.AllScales$nti, n = 5),
-       round(
-         c(min(MPD.MNTD.LatLong.AllScales$nti, na.rm = T),
-           -2,
-           0,
-           2,
-           4,
-           max(MPD.MNTD.LatLong.AllScales$nti, na.rm = T) + 0.1)
-       ),
-     limits = c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T) - 0.1,
-                max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T) + 0.1)
-     # n.breaks = 4
-   )
-) +
-  geom_hline(yintercept = 0,
-             alpha = 0.4) +
-  labs(y = "NTI", x = "") +
-  theme_minimal() +
-  theme_minimal(base_size = 20) +
-  theme(strip.background = element_rect(fill = "white",
-                                        linetype = NULL,
-                                        color = "white"),
-        strip.text = element_text(color = "black",
-                                  face = "bold",
-                                  size = 15),
-        axis.text.y = element_text(face = "bold"),
-        axis.text.x = element_blank(),
-        axis.title = element_text(size = 16, face="bold"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "bottom",
-        legend.text = element_text(size = 14),
-        legend.title = element_text(size = 16),
-        legend.title.align = 0.5,
-        legend.margin=margin(0, 0, 0, 0),
-        legend.box.margin=margin(-5, -5, 2, -5)
-  ) +   
-  guides(fill = guide_legend(nrow = 1, byrow = TRUE,
-                             title.position = "bottom",
-                             title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
-  )
-)
-
 
 NTI.Realm.boxplot.phyloSampling.plot <- function() {
   (NTI.Realm.boxplot.phyloSampling <- ggplot(MPD.MNTD.LatLong.AllScales_phyloSampling %>%

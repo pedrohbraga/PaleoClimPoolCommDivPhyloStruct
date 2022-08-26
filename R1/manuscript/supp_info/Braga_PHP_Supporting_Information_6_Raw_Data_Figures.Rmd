@@ -41,7 +41,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE,
                       fig.align = "center",
                       optipng = knitr::hook_optipng
-                      )
+)
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 ```
@@ -67,36 +67,36 @@ Conversely, negative values of NRI and NTI indicate that bat communities are mai
 # Refactor data
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm,
-                                                              levels = c(
-                                                                "Neotropical",
-                                                                "Nearctic",
-                                                                "Afrotropical",
-                                                                "Palearctic",
-                                                                "Indomalay",
-                                                                "Australasian"
-                                                              )
+                                                                                  levels = c(
+                                                                                    "Neotropical",
+                                                                                    "Nearctic",
+                                                                                    "Afrotropical",
+                                                                                    "Palearctic",
+                                                                                    "Indomalay",
+                                                                                    "Australasian"
+                                                                                  )
 )
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool,
-                                                                  levels = c(
-                                                                    "Global sampling",
-                                                                    "Hemispheric sampling",
-                                                                    "Realm sampling",
-                                                                    "Plate sampling",
-                                                                    "Biome sampling",
-                                                                    "Ecoregion sampling"
-                                                                  )
+                                                                                      levels = c(
+                                                                                        "Global sampling",
+                                                                                        "Hemispheric sampling",
+                                                                                        "Realm sampling",
+                                                                                        "Plate sampling",
+                                                                                        "Biome sampling",
+                                                                                        "Ecoregion sampling"
+                                                                                      )
 )
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome <- as.factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome)
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome_Acronym <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome,
-                                                                      labels = abbreviate(gsub(
-                                                                        "_",
-                                                                        " ",
-                                                                        levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome)
-                                                                      )
-                                                                      )
+                                                                                          labels = abbreviate(gsub(
+                                                                                            "_",
+                                                                                            " ",
+                                                                                            levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Biome)
+                                                                                          )
+                                                                                          )
 )
 ```
 
@@ -143,6 +143,12 @@ NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
                max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nri, na.rm = T) + 0.1)
   ) +
   geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  geom_hline(yintercept = 1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  geom_hline(yintercept = -1.96,
+             linetype='dotted',
              alpha = 0.4) +
   labs(y="NRI", x = "") +
   theme_minimal() +
@@ -194,6 +200,12 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
   ) +
   geom_hline(yintercept = 0,
              alpha = 0.4) +
+  geom_hline(yintercept = 1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  geom_hline(yintercept = -1.96,
+             linetype='dotted',
+             alpha = 0.4) +
   labs(y = "NTI", x = "") +
   theme_minimal(base_size = 20) +
   theme(strip.background = element_rect(fill = "white",
@@ -242,13 +254,211 @@ NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldCli
 
 
 \def\fillandplacepagenumber{%
-  \par\pagestyle{empty}%
-  \vbox to 0pt{\vss}\vfill
-  \vbox to 0pt{\baselineskip0pt
-    \hbox to\linewidth{\hss}%
-    \baselineskip\footskip
-    \hbox to\linewidth{%
-      \hfil\thepage\hfil}\vss}}
+\par\pagestyle{empty}%
+\vbox to 0pt{\vss}\vfill
+\vbox to 0pt{\baselineskip0pt
+\hbox to\linewidth{\hss}%
+\baselineskip\footskip
+\hbox to\linewidth{%
+\hfil\thepage\hfil}\vss}}
+
+\fillandplacepagenumber
+
+\elandscape
+
+
+\newpage
+
+\blandscape
+
+```{r fig_1_1_96, fig.align="center", fig.height=10, fig.width=16.5, message=FALSE, warning=FALSE, dev='png', dpi=300, include=FALSE, optipng=''}
+############################################################################ 
+### Representing the phylogenetic community structure of bats across the ###
+### gradient of sampling pool (or species pool) restriction              ###
+############################################################################
+
+# Representing NRI wrapping across Realms
+
+NRI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nri, -1.96, 1.96)),
+                            aes(x = SamplingPool, 
+                                y = nri)
+) +
+  geom_jitter(aes(fill = SamplingPool, 
+                  colour = SamplingPool), size = 0.01, alpha = 0.05) +
+  geom_boxplot(data = filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nri, -1.96, 1.96)) %>%
+                 filter(nri > 1.96), aes(fill = SamplingPool), alpha = 0.7) +
+    geom_boxplot(data = filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nri, -1.96, 1.96)) %>%
+                 filter(nri < 1.96), aes(fill = SamplingPool), alpha = 0.7) + 
+  facet_wrap(~ID_Realm,
+             nrow = 1,
+             strip.position = "bottom"
+  ) +
+  ggsci::scale_fill_uchicago() +
+  ggsci::scale_colour_uchicago(guide = "none") +
+  # scale_fill_nord("baie_mouton", reverse = TRUE) +
+  # scale_fill_okabeito(reverse = TRUE) +
+  # scale_fill_brewer(palette = "Dark2") +
+  # scale_fill_viridis(discrete = TRUE,
+  #                    name="Sampling Pool") +
+  scale_y_continuous(breaks = round(
+    #pretty(MPD.LatLong.AllScales.rarefaction$NRI, n = 7)
+    c(min(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                 is.na(ID_Realm) == FALSE) %>%
+            filter(!between(nri, -1.96, 1.96)) %>%
+            pull(nri), na.rm = T),
+      0,
+      5,
+      10,
+      15,
+      max(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                 is.na(ID_Realm) == FALSE) %>%
+            filter(!between(nri, -1.96, 1.96)) %>%
+            pull(nri), 
+          na.rm = T))),
+    limits = c(min(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                 is.na(ID_Realm) == FALSE) %>%
+           filter(!between(nri, -1.96, 1.96))%>%
+            pull(nri), na.rm = T) - 0.1,
+               max(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                 is.na(ID_Realm) == FALSE) %>%
+            filter(!between(nri, -1.96, 1.96)) %>%
+            pull(nri), na.rm = T) + 0.1)
+  ) +
+  geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  geom_hline(yintercept = 1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  geom_hline(yintercept = -1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  labs(y="NRI", x = "") +
+  theme_minimal() +
+  theme_minimal(base_size = 20) +
+  theme(strip.background = element_rect(fill = "white",
+                                        linetype = NULL,
+                                        color = "white"),
+        strip.text = element_text(color = "black",
+                                  face = "bold",
+                                  size = 15),
+        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_blank(),
+        axis.title = element_text(size = 16, face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 16),
+        legend.title.align = 0.5,
+        legend.margin=margin(0, 0, 0, 0),
+        legend.box.margin=margin(-5, -5, 2, -5)
+  ) +   
+  guides(fill = guide_legend(nrow = 1, 
+                             byrow = TRUE,
+                             title.position = "bottom",
+                             title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
+  )
+
+NTI.Realm.boxplot <- ggplot(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nti, -1.96, 1.96)),
+                            aes(x = SamplingPool, y = nti)) +
+  geom_jitter(aes(fill = SamplingPool, colour = SamplingPool), size = 0.01, alpha = 0.2) +
+  geom_boxplot(aes(fill = SamplingPool), alpha = 0.7) +
+  facet_wrap(~ID_Realm,
+             nrow = 1,
+             strip.position = "bottom"
+  ) +
+  ggsci::scale_fill_uchicago() +
+  ggsci::scale_colour_uchicago(guide = "none") +
+  scale_y_continuous(breaks = pretty(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nti, -1.96, 1.96)) %>%
+                                pull(nti), n = 5),
+                     # round(c(min(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T),
+                     #   0,
+                     #   5,
+                     #   10,
+                     #   15,
+                     #   max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T)))),
+                     limits = c(min(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nti, -1.96, 1.96)) %>%
+                                pull(nti), na.rm = T) - 0.1,
+                                max(filter(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+                                   is.na(ID_Realm) == FALSE) %>%
+                              filter(!between(nti, -1.96, 1.96)) %>%
+                                pull(nti), na.rm = T) + 0.1)
+  ) +
+  geom_hline(yintercept = 0,
+             alpha = 0.4) +
+  geom_hline(yintercept = 1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  geom_hline(yintercept = -1.96,
+             linetype='dotted',
+             alpha = 0.4) +
+  labs(y = "NTI", x = "") +
+  theme_minimal(base_size = 20) +
+  theme(strip.background = element_rect(fill = "white",
+                                        linetype = NULL,
+                                        color = "white"),
+        strip.text = element_text(color = "black",
+                                  face = "bold",
+                                  size = 15),
+        axis.text.y = element_text(face = "bold"),
+        axis.text.x = element_blank(),
+        axis.title = element_text(size = 16, face="bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        legend.title = element_text(size = 15),
+        legend.title.align = 0.5,
+        legend.margin=margin(0, 0, 0, 0),
+        legend.box.margin=margin(-5, -5, -5, -5)
+  ) +
+  guides(fill = guide_legend(nrow = 1, 
+                             byrow = TRUE,
+                             title.position = "bottom",
+                             title = "Lower  ⬅  Geographical Extent Restriction  ➡  Higher",)
+  )
+
+
+### Combining plots into a single figure ###
+
+(fig.NRI.NTI.Realm.boxplot <- ggarrange(
+  NRI.Realm.boxplot +
+    theme(axis.title.x = element_blank()), 
+  NTI.Realm.boxplot,
+  labels = c("A", "B"),
+  ncol = 1, nrow = 2,
+  widths = c(1, 1),
+  heights = c(1, 1.1),
+  align = "v",
+  common.legend = TRUE,
+  legend = "bottom")
+)
+```
+
+\noindent
+![]("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/manuscript/supp_info/Braga_PHP_Supporting_Information_6_Raw_Data_Figures_files/figure-latex/fig_1_1_96-1.png")
+
+
+\def\fillandplacepagenumber{%
+\par\pagestyle{empty}%
+\vbox to 0pt{\vss}\vfill
+\vbox to 0pt{\baselineskip0pt
+\hbox to\linewidth{\hss}%
+\baselineskip\footskip
+\hbox to\linewidth{%
+\hfil\thepage\hfil}\vss}}
 
 \fillandplacepagenumber
 

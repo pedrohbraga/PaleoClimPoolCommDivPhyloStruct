@@ -545,9 +545,10 @@ MPD.MNTD.LatLong.AllScales.rarefaction.relative$ID_Biome_Acronym = factor(MPD.MN
                                                                                  " ",
                                                                                  levels(MPD.LatLong.AllScales.rarefaction.relative$ID_Biome))))
 
-# write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative, 
-#          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv")
+write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.relative, 
+          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv")
 
+ 
 # MPD.MNTD.LatLong.AllScales.rarefaction.relative <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.csv", h = T, row.names = 1)
 
 # MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T)
@@ -687,10 +688,13 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.rarefaction.relative.boxplot_1_3.sa
 
 ####
 
-MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
   select(-c("nri.rarefac.mean", "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean" )) %>%
   left_join(MPD.MNTD.LatLong.AllScales.rarefaction.relative %>%
               select(c("ID_SamplingPool", "nri.rarefac.mean",
                        "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean" )),
             by = "ID_SamplingPool"
             )
+
+saveRDS(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div, 
+        "data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")

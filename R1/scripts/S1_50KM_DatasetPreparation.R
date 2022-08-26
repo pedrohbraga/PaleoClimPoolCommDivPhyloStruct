@@ -120,6 +120,10 @@ world_grid_50km_cat_sf <- world_grid_50km_cat %>%
   unnest(cols = c(ID_Ecoregion, ID_Biome, ID_Realm),
          keep_empty = TRUE)
 
+
+world_grid_50km_cat_sf$Quadrat_AREA <- world_grid_50km_cat_sf %>%
+  st_area()
+
 ## Rename and reorder levels to make sense
 
 world_grid_50km_cat_df <- as.data.frame(world_grid_50km_cat_sf) %>%
@@ -165,6 +169,73 @@ world_grid_50km_cat_df$ID_Biome_Realm <- paste(world_grid_50km_cat_df$ID_Biome,
 world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
   naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA")))
 
+# Area
+
+area_ID_Hemisphere <- world_grid_50km_cat_df %>%
+  mutate(ID_Region = ifelse(ID_Realm %in% c("Nearctic", "Neotropical"), 
+                            "New World",
+                            ifelse(ID_Realm %in% c("Palearctic",
+                                                   "Afrotropical",
+                                                   "Indomalay",
+                                                   "Oceanic",
+                                                   "Australasian"), "Old World",
+                                   NA))) %>%
+  group_by(ID_Region) %>%
+  dplyr::summarise(sum_Quadrat_AREA = 
+                     sum(Quadrat_AREA, na.rm = T)) %>%
+  mutate(ID_extent = rep("ID_Hemisphere"))
+
+area_ID_Realm <- world_grid_50km_cat_df %>%
+  rename(ID_Region = ID_Realm) %>%
+  group_by(ID_Region) %>%
+  dplyr::summarise(sum_Quadrat_AREA = 
+                     sum(Quadrat_AREA, na.rm = T)) %>%
+  mutate(ID_extent = rep("ID_Realm"))
+
+area_ID_PlateName <- world_grid_50km_cat_df %>%
+  rename(ID_Region = ID_PlateName) %>%
+  group_by(ID_Region) %>%
+  dplyr::summarise(sum_Quadrat_AREA = 
+                     sum(Quadrat_AREA, na.rm = T)) %>%
+  mutate(ID_extent = rep("ID_PlateName"))
+
+area_ID_Biome_Realm <- world_grid_50km_cat_df %>%
+  rename(ID_Region = ID_Biome_Realm) %>%
+  group_by(ID_Region) %>%
+  dplyr::summarise(sum_Quadrat_AREA = 
+                     sum(Quadrat_AREA, na.rm = T)) %>%
+  
+  mutate(ID_extent = rep("ID_Biome_Realm"))
+
+area_ID_Ecoregion <- world_grid_50km_cat_df %>%
+  rename(ID_Region = ID_Ecoregion) %>%
+  group_by(ID_Region) %>%
+  dplyr::summarise(sum_Quadrat_AREA = 
+                     sum(Quadrat_AREA, na.rm = T)) %>%
+  mutate(ID_extent = rep("ID_Ecoregion"))
+
+area_ID_extent <- bind_rows(area_ID_Hemisphere,
+                            area_ID_Realm,
+                            area_ID_PlateName,
+                            area_ID_Biome_Realm,
+                            area_ID_Ecoregion)
+
+area_ID_extent$sum_Quadrat_AREA <- set_units(area_ID_extent$sum_Quadrat_AREA, km^2)
+
+area_ID_extent %>%
+  group_by(ID_extent) %>%
+  summarise(mean_area = mean(sum_Quadrat_AREA, na.rm =T))
+
+ggplot(data = area_ID_extent,
+       aes(x = ID_extent,
+           y =  sum_Quadrat_AREA)) +
+  geom_point() 
+
+bind_rows(area_ID_Hemisphere,
+          area_ID_Realm,
+          area_ID_PlateName,
+          area_ID_Biome_Realm,
+          area_ID_Ecoregion) 
 
 #### Preparing the bat community dataset ---------------------------------------
 

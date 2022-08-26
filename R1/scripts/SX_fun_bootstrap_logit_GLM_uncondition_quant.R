@@ -260,3 +260,68 @@ logistic.Phylo.Env <- function(dataset = dataset,
                  p.values = p.values)
   return(result)
 }
+
+
+###
+
+logistic.Phylo.Env.threhsold <- function(dataset = dataset,
+                                         community.phylo.variable = "nri", 
+                                         X,
+                                         threshold = c(1.96), 
+                                         n.boot = 200,
+                                         boot.size = 500) {
+  X = dataset[, X]
+  
+  community.phylo.variable = dataset[, community.phylo.variable]
+  
+  n.threshold <- length(threshold)
+  
+  n <- nrow(X)
+  
+  phylo.condition <- matrix(0, n, 1)
+  phylo.threshold <- setNames(threshold, threshold)
+  
+  boot.list <- list()
+  
+  model.rob.list <- list()
+  
+  for (j in 1:n.threshold) {
+    phylo.condition[which(community.phylo.variable <= phylo.threshold[j])] <- 0 # no need to set this (all values already set as zero), it's just for completion
+    phylo.condition[which(community.phylo.variable > phylo.threshold[j])] <- 1
+    data.tmp <- data.frame(phylo.condition, scale(X))
+    model.rob.list[[j]] <- glmRob(phylo.condition ~ ., 
+                                  family = binomial(link = "logit"), 
+                                  data = data.tmp)
+    boot.coefs <- matrix(NA, 
+                         nrow = n.boot, ncol = length(coef(model.rob.list[[j]])), 
+                         dimnames = list(rep = seq(n.boot), 
+                                         coef = names(coef(model.rob.list[[j]]))))
+    for (i in 1:n.boot) {
+      print(i)
+      boot.data <- data.tmp[sample(nrow(data.tmp), 
+                                   size = boot.size,
+                                   replace = TRUE), ]
+      boot.fit <- update(model.rob.list[[j]], 
+                         data = boot.data) # refit the robust model with resampled data
+      boot.coefs[i, ] <- coefficients(boot.fit)
+    }
+    boot.list[[j]] <- boot.coefs
+  }
+  
+  p.values <- matrix(0, 
+                     n.threshold, 
+                     ncol(boot.coefs))
+  colnames(p.values) <- colnames(boot.coefs)
+  rownames(p.values) <- paste0("t",
+                               threshold)
+  for (j in 1:n.threshold) {
+    for (i in 1:ncol(boot.coefs)) {
+      p.values[j, i] <- boot.pvalue.CI_inversion(boot.list[[j]][, i], 
+                                                 theta_null = 0)
+    }
+  }
+  result <- list(model.rob = model.rob.list, 
+                 boot.coefs = boot.list, 
+                 p.values = p.values)
+  return(result)
+}

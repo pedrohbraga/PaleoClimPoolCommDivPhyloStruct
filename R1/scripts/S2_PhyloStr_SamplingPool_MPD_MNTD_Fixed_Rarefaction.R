@@ -5,42 +5,43 @@
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Hemispheric sampling") %>%
-  select("ntaxa.pool.size") %>%
+  dplyr::select("ntaxa.pool.size") %>%
   distinct()
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Realm sampling") %>%
-  select("ID_Realm" , "ntaxa.pool.size") %>%
+  dplyr::select("ID_Realm" , "ntaxa.pool.size") %>%
   distinct() %>%
   arrange(desc(ntaxa.pool.size))
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Plate sampling") %>%
-  select("ID_PlateName", "ntaxa.pool.size") %>%
+  dplyr::select("ID_PlateName", "ntaxa.pool.size") %>%
   distinct() %>%
   arrange(desc(ntaxa.pool.size))
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Biome sampling") %>%
-  select("ID_Biome_Realm", "ntaxa.pool.size") %>%
+  dplyr::select("ID_Biome_Realm", "ntaxa.pool.size") %>%
   distinct() %>%
-  arrange(desc(ntaxa.pool.size))
+  arrange(ntaxa.pool.size)
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Ecoregion sampling") %>%
-  select("ID_Ecoregion", "ntaxa.pool.size") %>%
+  dplyr::select("ID_Ecoregion", "ntaxa.pool.size") %>%
   distinct() %>%
-  arrange(desc(ntaxa.pool.size))
+  arrange(ntaxa.pool.size) %>%
+  filter(ntaxa.pool.size > 1)
 
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
   filter(SamplingPool == "Hemispheric sampling") %>%
-  select("ntaxa.pool.size") %>%
+  dplyr::select("ntaxa.pool.size") %>%
   distinct() %>%
   group_by("ntaxa.pool.size")
 

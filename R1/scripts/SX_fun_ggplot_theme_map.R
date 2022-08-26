@@ -36,7 +36,7 @@ theme_boot_quant <- function(...){
           strip.text = element_text(color = "black",
                                     face = "bold",
                                     size = 15),
-          axis.text.y = element_text(face = "bold"),
+          # axis.text.y = element_text(face = "bold"),
           axis.title = element_text(size = 16),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
