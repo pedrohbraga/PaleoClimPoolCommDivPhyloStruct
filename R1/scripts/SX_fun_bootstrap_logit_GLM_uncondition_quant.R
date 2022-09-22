@@ -1,26 +1,51 @@
 # Unconditional quantile summary statistics
 
 quantile.XY <- function(dataset = dataset,
-                        X, Y, 
-                        n.classes = 100, 
-                        lab_x = "X", 
-                        lab_y = "Y") {
+                        X.var, 
+                        Y.var,
+                        SamplingPool.i,
+                        n.classes = 100 #, 
+                        # lab_x = "X", 
+                        # lab_y = "Y"
+                        ) {
   
-
-  X = dataset %>% as.data.frame() %>% pull(X)
-  Y = dataset %>% as.data.frame() %>% pull(Y)
+  
+  X = dataset %>%
+    filter(SamplingPool == SamplingPool.i) %>%
+    drop_na(Y.var) %>%
+    drop_na(X.var)  %>% 
+    as.data.frame() %>% 
+    pull(X.var)
+  
+  Y = dataset %>%
+    filter(SamplingPool == SamplingPool.i) %>%
+    drop_na(Y.var) %>%
+    drop_na(X.var) %>% 
+    as.data.frame() %>% 
+    pull(Y.var)
   
   # divide X into n.classes quantiles and then calculate the variance of Y in
   # each interval.
   
   quantile.values <- cumsum(rep(1 / (n.classes + 1), n.classes))
-  X.quant <- quantile(X, quantile.values)
-  matrix.summaries <- matrix(0, n.classes, 13)
-  colnames(matrix.summaries) <- c("median", "mean", "variance", 
+  
+  # quantile.values <- 1:100/100
+  
+  X.quant <- stats::quantile(X, quantile.values, type = 7) # ; length(unique(X.quant))
+  
+  if(length(unique(X.quant)) != n.classes){
+    X.quant <- X.quant[!duplicated(X.quant)]
+
+    print("Quantiles cover non-unique values. Keeping the first duplicated occurrence and removing the following duplicates.")
+  }
+  
+    matrix.summaries <- matrix(0, length(X.quant), 13)
+    
+    colnames(matrix.summaries) <- c("median", "mean", "variance", 
                                   "sd", "se", "IQR", 
                                   "min", "max",
                                   "min.X", "max.X", "mean.X", "sd.X", "se.X")
-  for (i in 1:n.classes) {
+  for (i in 1:length(X.quant)) {
     if (i == 1) {
       matrix.summaries[i, "median"] <- median(Y[which(X <= X.quant[i])])
       matrix.summaries[i, "mean"] <- mean(Y[which(X <= X.quant[i])])
@@ -36,7 +61,7 @@ quantile.XY <- function(dataset = dataset,
       matrix.summaries[i, "sd.X"] <- sd(X[which((X <= X.quant[i]))])
       matrix.summaries[i, "se.X"] <- plotrix::std.error(X[which((X <= X.quant[i]))])
     }
-    if (i == n.classes) {
+    if (i == length(X.quant)) {
       matrix.summaries[i, "median"] <- median(Y[which(X > X.quant[i])])
       matrix.summaries[i, "mean"] <- mean(Y[which(X > X.quant[i])])
       matrix.summaries[i, "variance"] <- var(Y[which(X > X.quant[i])])
@@ -51,7 +76,7 @@ quantile.XY <- function(dataset = dataset,
       matrix.summaries[i, "sd.X"] <- sd(X[which((X > X.quant[i]))])
       matrix.summaries[i, "se.X"] <- plotrix::std.error(X[which((X > X.quant[i]))])
     }
-    if ((i > 1) & (i < n.classes)) {
+    if ((i > 1) & (i < length(X.quant))) {
       matrix.summaries[i, "median"] <- median(Y[which((X > X.quant[i]) & (X <= X.quant[i + 1]))])
       matrix.summaries[i, "mean"] <- mean(Y[which((X > X.quant[i]) & (X <= X.quant[i + 1]))])
       matrix.summaries[i, "variance"] <- var(Y[which((X > X.quant[i]) & (X <= X.quant[i + 1]))])
@@ -90,83 +115,95 @@ quantile.XY <- function(dataset = dataset,
   #   theme(plot.margin=grid::unit(c(1,1,1,1), "cm"))
   # return(panel.biotic)
   
-  data.df <- data.frame(X.quantiles = X.quant, 
-                        mean.Y = matrix.summaries[, "mean"],
-                        sd.Y = matrix.summaries[, "sd"],
-                        se.Y = matrix.summaries[, "se"],
-                        IQR.Y = matrix.summaries[, "IQR"],
-                        min.Y = matrix.summaries[, "min"],
-                        max.Y = matrix.summaries[, "max"],
-                        min.X = matrix.summaries[, "min.X"],
-                        max.X = matrix.summaries[, "max.X"],
-                        mean.X = matrix.summaries[, "mean.X"],
-                        sd.X = matrix.summaries[, "sd.X"],
-                        se.X = matrix.summaries[, "se.X"])
+  data.df <- data.frame(
+    X.quantiles = X.quant, 
+    mean.Y = matrix.summaries[, "mean"],
+    sd.Y = matrix.summaries[, "sd"],
+    se.Y = matrix.summaries[, "se"],
+    IQR.Y = matrix.summaries[, "IQR"],
+    min.Y = matrix.summaries[, "min"],
+    max.Y = matrix.summaries[, "max"],
+    min.X = matrix.summaries[, "min.X"],
+    max.X = matrix.summaries[, "max.X"],
+    mean.X = matrix.summaries[, "mean.X"],
+    sd.X = matrix.summaries[, "sd.X"],
+    se.X = matrix.summaries[, "se.X"],
+    x.lab = X.var,
+    y.lab = Y.var,
+    SamplingPool = SamplingPool.i
+  )
+  
+  data.df$pct <- row.names(data.df)
   
   # Represent with ggplot() and geom_point()
+  # 
+  #   (fig.subset.mean.var_y.var_x.quantile <- ggplot(
+  #     data.df,
+  #     aes(
+  #       x = mean.X,
+  #       y = mean.Y
+  #     )
+  #   ) +
+  #       # geom_errorbar(aes(ymin = mean.Y - 1.96*se.Y,
+  #       #                   ymax = mean.Y + 1.96*se.Y),
+  #       #               cex = 0.1) +
+  #       # geom_errorbarh(aes(xmin = min.X,
+  #       #                    xmax = max.X),
+  #       #                cex = 1) +
+  #       # scico::scale_fill_scico_d(
+  #       #   palette = "acton",
+  #       #   direction = -1,
+  #       #   drop = FALSE
+  #       # ) +
+  #     geom_point(cex = 2.1) +
+  #       labs(
+  #         x = lab_x,
+  #         y = lab_y
+  #       ) +
+  #       geom_hline(yintercept = 0, alpha = 0.25) +
+  #       geom_vline(xintercept = 0, alpha = 0.25) +
+  #       scale_y_continuous(
+  #         breaks = pretty(c(data.df$mean.Y,
+  #                           0), n = 6),
+  #         limits = c(-0.05, 0.05) + range(pretty(c(data.df$mean.Y, 0), n = 7)),
+  #         #   expand = expansion(mult = c(0, 0)),
+  #         position = "left"
+  #       ) +
+  #       scale_x_continuous(
+  #         breaks = pretty(c(X, 0), n = 5),
+  #         limits = c(-0.05, 0.05) + range(pretty(c(data.df$mean.X, 0),
+  #                                                n = 6)),
+  #         #        expand = expansion(mult = c(0, 0)),
+  #       ) +
+  #       theme_classic(base_size = 17 * 1.6) +
+  #       theme(
+  #         legend.position = "none",
+  #         legend.direction = "horizontal",
+  #         legend.key.size = unit(0.5, "cm"),
+  #         legend.text = element_blank(),
+  #         legend.title = element_blank(),
+  #         legend.box = "horizontal",
+  #         # axis.title.x = element_blank(),
+  #         axis.text.x = element_text(size = 17 * 1.6),
+  #         axis.text.y = element_text(size = 17 * 1.6),
+  #         axis.title.y = element_text(
+  #           size = 17 * 2,
+  #           face = "bold"
+  #         ),
+  #         axis.title.x = element_text(
+  #           size = 17 * 1.4,
+  #           face = "bold"
+  #         ),
+  #         plot.margin = unit(c(0.5, 0.6, 0, 0.6), "cm")
+  #       ) +
+  #       guides(colour = guide_legend(nrow = 1))
+  #   )
   
-  (fig.subset.mean.var_y.var_x.quantile <- ggplot(
-    data.df,
-    aes(
-      x = mean.X,
-      y = mean.Y
+  return(
+    #fig.subset.mean.var_y.var_x.quantile,
+    data.df
     )
-  ) +
-      # geom_errorbar(aes(ymin = mean.Y - 1.96*se.Y,
-      #                   ymax = mean.Y + 1.96*se.Y),
-      #               cex = 0.1) +
-      # geom_errorbarh(aes(xmin = min.X,
-      #                    xmax = max.X),
-      #                cex = 1) +
-      # scico::scale_fill_scico_d(
-      #   palette = "acton",
-      #   direction = -1,
-      #   drop = FALSE
-      # ) +
-    geom_point(cex = 2.1) +
-      labs(
-        x = lab_x,
-        y = lab_y
-      ) +
-      geom_hline(yintercept = 0, alpha = 0.25) +
-      geom_vline(xintercept = 0, alpha = 0.25) +
-      scale_y_continuous(
-        breaks = pretty(c(data.df$mean.Y, 
-                          0), n = 6),
-        limits = c(-0.05, 0.05) + range(pretty(c(data.df$mean.Y, 0), n = 7)),
-        #   expand = expansion(mult = c(0, 0)),
-        position = "left"
-      ) +
-      scale_x_continuous(
-        breaks = pretty(c(X, 0), n = 5),
-        limits = c(-0.05, 0.05) + range(pretty(c(data.df$mean.X, 0), 
-                                               n = 6)),
-        #        expand = expansion(mult = c(0, 0)),
-      ) +
-      theme_classic(base_size = 17 * 1.6) +
-      theme(
-        legend.position = "none",
-        legend.direction = "horizontal",
-        legend.key.size = unit(0.5, "cm"),
-        legend.text = element_blank(),
-        legend.title = element_blank(),
-        legend.box = "horizontal",
-        # axis.title.x = element_blank(),
-        axis.text.x = element_text(size = 17 * 1.6),
-        axis.text.y = element_text(size = 17 * 1.6),
-        axis.title.y = element_text(
-          size = 17 * 2,
-          face = "bold"
-        ),
-        axis.title.x = element_text(
-          size = 17 * 1.4,
-          face = "bold"
-        ),
-        plot.margin = unit(c(0.5, 0.6, 0, 0.6), "cm")
-      ) +
-      guides(colour = guide_legend(nrow = 1))
-  )
-  return(fig.subset.mean.var_y.var_x.quantile)
+  
 }
 
 # p-value computation for bootstrap estimations using confidence interval inversion
@@ -310,7 +347,9 @@ logistic.Phylo.Env.threhsold <- function(dataset = dataset,
   
   p.values <- matrix(0, 
                      n.threshold, 
-                     ncol(boot.coefs))
+                     ncol(boot.coefs)
+                     )
+  
   colnames(p.values) <- colnames(boot.coefs)
   rownames(p.values) <- paste0("t",
                                threshold)
@@ -323,5 +362,7 @@ logistic.Phylo.Env.threhsold <- function(dataset = dataset,
   result <- list(model.rob = model.rob.list, 
                  boot.coefs = boot.list, 
                  p.values = p.values)
+  
   return(result)
 }
+
