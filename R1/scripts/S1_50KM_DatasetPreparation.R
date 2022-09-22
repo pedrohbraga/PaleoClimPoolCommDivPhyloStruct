@@ -167,8 +167,9 @@ world_grid_50km_cat_df$ID_Biome_Realm <- paste(world_grid_50km_cat_df$ID_Biome,
 # Define NA values
 
 world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
-  naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA")))
+  naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA"))) 
 
+<<<<<<< HEAD
 # Area
 
 area_ID_Hemisphere <- world_grid_50km_cat_df %>%
@@ -236,6 +237,12 @@ bind_rows(area_ID_Hemisphere,
           area_ID_PlateName,
           area_ID_Biome_Realm,
           area_ID_Ecoregion) 
+=======
+str(
+  world_grid_50km_cat_df %>%
+    droplevels()
+)
+>>>>>>> 815f1859fbe1ee38a1d794fb8744a1c4ba5a2954
 
 #### Preparing the bat community dataset ---------------------------------------
 
@@ -259,13 +266,12 @@ head(Chiroptera.Comm); nrow(Chiroptera.Comm)
 # Remove species (i.e. columns) that have sum zero
 Chiroptera.Comm <- Chiroptera.Comm[, colSums(Chiroptera.Comm) >= 1]
 
+Chiroptera.Comm[ rowSums(Chiroptera.Comm) < 1, ]
+
 # Drop levels, but not working so far
 
 world_grid_50km_cat_df$ID_Realm <- droplevels(world_grid_50km_cat_df$ID_Realm)
 world_grid_50km_cat_df$ID_Biome <- droplevels(world_grid_50km_cat_df$ID_Biome)
-
-world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
-  select(-QuadratID, -geometry)
 
 ### Preparing the phylogenetic dataset -----------------------------------------
 
@@ -340,8 +346,11 @@ Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree,
 
 # Save results
 
-write.tree(Mammal.FaurbySven.tree, file = "data/phylogenies/Mammal.FaurbySven.tree.phy")
-write.tree(Chiroptera.FaurSven.tree, file = "data/phylogenies/Chiroptera.FaurSven.tree.phy")
+write.tree(Mammal.FaurbySven.tree, 
+           file = "data/phylogenies/Mammal.FaurbySven.tree.phy")
+
+write.tree(Chiroptera.FaurSven.tree, 
+           file = "data/phylogenies/Chiroptera.FaurSven.tree.phy")
 
 # For future analyses, load them from here
 # Mammal.FaurSven.MCC.tree <- read.tree("data/phylogenies/Mammal.FaurbySven.tree.phy")
@@ -351,9 +360,7 @@ write.tree(Chiroptera.FaurSven.tree, file = "data/phylogenies/Chiroptera.FaurSve
 is.ultrametric(Chiroptera.FaurSven.tree)
 
 # Force tree to be ultrametric
-Chiroptera.FaurSven.Phylo.ultra <- force.ultrametric(Chiroptera.FaurSven.tree)
-
-Chiroptera.FaurSven.Phylo.ultra
+# Chiroptera.FaurSven.Phylo.ultra <- force.ultrametric(Chiroptera.FaurSven.tree)
 
 # Check if number of species matches between both trait and phylogenetic relationship datasets
 length(Chiroptera.FaurSven.tree$tip.label); ncol(Chiroptera.FaurSven.comm)
@@ -378,4 +385,3 @@ rm(intersects_plates_world_grid_50km_centroids,
    Mammal.FaurSven.tree.3)
 
 #######################################################################################################
-
