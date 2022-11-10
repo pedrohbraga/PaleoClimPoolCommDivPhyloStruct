@@ -169,7 +169,6 @@ world_grid_50km_cat_df$ID_Biome_Realm <- paste(world_grid_50km_cat_df$ID_Biome,
 world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
   naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA"))) 
 
-<<<<<<< HEAD
 # Area
 
 area_ID_Hemisphere <- world_grid_50km_cat_df %>%
@@ -237,12 +236,11 @@ bind_rows(area_ID_Hemisphere,
           area_ID_PlateName,
           area_ID_Biome_Realm,
           area_ID_Ecoregion) 
-=======
+
 str(
   world_grid_50km_cat_df %>%
     droplevels()
 )
->>>>>>> 815f1859fbe1ee38a1d794fb8744a1c4ba5a2954
 
 #### Preparing the bat community dataset ---------------------------------------
 

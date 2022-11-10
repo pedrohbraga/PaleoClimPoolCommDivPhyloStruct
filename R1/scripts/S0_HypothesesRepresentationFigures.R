@@ -14,7 +14,7 @@ Hypothesis.1.alt <- data.frame(SamplingPool = factor(rep(c("Broad scale",
                                                            "Biome scale",
                                                            "Ecoregion scale"), 
                                                          each = 2000), 
-                                                     levels = c("Broad scale",
+                                                   levels = c("Broad scale",
                                                                 "Regional scale",
                                                                 "Biome scale",
                                                                 "Ecoregion scale")

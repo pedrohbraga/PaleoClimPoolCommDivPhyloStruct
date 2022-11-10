@@ -33,17 +33,15 @@ devtools::install_github("cran/PhyloMeasures")
 
 devtools::install_github("fawda123/WRTDStidal")
 
+
+devtools::install_github("KaiHsiangHu/iNEXT.3D")
+
 # Check for needed packages, and install the missing ones
-required.libraries <- c("ade4","subniche",
+required.libraries <- c("ade4",
                         "RcppEigen", "snowfall", "rlist",
-                        "letsR", 
                         "ape", "picante", "phytools",
                         "vegan", "geiger", "Rcpp", "adephylo", "phylobase",
-<<<<<<< HEAD
-=======
-                        "geiger", "hisse",
-                        "lme4", "spgwr", "dglm", "coda",
->>>>>>> 815f1859fbe1ee38a1d794fb8744a1c4ba5a2954
+                        "lme4", "coda",
                         "devtools", "rgeos", "dplyr", "gtable", "grid", "readxl",
                         "sf", "lwgeom", "sp","raster", "maptools", "splancs",
                         "ggplot2", "ggtree",  "viridis", "magrittr",
@@ -55,16 +53,10 @@ required.libraries <- c("ade4","subniche",
                         "BAMMtools", "coda",
                         "rgdal", "tidyverse", "rbin", 
                         "quantreg", "WRTDStidal",
-<<<<<<< HEAD
                         "ggrepel", "ggpubr",
+                        "latex2exp",
                         "naniar", "data.table",
-                        "robust",
-                        "latex2exp"
-=======
-                        "ggrepel",
-                        "naniar"
->>>>>>> 815f1859fbe1ee38a1d794fb8744a1c4ba5a2954
-)
+                        "robust")
 
 needed.libraries <- required.libraries[!(required.libraries %in% installed.packages()[,"Package"])]
 

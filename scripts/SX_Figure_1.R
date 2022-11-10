@@ -4,7 +4,7 @@
 ##                                                                             ##
 #                                                                               #
 # Author: Pedro Henrique Pereira Braga                                          #
-# Last Update: "2020-05-13"                                                     #
+# Last Update: "2022-11-09"                                                     #
 #                                                                               # 
 #################################################################################
 
@@ -16,7 +16,7 @@ polygonGrid_world_50km$id = 1:length(polygonGrid_world_50km)
 
 # Merge the MPD.MNTD data with the grid
 polygonGrid_world_50km_merged_sf <- polygonGrid_world_50km %>%
-  merge(filter(MPD.MNTD.LatLong.AllScales,
+  merge(filter(MPD.MNTD.LatLong.AllScales.raref.min.relative.worldClimate.diff.CWM.Div,
                is.na(ID_Realm) == FALSE,
                # SamplingPool == "Global sampling"
   ) %>%
@@ -29,49 +29,132 @@ polygonGrid_world_50km_merged_sf <- polygonGrid_world_50km %>%
 long.polygonGrid_world_50km_merged_sf <- polygonGrid_world_50km_merged_sf %>%
   gather(key = "PhyloMetric",
          value = "PhyloStructure",
-         c(NRI, NTI)
+         c(nri, nti)
   )
 
 # head(long.polygonGrid_world_50km_merged_sf)
 
+# Choose colours, play with luminance and chroma values
+
+show_col(c("red", "blue", "lightgray",
+           muted("red", l = 20, c = 90), 
+           muted("blue", l = 20, c = 90),
+           "lightgray",
+           muted("red"),
+           muted("blue"),
+           "lightgray"
+)
+)
+
 # Plot the information using geom_sf() and ggplot()
 
-ggplot(data = long.polygonGrid_world_50km_merged_sf) +
+nri.AllScales.map <- ggplot(data = long.polygonGrid_world_50km_merged_sf %>%
+                              filter(PhyloMetric == "nri")) +
   geom_sf(mapping = aes(fill = PhyloStructure),
-          lwd = 0 # no quadrat boundaries 
+          colour = NA
+          # lwd = 0, # no quadrat boundaries
   ) +
-  scico::scale_colour_scico(palette = "acton", direction = -1) +
-  # scale_fill_gradient2( # Divergent colour scale 
-  #   name = "Phylogenetic Structure",
-  #   low = muted("blue"),
-  #   mid = "white",
-  #   high = muted("red"),
-  #   midpoint = 0,
-  #   na.value = "lightgrey",
-  #   breaks = breaks_extended(9),
-  #   guide = guide_colorbar(
-  #     direction = "horizontal",
-  #     barheight = unit(2, units = "mm"),
-  #     barwidth = unit(75, units = "mm"),
-  #     draw.ulim = F, 
-  #     title.position = 'top', 
-  #     title.hjust = 0.5,  # shifting title height 
-  #     label.hjust = 0.5   # shifting label height
-  #   ) # FALSE will suppress legend
-  # ) +
-  facet_grid(SamplingPool ~ PhyloMetric,
+  # scico::scale_colour_scico(palette = "acton", direction = -1) +
+  scale_fill_gradient2( # Divergent colour scale
+    name = "NRI",
+    low = muted("blue",
+                l = 20,
+                c = 90),
+    mid = "white",
+    high = muted("red",
+                 l = 20,
+                 c = 90),
+    midpoint = 0,
+    na.value = "lightgrey",
+    breaks = breaks_extended(10),
+    guide = guide_colorbar(
+      direction = "horizontal",
+      barheight = unit(2, units = "mm"),
+      barwidth = unit(75, units = "mm"),
+      draw.ulim = F,
+      title.position = 'top',
+      title.hjust = 0.5,  # shifting title height
+      label.hjust = 0.5   # shifting label height
+    ) # FALSE will suppress legend
+  ) +
+  # colorspace::scale_fill_continuous_diverging(palette = "Blue-Red 3", 
+  #                                 l1 = 30, 
+  #                                 l2 = 100, 
+  #                                 p1 = .9, 
+  #                                 p2 = 1.2) +
+  facet_grid(SamplingPool ~ .,
              switch = "x") + # facet_grid top labels on bottom
   # add theme
+  theme_minimal() +
   theme_map() + 
   theme(legend.position = "bottom",
         strip.text.y = element_text(size = 10),
-        strip.text.x = element_text(size = 10)
-        )
+        # strip.text.y = element_blank(),
+        strip.text.x = element_text(size = 10),
+        panel.grid.major = element_line(colour = "transparent")
+  )
+
+
+# Plot the information using geom_sf() and ggplot()
+
+nti.AllScales.map <- ggplot(data = long.polygonGrid_world_50km_merged_sf %>%
+                              filter(PhyloMetric == "nti")) +
+  geom_sf(mapping = aes(fill = PhyloStructure),
+          colour = NA
+          # lwd = 0, # no quadrat boundaries
+  ) +
+  # scico::scale_colour_scico(palette = "acton", direction = -1) +
+  scale_fill_gradient2( # Divergent colour scale
+    name = "NTI",
+    low = muted("blue",
+                l = 20,
+                c = 90),
+    mid = "white",
+    high = muted("red",
+                 l = 20,
+                 c = 90),
+    midpoint = 0,
+    na.value = "lightgrey",
+    breaks = breaks_extended(9),
+    guide = guide_colorbar(
+      direction = "horizontal",
+      barheight = unit(2, units = "mm"),
+      barwidth = unit(75, units = "mm"),
+      draw.ulim = F,
+      title.position = 'top',
+      title.hjust = 0.5,  # shifting title height
+      label.hjust = 0.5   # shifting label height
+    ) # FALSE will suppress legend
+  ) +
+  # colorspace::scale_fill_continuous_diverging(palette = "Blue-Red 3", 
+  #                                 l1 = 30, 
+  #                                 l2 = 100, 
+  #                                 p1 = .9, 
+  #                                 p2 = 1.2) +
+  facet_grid(SamplingPool ~ .,
+             switch = "x") + # facet_grid top labels on bottom
+  # add theme
+  theme_minimal() +
+  theme_map() + 
+  theme(legend.position = "bottom",
+        strip.text.y = element_text(size = 10),
+        strip.text.x = element_text(size = 10),
+        panel.grid.major = element_line(colour = "transparent")
+  )
+
+
+ggarrange(nri.AllScales.map + 
+            theme(strip.text.y =  element_text(size = 10,
+                                               colour = "transparent")),
+          nti.AllScales.map,
+          ncol = 2,
+          nrow = 1)
 
 # Export Figure 1
 
-ggsave(filename = "Figure.1.NRI.NTI.Sampling.maps.png", 
-       dpi = 300, 
-       width = 8.5 , height = 11.5, 
-       units = "in")
-
+ggplot2::ggsave(filename = "figures/Figure.1.NRI.NTI.Sampling.maps.png", 
+       dpi = 600, 
+       width = 9 , height = 13, 
+       units = "in",
+#       device = "png",
+       type = "agg_png")
