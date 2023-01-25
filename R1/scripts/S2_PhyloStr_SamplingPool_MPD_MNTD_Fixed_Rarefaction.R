@@ -20,7 +20,9 @@ MPD.LatLong.AllScales %>%
   filter(SamplingPool == "Plate sampling") %>%
   dplyr::select("ID_PlateName", "ntaxa.pool.size") %>%
   distinct() %>%
-  arrange(desc(ntaxa.pool.size))
+  arrange(
+    ntaxa.pool.size
+    )
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
@@ -35,22 +37,24 @@ MPD.LatLong.AllScales %>%
   dplyr::select("ID_Ecoregion", "ntaxa.pool.size") %>%
   distinct() %>%
   arrange(ntaxa.pool.size) %>%
-  filter(ntaxa.pool.size > 1)
+  filter(ntaxa.pool.size)
 
 
 MPD.LatLong.AllScales %>%
   group_by(SamplingPool) %>%
-  filter(SamplingPool == "Hemispheric sampling") %>%
-  dplyr::select("ntaxa.pool.size") %>%
+  filter(SamplingPool == "Ecoregion sampling") %>%
+  dplyr::select("ntaxa.pool.size", "ID_Realm") %>%
   distinct() %>%
-  group_by("ntaxa.pool.size")
+  group_by("ntaxa.pool.size", "ID_Realm") %>%
+  arrange(ntaxa.pool.size) %>%
+  print( n = 300)
 
 
 # Determine the how many species will compose the new sampling pool   
 
 divide.sampling.pool.size.by <- 2
 
-n.species.rarefac.no = 20
+n.species.rarefac.no = 40
 
 #########################
 #### Global sampling ####
@@ -61,7 +65,8 @@ n.species.rarefac.no = 20
 SES.MPD.Chiroptera.World.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = Chiroptera.FaurSven.Phylo.ultra, 
                                                                   species.data = Chiroptera.FaurSven.comm, 
                                                                   n.species.rarefac = n.species.rarefac.no,
-                                                                  n.rep = 99, n.cores = 8)
+                                                                  n.rep = 499, 
+                                                                  n.cores = 8)
 
 # Add everything to a data.frame
 SES.MPD.Chiroptera.World.rarefaction.fixed$ses.mpd.z.query.rarefac$ID <- as.numeric(row.names(SES.MPD.Chiroptera.World.rarefaction.fixed$ses.mpd.z.query.rarefac))
@@ -80,13 +85,13 @@ MPD.LatLong.World.rarefaction.fixed <- right_join(SES.MPD.Chiroptera.World.raref
 SES.MPD.Chiroptera.NW.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = Chiroptera.NW.Tree, 
                                                                species.data = Chiroptera.NW.Comm, 
                                                                n.species.rarefac = n.species.rarefac.no,
-                                                               n.rep = 99, n.cores = 8)
+                                                               n.rep = 499, n.cores = 8)
 
 #### Old World ####
 SES.MPD.Chiroptera.OW.rarefaction.fixed <-  opt.rarefaction.mpd(phylo.tree = Chiroptera.OW.Tree, 
                                                                 species.data = Chiroptera.OW.Comm, 
                                                                 n.species.rarefac = n.species.rarefac.no,
-                                                                n.rep = 99, n.cores = 4)
+                                                                n.rep = 499, n.cores = 4)
 
 
 MPD.LatLong.NW.OW.rarefaction.fixed <- rbind(SES.MPD.Chiroptera.NW.rarefaction.fixed$ses.mpd.z.query.rarefac, 
@@ -111,7 +116,7 @@ for(j in as.factor(ls(SubRegion.Realm.Comm.Phylo))){
   SES.MPD.Chiroptera.Realm.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = SubRegion.Realm.Comm.Phylo[[j]]$Phylo, 
                                                                     species.data = SubRegion.Realm.Comm.Phylo[[j]]$Comm, 
                                                                     n.species.rarefac = n.species.rarefac.no,
-                                                                    n.rep = 99, n.cores = 8)
+                                                                    n.rep = 499, n.cores = 8)
   
   MPD.LatLong.Realm.rarefaction.fixed[[paste0(j)]] <- SES.MPD.Chiroptera.Realm.rarefaction.fixed
   
@@ -148,7 +153,7 @@ for(j in as.factor(ls(SubRegion.Plate.Comm.Phylo))){
     SES.MPD.Chiroptera.Plate.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = SubRegion.Plate.Comm.Phylo[[j]]$Phylo, 
                                                                       species.data = SubRegion.Plate.Comm.Phylo[[j]]$Comm, 
                                                                       n.species.rarefac = n.species.rarefac.no,
-                                                                      n.rep = 99, n.cores = 8)
+                                                                      n.rep = 499, n.cores = 8)
     
     MPD.LatLong.Plate.rarefaction.fixed[[paste0(j)]] <- SES.MPD.Chiroptera.Plate.rarefaction.fixed
     
@@ -185,7 +190,7 @@ for(j in as.factor(ls(SubRegion.Biome.Comm.Phylo))){
     SES.MPD.Chiroptera.Biome.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = SubRegion.Biome.Comm.Phylo[[j]]$Phylo, 
                                                                       species.data = SubRegion.Biome.Comm.Phylo[[j]]$Comm, 
                                                                       n.species.rarefac = round(ncol(SubRegion.Biome.Comm.Phylo[[j]]$Comm)/divide.sampling.pool.size.by),
-                                                                      n.rep = 99, n.cores = 8)
+                                                                      n.rep = 499, n.cores = 8)
     
     MPD.LatLong.Biome.rarefaction.fixed[[paste0(j)]] <- SES.MPD.Chiroptera.Biome.rarefaction.fixed
     
@@ -222,7 +227,7 @@ for(j in as.factor(ls(SubRegion.Ecoregion.Comm.Phylo))){
     SES.MPD.Chiroptera.Ecoregion.rarefaction.fixed <- opt.rarefaction.mpd(phylo.tree = SubRegion.Ecoregion.Comm.Phylo[[j]]$Phylo, 
                                                                           species.data = SubRegion.Ecoregion.Comm.Phylo[[j]]$Comm, 
                                                                           n.species.rarefac = n.species.rarefac.no,
-                                                                          n.rep = 99, n.cores = 4)
+                                                                          n.rep = 499, n.cores = 4)
     
     MPD.LatLong.Ecoregion.rarefaction.fixed[[paste0(j)]] <- SES.MPD.Chiroptera.Ecoregion.rarefaction.fixed
     
@@ -271,7 +276,7 @@ MPD.LatLong.AllScales.rarefaction.fixed <- rbind(MPD.LatLong.World.rarefaction.f
 SES.MNTD.Chiroptera.World.rarefaction.fixed <- opt.rarefaction.mntd(phylo.tree = Chiroptera.FaurSven.Phylo.ultra, 
                                                                     species.data = Chiroptera.FaurSven.comm, 
                                                                     n.species.rarefac = n.species.rarefac.no,
-                                                                    n.rep = 99, n.cores = 8)
+                                                                    n.rep = 499, n.cores = 8)
 
 # Add everything to a data.frame
 SES.MNTD.Chiroptera.World.rarefaction.fixed$ses.mntd.z.query.rarefac$ID <- as.numeric(row.names(SES.MNTD.Chiroptera.World.rarefaction.fixed$ses.mntd.z.query.rarefac))
@@ -290,13 +295,13 @@ MNTD.LatLong.World.rarefaction.fixed <- right_join(SES.MNTD.Chiroptera.World.rar
 SES.MNTD.Chiroptera.NW.rarefaction.fixed <- opt.rarefaction.mntd(phylo.tree = Chiroptera.NW.Tree, 
                                                                  species.data = Chiroptera.NW.Comm, 
                                                                  n.species.rarefac = n.species.rarefac.no,
-                                                                 n.rep = 99, n.cores = 8)
+                                                                 n.rep = 499, n.cores = 8)
 
 #### Old World ####
 SES.MNTD.Chiroptera.OW.rarefaction.fixed <-  opt.rarefaction.mntd(phylo.tree = Chiroptera.OW.Tree, 
                                                                   species.data = Chiroptera.OW.Comm, 
                                                                   n.species.rarefac = n.species.rarefac.no,
-                                                                  n.rep = 99, n.cores = 4)
+                                                                  n.rep = 499, n.cores = 4)
 
 
 MNTD.LatLong.NW.OW.rarefaction.fixed <- rbind(SES.MNTD.Chiroptera.NW.rarefaction.fixed$ses.mntd.z.query.rarefac, 
@@ -321,7 +326,7 @@ for(j in as.factor(ls(SubRegion.Realm.Comm.Phylo))){
   SES.MNTD.Chiroptera.Realm.rarefaction <- opt.rarefaction.mntd(phylo.tree = SubRegion.Realm.Comm.Phylo[[j]]$Phylo, 
                                                                 species.data = SubRegion.Realm.Comm.Phylo[[j]]$Comm, 
                                                                 n.species.rarefac = n.species.rarefac.no,
-                                                                n.rep = 99, n.cores = 8)
+                                                                n.rep = 499, n.cores = 8)
   
   MNTD.LatLong.Realm.rarefaction.fixed[[paste0(j)]] <- SES.MNTD.Chiroptera.Realm.rarefaction
   
@@ -358,7 +363,7 @@ for(j in as.factor(ls(SubRegion.Plate.Comm.Phylo))){
     SES.MNTD.Chiroptera.Plate.rarefaction.fixed <- opt.rarefaction.mntd(phylo.tree = SubRegion.Plate.Comm.Phylo[[j]]$Phylo, 
                                                                         species.data = SubRegion.Plate.Comm.Phylo[[j]]$Comm, 
                                                                         n.species.rarefac = n.species.rarefac.no,
-                                                                        n.rep = 99, n.cores = 8)
+                                                                        n.rep = 499, n.cores = 8)
     
     MNTD.LatLong.Plate.rarefaction.fixed[[paste0(j)]] <- SES.MNTD.Chiroptera.Plate.rarefaction.fixed
     
@@ -395,7 +400,7 @@ for(j in as.factor(ls(SubRegion.Biome.Comm.Phylo))){
     SES.MNTD.Chiroptera.Biome.rarefaction.fixed <- opt.rarefaction.mntd(phylo.tree = SubRegion.Biome.Comm.Phylo[[j]]$Phylo, 
                                                                         species.data = SubRegion.Biome.Comm.Phylo[[j]]$Comm, 
                                                                         n.species.rarefac = n.species.rarefac.no,
-                                                                        n.rep = 99, n.cores = 8)
+                                                                        n.rep = 499, n.cores = 8)
     
     MNTD.LatLong.Biome.rarefaction.fixed[[paste0(j)]] <- SES.MNTD.Chiroptera.Biome.rarefaction.fixed
     
@@ -432,7 +437,7 @@ for(j in as.factor(ls(SubRegion.Ecoregion.Comm.Phylo))){
     SES.MNTD.Chiroptera.Ecoregion.rarefaction.fixed <- opt.rarefaction.mntd(phylo.tree = SubRegion.Ecoregion.Comm.Phylo[[j]]$Phylo, 
                                                                             species.data = SubRegion.Ecoregion.Comm.Phylo[[j]]$Comm, 
                                                                             n.species.rarefac = n.species.rarefac.no,
-                                                                            n.rep = 99, n.cores = 4)
+                                                                            n.rep = 499, n.cores = 4)
     
     MNTD.LatLong.Ecoregion.rarefaction.fixed[[paste0(j)]] <- SES.MNTD.Chiroptera.Ecoregion.rarefaction.fixed
     
@@ -541,7 +546,7 @@ MPD.MNTD.LatLong.AllScales.rarefaction.fixed$ID_Biome_Acronym = factor(MPD.MNTD.
                                                                                                 levels(MPD.LatLong.AllScales.rarefaction.fixed$ID_Biome))))
 
 write.csv(MPD.MNTD.LatLong.AllScales.rarefaction.fixed,
-          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.fixed.csv")
+          "data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.fixed_40.csv")
 
 ############################################################################ 
 ### Representing the phylogenetic community structure of bats across the ###
@@ -727,3 +732,19 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.rarefaction.fixed.boxplot_90.sampli
                                title="Lower  ⬅  Sampling Pool Restriction  ➡  Higher",)
     )
 )
+
+
+####
+
+MPD.MNTD.LatLong.AllScales.raref.fix.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  select(-c("nri.rarefac.mean", "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean", "mntd.obs.p", "mpd.obs.p" )) %>%
+  left_join(MPD.MNTD.LatLong.AllScales.rarefaction.fixed %>%
+              select(c("ID_SamplingPool", "nri.rarefac.mean",
+                       "nti.rarefac.mean",  "ses.mpd.z.query.rarefac.mean",  "ses.mpd.z.query.rarefac.mean", "mntd.obs.p", "mpd.obs.p")),
+            by = "ID_SamplingPool"
+  )
+
+saveRDS(MPD.MNTD.LatLong.AllScales.raref.fix.worldClimate.diff.CWM.Div, 
+        "data/matrices/MPD.MNTD.LatLong.AllScales.raref.fix.worldClimate.diff.CWM.Div.RDS")
+
+

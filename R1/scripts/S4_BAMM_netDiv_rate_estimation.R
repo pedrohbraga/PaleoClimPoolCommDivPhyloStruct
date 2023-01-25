@@ -31,7 +31,7 @@ sum(Chiroptera.FaurSven.tree.ultra$edge.length < 0)
 # Count branches with lengths equal to zero
 sum(Chiroptera.FaurSven.tree.ultra$edge.length == 0)
 
-## Force changes to the tree
+## Correct negative and zero length branches
 
 # For negative branches to be zero
 Chiroptera.FaurSven.tree.ultra$edge.length[Chiroptera.FaurSven.tree.ultra$edge.length < 0] <- 0
@@ -50,7 +50,6 @@ sum(Chiroptera.FaurSven.tree.ultra$edge.length < 0)
 
 # Count branches with lengths equal to zero
 sum(Chiroptera.FaurSven.tree.ultra$edge.length == 0)
-
 
 # Export tree
 write.tree(Chiroptera.FaurSven.tree.ultra, "data/BAMM/Chiroptera.FaurSven.tree.ultra.tree")
@@ -71,6 +70,7 @@ is.ultrametric(Chiroptera.FaurSven.tree.ultra)
 # this pure birth value. For betaInitPrior and betaInitRootPrior,  rather than
 # fitting a pure-birth model, we find the maximum likelihood estimate of the
 # variance parameter under a Brownian motion model.
+
 (BAMMpriors <- setBAMMpriors(Chiroptera.FaurSven.tree.ultra,	
                              outfile = NULL))
 

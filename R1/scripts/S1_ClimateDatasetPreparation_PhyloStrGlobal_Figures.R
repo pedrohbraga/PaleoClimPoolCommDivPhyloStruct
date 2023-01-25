@@ -1,12 +1,10 @@
 ######################################################################################
-### Climate dataset preparation and complementary analyses                      ######
+#####             Climate dataset preparation and complementary analyses                      ######
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2019-01-28"                                                          #
 #                                                                                    # 
 ######################################################################################
-
-# S1b_ClimateDatasetPreparation
 
 # Date: 2018-11-28
 
@@ -23,25 +21,25 @@
 # PaleoClim, high spatial resolution paleoclimate surfaces for global land areas.  
 # Nature – Scientific Data. 5:180254
 
-# Bio_1=Annual Mean Temperature [°C*10]
-# Bio_2=Mean Diurnal Range [°C]
-# Bio_3=Isothermality [Bio_2/Bio_7]
-# Bio_4=Temperature Seasonality [standard deviation*100]
-# Bio_5=Max Temperature of Warmest Month [°C*10]
-# Bio_6=Min Temperature of Coldest Month [°C*10]
-# Bio_7=Temperature Annual Range [°C*10]
-# Bio_8=Mean Temperature of Wettest Quarter [°C*10]
-# Bio_9=Mean Temperature of Driest Quarter [°C*10]
-# Bio_10=Mean Temperature of Warmest Quarter [°C*10]
-# Bio_11=Mean Temperature of Coldest Quarter [°C*10]
-# Bio_12=Annual Precipitation [mm/year]
-# Bio_13=Precipitation of Wettest Month [mm/month]
-# Bio_14=Precipitation of Driest Month [mm/month]
-# Bio_15=Precipitation Seasonality [coefficient of variation]
-# Bio_16=Precipitation of Wettest Quarter [mm/quarter]
-# Bio_17=Precipitation of Driest Quarter [mm/quarter]
-# Bio_18=Precipitation of Warmest Quarter [mm/quarter]
-# Bio_19=Precipitation of Coldest Quarter [mm/quarter]
+# Bio_1 = Annual Mean Temperature [°C*10]
+# Bio_2 = Mean Diurnal Range [°C]
+# Bio_3 = Isothermality [Bio_2/Bio_7]
+# Bio_4 = Temperature Seasonality [standard deviation*100]
+# Bio_5 = Max Temperature of Warmest Month [°C*10]
+# Bio_6 = Min Temperature of Coldest Month [°C*10]
+# Bio_7 = Temperature Annual Range [°C*10]
+# Bio_8 = Mean Temperature of Wettest Quarter [°C*10]
+# Bio_9 = Mean Temperature of Driest Quarter [°C*10]
+# Bio_10 = Mean Temperature of Warmest Quarter [°C*10]
+# Bio_11 = Mean Temperature of Coldest Quarter [°C*10]
+# Bio_12 = Annual Precipitation [mm/year]
+# Bio_13 = Precipitation of Wettest Month [mm/month]
+# Bio_14 = Precipitation of Driest Month [mm/month]
+# Bio_15 = Precipitation Seasonality [coefficient of variation]
+# Bio_16 = Precipitation of Wettest Quarter [mm/quarter]
+# Bio_17 = Precipitation of Driest Quarter [mm/quarter]
+# Bio_18 = Precipitation of Warmest Quarter [mm/quarter]
+# Bio_19 = Precipitation of Coldest Quarter [mm/quarter]
 
 period.kYA <- data.frame(Period = c("Current", 
                                     "Late-Holocene",
@@ -69,7 +67,7 @@ period.kYA <- data.frame(Period = c("Current",
                                   3300))
 
 
-# Load datasets ####
+# Load Climatic datasets ####
 
 current.env.raw <- read.csv("data/matrices/world_CHELSA_cur_V1_2B_r2_5m_50km.csv" , 
                             row.names = 1, 
@@ -96,17 +94,34 @@ worldClimate <- cbind(current.env.raw,
 
 str(worldClimate); dim(worldClimate)
 
-# Check for NAs
+# Check rows that have elements containing NAs
 (rows.NA <- c(row.names(which(is.na(worldClimate), 
-                              arr.ind = TRUE))))
+                              arr.ind = TRUE) 
+                        ) 
+              ) 
+  )
 
-# Solve NAs using zoo::na.spline
+# Total number of cells, and number of unique cells with NA values
+nrow(worldClimate); length(unique(rows.NA)) # 1.058 % of rows
 
-worldClimate <- as.data.frame(zoo::na.spline(worldClimate))
+# Many of these cells are NA because of artifacts generated during the the projection
+# of the grid and the climatic data.
 
-# Identify rows that have NA in all environmental datasets
-c(row.names(which(is.na(worldClimate), 
-                  arr.ind = TRUE)))
+# Check how species rich these communities with NA are
+# Chiroptera.FaurSven.comm[unique(rows.NA), ] %>%
+#   rowSums()
+
+# You can replace NAs with cubic spline interpolated values, as below:
+
+worldClimate <- as.data.frame(
+  zoo::na.spline(worldClimate)
+                              )
+
+# Identify rows that have NA in all environmental data sets
+
+unique(
+  c(row.names(which(is.na(worldClimate), 
+                  arr.ind = TRUE))))
 
 head(worldClimate); str(worldClimate)
 

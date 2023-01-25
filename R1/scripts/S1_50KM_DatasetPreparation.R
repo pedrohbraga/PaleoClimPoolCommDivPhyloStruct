@@ -9,8 +9,7 @@
 ### Preparing the spatial dataset ----------------------------------------------
 
 # Load the world projection grid shapefile
-world_grid_50km <- st_read("data/grids/world_grid_prev_50km.shp")
-world_grid_50km$CRI <- NULL
+world_grid_50km <- st_read("data/grids/world_grid_50km.shp")
 
 equal_area_projection <- st_crs(world_grid_50km)
 
@@ -67,7 +66,7 @@ intersects_plates_world_grid_50km_centroids <- st_intersects(worldPlates,
                                                              sparse = FALSE)
 
 # The above result is boolean, and will require the names of each plate to be
-# attributed to each cell. You may do this as follows.
+# attributed to each cell. You may do this as follows. It may take a while.
 
 world_grid_50km_cat$PlateName <- apply(intersects_plates_world_grid_50km_centroids,
                                        2,
@@ -78,13 +77,13 @@ world_grid_50km_cat$PlateName <- apply(intersects_plates_world_grid_50km_centroi
 # We can repeat the same steps above to classify each cell according to the
 # realms, biomes, and terrestrial ecoregions where it occurs.
 
-# Begin by intersecting plates with the grid cell centroids
+# Begin by intersecting plates with the grid cell centroids:
 
 intersects_terrEcoregions_world_grid_50km_centroids <- st_intersects(terrEcoregions,
                                                                      world_grid_50km_centroids, 
                                                                      sparse = FALSE)
 
-# Then, convert the Boolean results from the intersects to region names
+# Then, convert the Boolean results from the intersects to region names:
 
 world_grid_50km_cat$ECO_NAME <- apply(intersects_terrEcoregions_world_grid_50km_centroids,
                                       2,
@@ -104,11 +103,15 @@ world_grid_50km_cat$REALM <- apply(intersects_terrEcoregions_world_grid_50km_cen
                                      terrEcoregions[which(col), ]$REALM
                                    })
 
+# Rename X to Longitude and Y to Latitude
+
 world_grid_50km_centroids_lat_long <- world_grid_50km_centroids %>%
   st_coordinates() %>%
   as.data.frame() %>%
   rename(Longitude = X,
          Latitude = Y)
+
+# Rename other columns and unnest data
 
 world_grid_50km_cat_sf <- world_grid_50km_cat %>%
   bind_cols(world_grid_50km_centroids_lat_long) %>%
@@ -120,11 +123,13 @@ world_grid_50km_cat_sf <- world_grid_50km_cat %>%
   unnest(cols = c(ID_Ecoregion, ID_Biome, ID_Realm),
          keep_empty = TRUE)
 
+# Compute the area of quadrats. Note they should be the same because we are using an
+# equal area projection.
 
 world_grid_50km_cat_sf$Quadrat_AREA <- world_grid_50km_cat_sf %>%
   st_area()
 
-## Rename and reorder levels to make sense
+## Rename and reorder levels for realms
 
 world_grid_50km_cat_df <- as.data.frame(world_grid_50km_cat_sf) %>%
   mutate(ID_Realm = dplyr::recode_factor(ID_Realm, 
@@ -135,7 +140,8 @@ world_grid_50km_cat_df <- as.data.frame(world_grid_50km_cat_sf) %>%
                                          "IM" = "Indomalay",
                                          "OC" = "Oceanic",
                                          "AA" = "Australasian",
-                                         "AN" = "Antarctic"))
+                                         "AN" = "Antarctic")
+  )
 
 ## Do the same for the biomes, in a slightly different approach
 
@@ -160,16 +166,17 @@ world_grid_50km_cat_df$ID_Biome <- names(Biomes.code)[match(world_grid_50km_cat_
 world_grid_50km_cat_df$ID_Biome <- as.factor(world_grid_50km_cat_df$ID_Biome)
 
 # Create a new variable that nests biomes within their respective realms
+
 world_grid_50km_cat_df$ID_Biome_Realm <- paste(world_grid_50km_cat_df$ID_Biome, 
                                                "__",
                                                world_grid_50km_cat_df$ID_Realm, 
                                                sep = "")
-# Define NA values
+# Replace regions that were NA__NA (NA biomes and NA realms) with NA values
 
 world_grid_50km_cat_df <- world_grid_50km_cat_df %>%
   naniar::replace_with_na(replace = list(ID_Biome_Realm = c("NA__NA"))) 
 
-# Area
+# Area calculations
 
 area_ID_Hemisphere <- world_grid_50km_cat_df %>%
   mutate(ID_Region = ifelse(ID_Realm %in% c("Nearctic", "Neotropical"), 
@@ -224,7 +231,8 @@ area_ID_extent$sum_Quadrat_AREA <- set_units(area_ID_extent$sum_Quadrat_AREA, km
 
 area_ID_extent %>%
   group_by(ID_extent) %>%
-  summarise(mean_area = mean(sum_Quadrat_AREA, na.rm =T))
+  summarise(mean_area = mean(sum_Quadrat_AREA, na.rm =T)
+  )
 
 ggplot(data = area_ID_extent,
        aes(x = ID_extent,
@@ -237,12 +245,14 @@ bind_rows(area_ID_Hemisphere,
           area_ID_Biome_Realm,
           area_ID_Ecoregion) 
 
+# Checking levels
+
 str(
   world_grid_50km_cat_df %>%
     droplevels()
 )
 
-#### Preparing the bat community dataset ---------------------------------------
+#### Preparing the dataset of bat communities  ---------------------------------------
 
 # Load community data ###
 
@@ -252,6 +262,7 @@ Chiroptera.Comm <- read.csv("data/matrices/world_chiroptera_PropCover_50KM.csv",
 nrow(Chiroptera.Comm); nrow(world_grid_50km_cat_df) # Verify lengths
 
 # Replace periods in species names by underscores
+
 colnames(Chiroptera.Comm) <- gsub('\\.', 
                                   "_", 
                                   colnames(Chiroptera.Comm))
@@ -259,21 +270,22 @@ colnames(Chiroptera.Comm) <- gsub('\\.',
 head(Chiroptera.Comm); nrow(Chiroptera.Comm)
 
 # Remove species that do not occur in any community
-# To identify them: colnames(Chiroptera.Comm[,colSums(Chiroptera.Comm) < 1])
+# To identify them: colnames(Chiroptera.Comm[ , colSums(Chiroptera.Comm) < 1])
 
 # Remove species (i.e. columns) that have sum zero
-Chiroptera.Comm <- Chiroptera.Comm[, colSums(Chiroptera.Comm) >= 1]
+Chiroptera.Comm <- Chiroptera.Comm[ , colSums(Chiroptera.Comm) >= 1]
 
-Chiroptera.Comm[ rowSums(Chiroptera.Comm) < 1, ]
+Chiroptera.Comm[rowSums(Chiroptera.Comm) < 1, ]
 
-# Drop levels, but not working so far
+# Drop empty-case levels
 
 world_grid_50km_cat_df$ID_Realm <- droplevels(world_grid_50km_cat_df$ID_Realm)
 world_grid_50km_cat_df$ID_Biome <- droplevels(world_grid_50km_cat_df$ID_Biome)
 
-### Preparing the phylogenetic dataset -----------------------------------------
+### Preparing the phylogenetic data  -----------------------------------------
 
-#### Load phylogenetic trees from Faurby and Svenning, 2015 () #
+# Load phylogenetic trees from Faurby and Svenning, 2015 (doi:10.1016/j.ympev.2014.11.00)
+# They are available in Appendix D, within the Supplementary Material
 
 Mammal.FaurSven.tree.1 <-  read.nexus("data/phylogenies/Fully_resolved_phylogeny_1.nex")
 Mammal.FaurSven.tree.2 <-  read.nexus("data/phylogenies/Fully_resolved_phylogeny_2.nex")
@@ -284,6 +296,10 @@ Mammal.FaurSven.trees <- c(Mammal.FaurSven.tree.1,
                            Mammal.FaurSven.tree.3)
 
 # Obtain the maximum credibility tree
+
+# This tree will be used for subsequent analyses, but also see the Supplementary
+# Material X, where we repeated our analyses across subsets of trees randomly obtained
+# from Mammal.FaurSven.trees and show that they are very similar.
 
 Mammal.FaurSven.MCC.tree <- phangorn::maxCladeCred(Mammal.FaurSven.trees)
 
@@ -296,14 +312,14 @@ Mammal.FaurSven.MCC.tree.scores <- phangorn::maxCladeCred(Mammal.FaurSven.trees,
 
 # Represent log credibility scores in a histogram 
 
-histogram <- hist(Mammal.FaurSven.MCC.tree.scores,
-                  breaks = 25,
-                  col = "gray",
-                  main = "",
-                  xlab = "log(Clade Credibility for Faurby and Svenning's (2015) tree)")
+Mammal.FaurSven.MCC.tree.scores.histogram <- hist(Mammal.FaurSven.MCC.tree.scores,
+                                                  breaks = 25,
+                                                  col = "gray",
+                                                  main = "",
+                                                  xlab = "log(Clade Credibility for Faurby and Svenning's (2015) tree)")
 
 arrows(x0 = max(Mammal.FaurSven.MCC.tree.scores), 
-       y0 = 0.5*max(histogram$counts),
+       y0 = 0.5*max(Mammal.FaurSven.MCC.tree.scores.histogram$counts),
        x1 = max(Mammal.FaurSven.MCC.tree.scores),
        y1 = 0,
        col = "red",
@@ -312,13 +328,13 @@ arrows(x0 = max(Mammal.FaurSven.MCC.tree.scores),
        angle = 20)
 
 text(x = max(Mammal.FaurSven.MCC.tree.scores),
-     y = 0.5*max(histogram$counts)+ 1,
+     y = 0.5*max(Mammal.FaurSven.MCC.tree.scores.histogram$counts)+ 1,
      "Clade credibility of the tree we used",
      adj = c(0, 0.3),
      srt = 90)
 
 arrows(x0 = median(Mammal.FaurSven.MCC.tree.scores), 
-       y0 = 0.5*median(histogram$counts),
+       y0 = 0.5*median(Mammal.FaurSven.MCC.tree.scores.histogram$counts),
        x1 = median(Mammal.FaurSven.MCC.tree.scores),
        y1 = 0,
        col = "blue",
@@ -328,30 +344,37 @@ arrows(x0 = median(Mammal.FaurSven.MCC.tree.scores),
 
 Mammal.FaurSven.MCC.tree.scores
 
+# If you would like to choose a 
+
 Mammal.FaurSven.MCC.tree.scores[Mammal.FaurSven.MCC.tree.scores < quantile(Mammal.FaurSven.MCC.tree.scores, 0.05)]
 
-# Filter species from the phylogenetic tree
+# Remove species that are unmatched between the phylogeny and the community data
 
 # ChiropteraPhylo <- drop.tip(Chiroptera.tree, 
 #                               Chiroptera.tree$tip.label[-match(colnames(Chiroptera.Comm), 
 #                                                                Chiroptera.tree$tip.label)]) #Prunning the tree
 # length(ChiropteraPhylo$tip.label); ncol(Chiroptera.Comm)
 
-Chiroptera.FaurSven.tree <- match.phylo.comm(Mammal.FaurSven.MCC.tree, 
+Chiroptera.FaurSven.tree <- picante::match.phylo.comm(Mammal.FaurSven.MCC.tree, 
                                              Chiroptera.Comm)$phy
-Chiroptera.FaurSven.comm <- match.phylo.comm(Mammal.FaurSven.MCC.tree, 
+
+Chiroptera.FaurSven.comm <- picante::match.phylo.comm(Mammal.FaurSven.MCC.tree, 
                                              Chiroptera.Comm)$comm
 
-# Save results
+# Save trees
 
-write.tree(Mammal.FaurbySven.tree, 
-           file = "data/phylogenies/Mammal.FaurbySven.tree.phy")
+# MCC tree
+write.tree(Mammal.FaurSven.MCC.tree, 
+           file = "data/phylogenies/Mammal.FaurSven.MCC.tree.phy")
+
+# Chiroptera MCC tree, filtered species
 
 write.tree(Chiroptera.FaurSven.tree, 
            file = "data/phylogenies/Chiroptera.FaurSven.tree.phy")
 
 # For future analyses, load them from here
-# Mammal.FaurSven.MCC.tree <- read.tree("data/phylogenies/Mammal.FaurbySven.tree.phy")
+
+# Mammal.FaurSven.MCC.tree <- read.tree("data/phylogenies/Mammal.FaurSven.MCC.tree.phy")
 # Chiroptera.FaurSven.tree <- read.tree("data/phylogenies/Chiroptera.FaurSven.tree.phy")
 
 # ChiropteraPhylo
@@ -376,10 +399,22 @@ length(Chiroptera.FaurSven.tree$tip.label); ncol(Chiroptera.FaurSven.comm)
 
 ######################################################################################################
 
-rm(intersects_plates_world_grid_50km_centroids,
-   intersects_terrEcoregions_world_grid_50km_centroids,
-   Mammal.FaurSven.tree.1,
-   Mammal.FaurSven.tree.2,
-   Mammal.FaurSven.tree.3)
+# Remove objects that will not be used later
+
+rm(
+  intersects_plates_world_grid_50km_centroids,
+  intersects_terrEcoregions_world_grid_50km_centroids,
+  Mammal.FaurSven.tree.1,
+  Mammal.FaurSven.tree.2,
+  Mammal.FaurSven.tree.3,
+  Mammal.FaurSven.MCC.tree,
+  Mammal.FaurSven.trees,
+  Mammal.FaurSven.MCC.tree.scores,
+  area_ID_Hemisphere,
+  area_ID_Realm,
+  area_ID_PlateName,
+  area_ID_Ecoregion,
+  area_ID_extent
+)
 
 #######################################################################################################
