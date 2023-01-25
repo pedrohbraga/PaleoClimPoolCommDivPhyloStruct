@@ -1,4 +1,5 @@
 brokenStick.selection <- function(dudi.pca.object){
+  
   ## First, choose how many axes are going to be kept
   ev <- dudi.pca.object$eig
   

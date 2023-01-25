@@ -1,18 +1,20 @@
-# Spatial restriction, climatic legacies, diversification, and historical contingencies drive global phylogenetic structure – the case of bat communities
+# Spatial restriction, climatic legacies, diversification, and historical contingencies drive global phylogenetic structure -- the case of bat communities
 
 Authors: Pedro Henrique Pereira Braga, Steven Kembel, Pedro Peres-Neto
 
-This repository contains code to replicate all figures, tables and  analyses included in the manuscript and in its supplementary information.
+This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information.
+
+The data used by these scripts and that could not be included here due to file size limits are available within the Dryad repository (doi: XXXXXXXXXX).
 
 ## Abstract
 
-<details> 
+<details>
 
-<summary> Click to read </summary>
+<summary>Click to read</summary>
 
 ### Aim
 
-Patterns of evolutionary relatedness among co-occurring species are driven by scale-dependent contemporary and historical processes. Yet, we still lack a detailed understanding of how paleoclimatic stability, local diversification rates and species pool extent determine the phylogenetic structure of biological communities. Here, we focused on bats – the most dominant and vagile group of mammals – and test the predictions of three biogeographical hypotheses that are particularly relevant to understanding how these drivers shaped the present-day phylogenetic community structure.
+Patterns of evolutionary relatedness among co-occurring species are driven by scale-dependent contemporary and historical processes. Yet, we still lack a detailed understanding of how paleoclimatic stability, local diversification rates and species pool extent determine the phylogenetic structure of biological communities. Here, we focused on bats -- the most dominant and vagile group of mammals -- and test the predictions of three biogeographical hypotheses that are particularly relevant to understanding how these drivers shaped the present-day phylogenetic community structure.
 
 ### Location
 
@@ -20,19 +22,19 @@ Worldwide, across restrictive spatial extents: global, east-west hemispheres, bi
 
 ### Time period
 
-Last Glacial Maximum (~22,000 years ago) to present.
+Last Glacial Maximum (\~22,000 years ago) to present.
 
 ### Major taxa studied
 
 Bats (Chiroptera).
 
-### Methods 
+### Methods
 
-We estimated the bat phylogenetic community structure across restrictive sampling pools and modeled it against sampling pool restriction, paleoclimatic stability, and bat _in situ_ net diversification rates.
+We estimated the bat phylogenetic community structure across restrictive sampling pools and modelled it against sampling pool restriction, paleoclimatic stability, and bat *in situ* net diversification rates.
 
 ### Results
 
-Limiting species pools from broader to local spatial scales strongly changed the phylogenetic structure of bat communities. The magnitude of these effects is less noticeable in the Old World, where frequent among-realm biota interchange could have been maintained through bats adaptive traits. Phylogenetically-structured bat communities are rare in regions that were much colder during the last glacial maximum in relation to the contemporary period, supporting the expectation that stable climate paves the way for increased phylogenetic clustering. Finally, increased in situ net diversification rates are associated with greater phylogenetic clustering in bat communities.
+Limiting species pools from broader to local spatial scales strongly changed the phylogenetic structure of bat communities. The magnitude of these effects is less noticeable in the Old World, where frequent among-realm biota interchange could have been maintained through bats adaptive traits. Phylogenetically-structured bat communities are rare in regions that were much colder during the last glacial maximum in relation to the contemporary period, supporting the expectation that a stable climate paves the way for increased phylogenetic clustering. Finally, increased *in situ* net diversification rates are associated with greater phylogenetic clustering in bat communities.
 
 ### Main conclusions
 
@@ -46,27 +48,26 @@ A stable data set containing the estimates for bat community phylogenetic struct
 
 # Description of this research compendium
 
-<details> 
+<details>
 
-<summary> <code> scripts/ </code> </summary>
+<summary><code> scripts/ </code></summary>
 
-1. `S0_REnvironmentPreparation.R`
-3. `SX_fun_brokenStick.selection.R`
-4. `SX_fun_CommWeightedMeans.R`
-4. `SX_fun_ggplot_theme_map.R`
-5. `SX_fun_make_grid_sf.R`
-6. `SX_fun_match_phylo_comm.R`
-7. `SX_fun_ses.opt.rarefaction.phylostr.R`
-2. `S1_50KM_DatasetPreparation.R`
-3. `S1_ClimateDatasetPreparation_PhyloStr_Figures.R` 
-4. `S2_PhyloStr_SamplingPool_MPD_MNTD_Relative_Min_Size_Rarefaction.R` 
-
+1.  `S0_REnvironmentPreparation.R`
+2.  `SX_fun_brokenStick.selection.R`
+3.  `SX_fun_CommWeightedMeans.R`
+4.  `SX_fun_ggplot_theme_map.R`
+5.  `SX_fun_make_grid_sf.R`
+6.  `SX_fun_match_phylo_comm.R`
+7.  `SX_fun_ses.opt.rarefaction.phylostr.R`
+8.  `S1_50KM_DatasetPreparation.R`
+9.  `S1_ClimateDatasetPreparation_PhyloStr_Figures.R`
+10. `S2_PhyloStr_SamplingPool_MPD_MNTD_Relative_Min_Size_Rarefaction.R`
 
 </details>
 
-<details> 
-aa
-<summary> <code> data/ </code> </summary>
+<details>
+
+<summary><code> data/ </code></summary>
 
 </details>
 
@@ -74,4 +75,4 @@ aa
 
 ## Citing
 
-Study: 
+Study:

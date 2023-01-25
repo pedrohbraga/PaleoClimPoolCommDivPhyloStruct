@@ -3,7 +3,8 @@
 #### Modified from the picante package                                                   ####   
 #############################################################################################
 
-# The difference here is that it does not drop names.
+# See the original function by running picante::match.phylo.comm
+# The difference here is that it does not drop names from the comm matrix.
 
 match.phylo.comm. <- function(phy, comm, silent = TRUE) {
   if (!(is.data.frame(comm) | is.matrix(comm))) {
@@ -20,7 +21,7 @@ match.phylo.comm. <- function(phy, comm, silent = TRUE) {
       print("Dropping taxa from the community because they are not present in the phylogeny:")
       print(setdiff(commtaxa, phytaxa))
     }
-    comm <- comm[, intersect(commtaxa, phytaxa), drop = FALSE]
+    comm <- comm[, intersect(commtaxa, phytaxa), drop = FALSE] # modified here
     commtaxa <- colnames(comm)
   }
   if (any(!(phytaxa %in% commtaxa))) {
@@ -33,7 +34,7 @@ match.phylo.comm. <- function(phy, comm, silent = TRUE) {
   else {
     res$phy <- phy
   }
-  res$comm <- comm[, res$phy$tip.label, drop = FALSE]
+  res$comm <- comm[, res$phy$tip.label, drop = FALSE]  # modified here
   return(res)
 }
 
