@@ -1,3 +1,84 @@
+######################################################################################
+##  Functions to describe and inferentially test whether how changes in predictive ###
+##  variables affect community phylogenetic structure                              ###
+
+# Code Author: Pedro Peres-Neto and Pedro Henrique Pereira Braga
+
+# Code Last Updated: 2022-11-22
+
+# We used two complementary approaches (one descriptive and the other inferential) to
+# assess the predictions that phylogenetically clustered communities are more frequent
+# in historically climatically stable regions (H2) and that increased in situ
+# diversification rates generate regional clusters of closely related species (H3).
+
+# To describe how phylogenetic relatedness of bat communities (for both NRI and NTI)
+# changed as a function of historical change in temperature, historical change in
+# precipitation and in situ net diversification rates, we plotted the mean
+# phylogenetic relatedness of bat communities (for both NRI and NTI) across each
+# percentile (100 quantiles) of the predictor variables of interest (i.e., historical
+# change in temperature, historical change in precipitation and in situ net
+# diversification rates; see Figures 3 and 4). This representation allowed us to
+# describe how phylogenetic structure varies as a response to the predictors of
+# interest.
+
+# The function quantile.XY() below takes a dataset (data.frame) containing response
+# and predictive variables (which are specified as names within the X.var and Y.var
+# arguments), and a column named SamplingPool specifying the geographical scale used
+# to compute Y.var (here, community phylogenetic structure). It will then represent
+# the mean of Y.var across the n.classes (numerical) conditional quantiles, for each
+# X.var, at the geographical scale you define (SamplingPool.i).
+
+# The output of quantile.XY() returns a data.frame containing multiple summary
+# statistics, which can be represented in a figure.
+
+# To test hypotheses H2 and H3 inferentially, we explicitly tested how changes in
+# historical climatic stability and in situ diversification rates independently
+# increased (or decreased) the likelihood of a community being composed of highly
+# phylogenetically related species. For this, we used two upper conditional
+# proportional percentiles of community phylogenetic relatedness, the 90th and the
+# 75th percentiles, as thresholds to consider whether a community was highly
+# phylogenetically related. These values were chosen somewhat arbitrarily but focusing
+# on these percentiles allowed us to focus on the effects of historical climatic
+# stability and local net diversification affecting long-term persistence of species,
+# and thus influencing highly phylogenetically related communities. We started by
+# attributing a value of one for a community if its phylogenetic structure (either NRI
+# or NTI) was greater than its upper conditional quantile (either the 90th or the 75th
+# percentile) across all communities. If smaller, a value of zero was assigned
+# instead. Based on this classification (of whether the community was highly
+# phylogenetically related or not), we then applied conditionally unbiased bounded
+# influence robust logistic regressions (i.e., robust to reduce the influence of
+# potential outliers; see Kunsch et al., 1989) in which the response variable was the
+# vector of binary outcomes (ones and zeros) representing relatively high or low
+# phylogenetic structure (separately for NRI and NTI) and the predictors were z-score
+# standardized values (i.e., to have mean zero and variance one) of historical change
+# in temperature, historical change in precipitation and in situ net diversification
+# rates. As such, we were able to estimate the relative importance of each predictor.
+# To estimate confidence intervals for each predictor, we used a bootstrap approach
+# based on 1,000 resamples of 2,500 random communities each. These logistic
+# regressions allowed us to describe how changes in historical climatic stability and
+# in situ diversification rates independently affected the log-odds (the logistic
+# response) of a community being highly phylogenetically related.
+
+# This second approach is done by the logistic.Phylo.Env() function (dependent on the
+# boot.pvalue.CI_inversion() function, specified below).
+
+# logistic.Phylo.Env() takes the same dataset (data.frame) containing response and
+# predictive variables. In this case, you must have already filtered the data for the
+# desired sampling pool.
+
+# The argument community.phylo.variable is the name of the response variable ("nri" or
+# "nti") within the dataset. 
+# X are is a vector containing the names of the predictive variable;
+# quantiles is a vector containing the quantiles of interest. In this study, we used
+# 0.75 and 0.90.
+# n.boot is the number of bootstraps;
+# and, boot.size is the size of the bootstrap.
+
+# The output is contains model, bootstrap coefficients, and p-values distributed in a
+# list for each quantile used in the computation.
+
+######################################################################################
+
 # Unconditional quantile summary statistics
 
 quantile.XY <- function(dataset = dataset,

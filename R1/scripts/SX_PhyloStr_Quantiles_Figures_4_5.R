@@ -158,6 +158,12 @@ facet_labels <- facet_labels %>%
                alpha = 0.25) +
     geom_vline(xintercept = 0, 
                alpha = 0.25) +
+    geom_hline(yintercept = 1.96,
+               linetype='dotted',
+               alpha = 0.4) +
+    geom_hline(yintercept = -1.96,
+               linetype='dotted',
+               alpha = 0.4) +
     # scale_y_continuous(
     #   breaks = pretty(c(quantile.nti.XY.all$mean.Y,
     #                     0), n = 6),

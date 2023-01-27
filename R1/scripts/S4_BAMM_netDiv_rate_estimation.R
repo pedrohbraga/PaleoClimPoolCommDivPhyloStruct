@@ -2,7 +2,7 @@
 ### Code to estimate extinction and speciation rates for bats using           ###
 ### Bayesian Analyses for Macroevolutionary Mixtures                          ###
 #                                                                               #
-# Author: Pedro Henrique Pereira Braga                                          #
+# Code Author: Pedro Henrique Pereira Braga                                          #
 # Last Update: "2020-03-21"                                                     #
 #                                                                               # 
 #################################################################################
@@ -10,7 +10,7 @@
 # library(BAMMtools)
 # library(coda)
 
-#### Preparing the phyologenetic tree ####
+#### Preparing the phylogenetic tree ####
 
 # Force the tree to be ultrametric by computing the set of edge lengths that
 # result in a minimized sum-of-squares distance between the patristic distance
@@ -23,7 +23,7 @@ is.ultrametric(Chiroptera.FaurSven.tree.ultra)
 
 # Check if it is dichotomous, i.e. whether every node (including the root node)
 # has exactly two descendant nodes.
-is.binary.tree(Chiroptera.FaurSven.tree.ultra)
+is.binary(Chiroptera.FaurSven.tree.ultra)
 
 # Count branches with negative lengths
 sum(Chiroptera.FaurSven.tree.ultra$edge.length < 0)
@@ -76,21 +76,23 @@ is.ultrametric(Chiroptera.FaurSven.tree.ultra)
 
 ### Correcting for Sampling Fractions
 
-separateGenusSp <- stringr::str_split_fixed(Chiroptera.FaurSven.tree.ultra$tip.label, "_", 2)
+separateGenusSp <- stringr::str_split_fixed(Chiroptera.FaurSven.tree.ultra$tip.label, 
+                                            "_", 
+                                            2)
 
 sppTable <- as.data.frame(matrix(nrow=length(Chiroptera.FaurSven.tree.ultra$tip.label),
                                  ncol=2))
 sppTable[ , 1] <- Chiroptera.FaurSven.tree.ultra$tip.label
 sppTable[ , 2] <- separateGenusSp[, 1]
 
-ASM_MammalsData <- read.csv("/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/matrices/asm-all-species-2020-03-20.csv", 
+ASM_MammalsData <- read.csv("data/matrices/asm-all-species-2020-03-20.csv", 
                             header = TRUE)
 
 # colnames(ASM_MammalsData)
 
 ASM_BatsData <- ASM_MammalsData %>%
   filter(Linnean.Order == "Chiroptera") %>%
-  select(Genus, Species, Linnean.Family) %>%
+  dplyr::select(Genus, Species, Linnean.Family) %>%
   droplevels()
 
 ## Correct for nomenclature changes
@@ -160,15 +162,17 @@ samplingProbsBats.core <- samplingProbsBats[-1, ] %>%
 rbind(samplingProbsBats[1, ],
       samplingProbsBats.core)
 
+# Table SX of the supplementary information uses samplingProbsBats
+
 write.table(rbind(samplingProbsBats[1, ],
                   samplingProbsBats.core), 
-            "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected_2/samplingProbsBats.txt",
+            "/home/pedro.braga/chapter-BiogHistPhyloRelatedSpatScales/data/BAMM/SamplingCorrected_2/samplingProbsBats.txt",
             quote = F, 
             col.names = F, 
             row.names = F, 
             sep = "\t")
 
-#### Preparing BAMM control file
+#### Preparing the BAMM control file
 
 # Estimate the prior block using BAMMtools::setBAMMpriors()
 
@@ -409,7 +413,8 @@ plot.phylo(Chiroptera.FaurSven.tree.ultra.cw,
            edge.color = edgecols,
            show.tip.label = F)
 
-# computing the marginal shift probs tree:
+# Computing the marginal shift probs tree:
+
 pdf("BAMM_margprobs.pdf", 
     width = 7, height = 10)
 
@@ -437,9 +442,7 @@ dev.off()
 
 ## Obtain speciation, extinction, net diversification for the tips of the tree
 ## from all posterior samples in the output
+
 tip.rates <- getTipRates(edata)
 
 str(tip.rates)
-
-# Should we subset the event data so tip rates are obtained only from the
-# credible subset?

@@ -1,18 +1,18 @@
 #################################################################################
-### Map representation of the globe-wise phylogenetic structure of bat        ###
-### communities across species sampling pools                                 ###
-##                                                                             ##
+### Global representation of the phylogenetic structure of bat communities    ###
 #                                                                               #
-# Author: Pedro Henrique Pereira Braga                                          #
+# This code produces Figure 1 in the manuscript.                                #
+#                                                                               #
+# Code Author: Pedro Henrique Pereira Braga                                     #
 # Last Update: "2022-11-09"                                                     #
 #                                                                               # 
 #################################################################################
 
 # Load world projection grid shapefile
-polygonGrid_world_50km <- st_read("data/grids/world_grid_prev_50km.shp")
+polygonGrid_world_50km <- st_read("data/grids/world_grid_50km.shp")
 
 # Attribute an "id" variable
-polygonGrid_world_50km$id = 1:length(polygonGrid_world_50km)
+polygonGrid_world_50km$id = 1:nrow(polygonGrid_world_50km)
 
 # Merge the MPD.MNTD data with the grid
 polygonGrid_world_50km_merged_sf <- polygonGrid_world_50km %>%

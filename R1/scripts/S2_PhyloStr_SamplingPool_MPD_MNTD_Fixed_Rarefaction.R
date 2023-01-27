@@ -1,3 +1,28 @@
+######################################################################################
+#### Code to apply a null-model framework to compute the phylogenetic structure   ####
+#### of communities across a gradient of restrictive sampling pools               ####
+#                                                                                    #
+# Description: To assess how patterns of phylogenetic community structure change     #
+# as a function of spatial scale, we applied commonly used null-models to            #
+# estimate standardized effect sizes for both metrics (MPDSES and MNTDSES,           #
+# respectively) (Kembel et al., 2010). Each null-model simulated random              #
+# assemblages by permuting species names across the phylogeny tips 999 times for     #
+# a given species pool (i.e., the sampling pool in which species were sampled to     #
+# compose random assemblages): global (all species in the phylogeny), east-west      #
+# hemispherical (i.e., Old World and New World species pools), biogeographical       #
+# realms, tectonic plates, within-realm biomes, and within-realm                     #
+# terrestrial-ecoregion scales. NRI and NTI were obtained by multiplying minus       #
+# one to MPDSES and MNTDSES, respectively.                                           #
+#                                                                                    #
+# The framework used here uses the sf.ses.mpd() function, which modifies the         #
+# picante::ses.mpd() function to allow for parallel computation using SNOW           #
+# (snowfall).                                                                        #
+#                                                                                    #
+# Author: Pedro Henrique Pereira Braga                                               #
+# Last Update: "2022-01-15"                                                          #
+#                                                                                    # 
+######################################################################################
+
 # Deciding on species pool sizes
 
 # Hemispheric sampling

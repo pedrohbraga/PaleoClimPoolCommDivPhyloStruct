@@ -1,7 +1,7 @@
-#############################################################################################
-#### Function to match (and subset) species between phylogenetic and community data sets ####
-#### Modified from the picante package                                                   ####   
-#############################################################################################
+############################################################################################
+#### Function to match (and subset) species between phylogenetic and community data sets ###
+#### Modified from picante::match.phylo.comm                                            ####   
+############################################################################################
 
 # See the original function by running picante::match.phylo.comm
 # The difference here is that it does not drop names from the comm matrix.

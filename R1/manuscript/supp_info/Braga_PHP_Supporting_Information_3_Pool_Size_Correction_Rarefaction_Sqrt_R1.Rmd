@@ -117,6 +117,17 @@ Geographical extents were restricted for the (i) global, (ii) east-west hemisphe
 Bat communities with positive values of $\mathsf{NRI_{raref}}$ and $\mathsf{NTI_{raref}}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent.
 Conversely, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent.
 
+
+```{r}
+    geom_text(data = stouffer.comb.p.val.nti, 
+              aes(y = max(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$nti, na.rm = T)*1.05, 
+                  label = stouffer.comb.p.val.nri %>%
+                    mutate(annot = ifelse(mntd.poolr.stouffer.comb.p.val < 0.05, "*", NA)) %>%
+                    pull(annot)), 
+              position = position_dodge(width = .75)) +
+```
+
+
 ```{r raref-boxplot, eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}
 # MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.rarefaction.relative.sqrt.csv", h = T)
 

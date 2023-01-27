@@ -61,6 +61,7 @@ MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/cha
 Geographical extents were restricted for the (i) global, (ii) east-west hemispheric (New World *versus* Old World), (iii) biogeographical realm, (iv) tectonic plate, (v) within-realm biome, and (vi) ecoregional extents.
 Bat communities with positive values of $\mathsf{NRI}$ and $\mathsf{NTI}$ indicate that co-occurring species in these communities are phylogenetically related in relation to a given geographical extent.
 Conversely, negative values of NRI and NTI indicate that bat communities are mainly composed of distantly-related species in relation to that given geographical extent. Boxplots overlay raw data values with added horizontal jitter for visibility.
+Dotted lines represent the confidence interval (at 95% or ±1.96 units) of the indices for phylogenetic community structure.
 
 
 ```{r eval=TRUE, echo = FALSE, fig.align = "center", fig.height = 10, fig.width = 16.5, message=FALSE, warning=FALSE}

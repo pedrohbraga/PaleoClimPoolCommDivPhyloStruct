@@ -108,6 +108,12 @@ MPD.LatLong.Env.AllScales$ID_Biome_Acronym = factor(MPD.LatLong.Env.AllScales$ID
     ) +
     geom_hline(yintercept = 0,
                alpha = 0.4) +
+    geom_hline(yintercept = 1.96,
+               linetype='dotted',
+               alpha = 0.4) +
+    geom_hline(yintercept = -1.96,
+               linetype='dotted',
+               alpha = 0.4) +
     labs(x="") +
     theme_minimal() +
     theme_minimal(base_size = 20) +
@@ -166,6 +172,12 @@ MPD.LatLong.Env.AllScales$ID_Biome_Acronym = factor(MPD.LatLong.Env.AllScales$ID
   # )) +
   geom_hline(yintercept = 0,
              alpha = 0.4) +
+    geom_hline(yintercept = 1.96,
+               linetype='dotted',
+               alpha = 0.4) +
+    geom_hline(yintercept = -1.96,
+               linetype='dotted',
+               alpha = 0.4) +
     labs(x="") +
     theme_minimal(base_size = 20) +
     theme(strip.background = element_rect(fill = "white",
@@ -287,13 +299,13 @@ for(ri in r){
     as.data.frame()
   
   rmanova.NRI.SamplingPool.ri <- WRS2::rmanova(NRI.SamplingPool.ri$NRI, 
-                                         NRI.SamplingPool.ri$SamplingPool, 
-                                         NRI.SamplingPool.ri$ID)
+                                               NRI.SamplingPool.ri$SamplingPool, 
+                                               NRI.SamplingPool.ri$ID)
   
   
   rmmcp.NRI.SamplingPool.ri <- WRS2::rmmcp(NRI.SamplingPool.ri$NRI, 
-                                     NRI.SamplingPool.ri$SamplingPool, 
-                                     NRI.SamplingPool.ri$ID)
+                                           NRI.SamplingPool.ri$SamplingPool, 
+                                           NRI.SamplingPool.ri$ID)
   
   rmmcp.NRI.SamplingPool.summary.ri <- rmmcp.NRI.SamplingPool.ri$comp %>%
     as.data.frame() %>%
@@ -337,13 +349,13 @@ for(ri in r){
     as.data.frame()
   
   rmanova.NTI.SamplingPool.ri <- WRS2::rmanova(NTI.SamplingPool.ri$NTI, 
-                                         NTI.SamplingPool.ri$SamplingPool, 
-                                         NTI.SamplingPool.ri$ID)
+                                               NTI.SamplingPool.ri$SamplingPool, 
+                                               NTI.SamplingPool.ri$ID)
   
   
   rmmcp.NTI.SamplingPool.ri <- WRS2::rmmcp(NTI.SamplingPool.ri$NTI, 
-                                     NTI.SamplingPool.ri$SamplingPool, 
-                                     NTI.SamplingPool.ri$ID)
+                                           NTI.SamplingPool.ri$SamplingPool, 
+                                           NTI.SamplingPool.ri$ID)
   
   rmmcp.NTI.SamplingPool.summary.ri <- rmmcp.NTI.SamplingPool.ri$comp %>%
     as.data.frame() %>%

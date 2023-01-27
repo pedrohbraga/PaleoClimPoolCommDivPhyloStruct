@@ -1,26 +1,34 @@
-#######################################################################################################
-###### Utility function to calculate community weighted means of trait data #####
-#######################################################################################################
-
-# Code Author: Pedro Henrique Pereira Braga                                                           #
-# Based on:                                                                                           #
-# Last Update: 2020-03-10                                                                             #
-#
-# This script provides the calculation for community weighted means (CWM;
-# Lavorel et al. 2008) of a trait for each ecological community. Three measures
-# are calculated for each set of communities: CWM, which refers to the
-
-# Arguments :
-# "Trait" = Trait values for each OTU.
-# "Distrib" = Presence-absence community data. Object must be from a class
-# "data.frame", "matrix" or "vector"
-#
-#
-# Returns : The function returns a data.frame with the community weighted means
-#
-# The row names of this data.frame correspond to the cell IDs of the original Distrib data.frame
-#
-#######################################################################################################
+######################################################################################
+######## Utility function to calculate community weighted means of trait data ########
+######################################################################################
+# Code Author: Pedro Henrique Pereira Braga                                          #
+# Modified from: "Linking trait variation to the environment: critical issues with   #
+# community-weighted mean correlation resolved by the fourth-corner approach"        #
+# Pedro R. Peres-Neto, Stéphane Dray, Cajo J. F. ter Braak                           #
+# First published: 11 July 2016                                                      #
+# https://doi-org.lib-ezproxy.concordia.ca/10.1111/ecog.02302                        #
+#                                                                                    #
+# Last Update: 2020-03-10                                                            #
+#                                                                                    #
+# This script provides the calculation for community weighted means (CWM;            #
+# Lavorel et al. 2008) of a trait for each ecological community.                     #
+#                                                                                    #
+# Function arguments :                                                               #
+# "Trait" = Trait values for each OTU.                                               #
+# "Distrib" = Presence-absence community data. Object must be from a class           #
+# "data.frame", "matrix" or "vector"                                                 #
+#                                                                                    #
+# Returns : The function returns a data.frame with the community weighted means.     #
+# CWM = community weighted means, where traits are weighted by the number of         #
+# occurrences (or species abundances) in each community;                             #
+# CWM_std_tw = CWM calculated on weighted standardized traits;                       #
+# CWM_std_w = CWM are weighted by the number of occurrences (or species              #
+# abundances) in each community.                                                     #
+#                                                                                    #
+# The row names of this data.frame correspond to the cell IDs of the Distrib         #
+# data.frame                                                                         #
+#                                                                                    #
+######################################################################################
 
 CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
   
@@ -120,5 +128,7 @@ CWM_Std_TW <- function(Trait = Trait, Distrib = CommunityDataset){
     )
 }
 
+# Usage:
+#
 # CWM_Std_TW(Trait = tip.rates$lambda.avg, 
 #            Distrib = Chiroptera.FaurSven.comm)
