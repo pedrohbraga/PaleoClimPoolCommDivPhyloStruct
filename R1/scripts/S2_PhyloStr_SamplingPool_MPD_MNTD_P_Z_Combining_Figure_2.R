@@ -11,7 +11,8 @@
 # models performed at each geographical extent and divide them by the square-root of #
 # the number of null models we performed (communities).                              #
 #                                                                                    #
-# This code also produces Figure 2.                                                  #
+# This code also produces Figure 2, and the results of these analyses are included   #
+# in Table S2.1.                                                                        #
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2022-11-15"                                                          #
@@ -21,15 +22,9 @@
 # Create new p-value, where the p-value for negative NRI and NTI values becomes
 # the complement of the original p-value, i.e. we take its reciprocal as in 1 - p
 
-MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
-  mutate(mntd.obs.p.complement.neg = ifelse(nti.rarefac.mean < 0, 1 - mntd.obs.p, mntd.obs.p),
-         mpd.obs.p.complement.neg = ifelse(nri.rarefac.mean < 0, 1 - mpd.obs.p, mpd.obs.p)) 
-
-# 
-# MPD.MNTD.LatLong.AllScales <-  MPD.MNTD.LatLong.AllScales %>%
-#   mutate(mntd.obs.p.complement.neg = ifelse(nti < 0, 1 - mntd.obs.p, mntd.obs.p),
-#          mpd.obs.p.complement.neg = ifelse(nri < 0, 1 - mpd.obs.p, mpd.obs.p)) 
-
+MPD.MNTD.LatLong.AllScales <-  MPD.MNTD.LatLong.AllScales %>%
+  mutate(mntd.obs.p.complement.neg = ifelse(nti < 0, 1 - mntd.obs.p, mntd.obs.p),
+         mpd.obs.p.complement.neg = ifelse(nri < 0, 1 - mpd.obs.p, mpd.obs.p))
 
 # Using poolr::stouffer()$p for NRI ----
 
@@ -260,4 +255,13 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.boxplot.png",
        dpi = 600, 
        width = 22, height = 10, 
        units = "in")
+
+
+###
+
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  mutate(mntd.obs.p.complement.neg = ifelse(nti.rarefac.mean < 0, 1 - mntd.obs.p, mntd.obs.p),
+         mpd.obs.p.complement.neg = ifelse(nri.rarefac.mean < 0, 1 - mpd.obs.p, mpd.obs.p)) 
+
 

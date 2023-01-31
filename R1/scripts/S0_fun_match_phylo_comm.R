@@ -1,10 +1,11 @@
-############################################################################################
-#### Function to match (and subset) species between phylogenetic and community data sets ###
-#### Modified from picante::match.phylo.comm                                            ####   
-############################################################################################
+######################################################################################
+### Function to match (and subset) species between phylogenetic and community data ###
+### sets                                                                           ###
+#### Modified from picante::match.phylo.comm()                                     ###   
+######################################################################################
 
 # See the original function by running picante::match.phylo.comm
-# The difference here is that it does not drop names from the comm matrix.
+# The difference here is that this one does not drop names from the comm matrix.
 
 match.phylo.comm. <- function(phy, comm, silent = TRUE) {
   if (!(is.data.frame(comm) | is.matrix(comm))) {

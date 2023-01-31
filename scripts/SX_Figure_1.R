@@ -124,7 +124,7 @@ nti.AllScales.map <- ggplot(data = long.polygonGrid_world_50km_merged_sf %>%
       title.position = 'top',
       title.hjust = 0.5,  # shifting title height
       label.hjust = 0.5   # shifting label height
-    ) # FALSE will suppress legend
+    )
   ) +
   # colorspace::scale_fill_continuous_diverging(palette = "Blue-Red 3", 
   #                                 l1 = 30, 

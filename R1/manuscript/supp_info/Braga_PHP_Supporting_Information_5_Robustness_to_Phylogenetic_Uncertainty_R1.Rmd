@@ -51,11 +51,11 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.align = "center",
                       cache.lazy = TRUE)
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ses.opt.rarefaction.phylostr.R")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_bootstrap_logit_GLM_uncondition_quant.R")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ggplot_theme_map.R")
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 

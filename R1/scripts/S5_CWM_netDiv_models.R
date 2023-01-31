@@ -179,7 +179,8 @@ MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
   filter(SamplingPool == "Global sampling") %>%
   filter(ntaxa > 2) %>%
-  dplyr::select(netDiv_CWM_std_tw_rs_1, netDiv_CWM_std_tw_rs_1_mean) %>%
+  dplyr::select(netDiv_CWM_std_tw_rs_1, 
+                netDiv_CWM_std_tw_rs_1_mean) %>%
   plot
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.rarefaction.relative %>%
