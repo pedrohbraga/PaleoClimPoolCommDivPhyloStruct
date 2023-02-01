@@ -59,7 +59,7 @@ source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ggplot_theme
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
 
-netDiv.CWM.Chiroptera.rs_5.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_5.mean.csv")[, -1]
+# netDiv.CWM.Chiroptera.rs_5.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_5.mean.csv")[, -1]
 netDiv.CWM.Chiroptera.rs_1.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/netDiv.CWM.Chiroptera.rs_1.mean.csv")[, -1]
 ```
 

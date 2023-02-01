@@ -2,21 +2,8 @@
 #### Code to apply a null-model framework to compute the phylogenetic structure   ####
 #### of communities across a gradient of restrictive sampling pools               ####
 #                                                                                    #
-# Description: To assess how patterns of phylogenetic community structure change     #
-# as a function of spatial scale, we applied commonly used null-models to            #
-# estimate standardized effect sizes for both metrics (MPDSES and MNTDSES,           #
-# respectively) (Kembel et al., 2010). Each null-model simulated random              #
-# assemblages by permuting species names across the phylogeny tips 999 times for     #
-# a given species pool (i.e., the sampling pool in which species were sampled to     #
-# compose random assemblages): global (all species in the phylogeny), east-west      #
-# hemispherical (i.e., Old World and New World species pools), biogeographical       #
-# realms, tectonic plates, within-realm biomes, and within-realm                     #
-# terrestrial-ecoregion scales. NRI and NTI were obtained by multiplying minus       #
-# one to MPDSES and MNTDSES, respectively.                                           #
-#                                                                                    #
-# The framework used here uses the sf.ses.mpd() function, which modifies the         #
-# picante::ses.mpd() function to allow for parallel computation using SNOW           #
-# (snowfall).                                                                        #
+# This framework uses the mod.ses.mpd.query.sf() function, which modifies            #
+# picante::ses.mpd()  to allow for parallel computation using SNOW (snowfall).       #
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2022-01-15"                                                          #
@@ -25,7 +12,7 @@
 
 set.seed(15145562)
 
-phylo.sample.pool <- sample(1:1000, 50)[3:50]
+phylo.sample.pool <- sample(1:1000, 100) # or 50
 
 starting.time <- Sys.time()
 
@@ -900,7 +887,7 @@ for(phylo.sampled.pos in phylo.sample.pool){
     set_rownames(.$ID)
   
   
-  # End of the computation of SES.MPD values across the sampling pool
+  # End of the computation of SES.MNTD values across the sampling pool
   # restriction gradient
   
   #################################
@@ -928,10 +915,7 @@ for(phylo.sampled.pos in phylo.sample.pool){
                                   MNTD.LatLong.Biome,
                                   MNTD.LatLong.Ecoregion)
   
-  
-  # Begin of the computation of SES.MPD values across the sampling pool
-  # restriction gradient
-  
+
   #########################################
   ### Merge data into a single data set ###
   #########################################
