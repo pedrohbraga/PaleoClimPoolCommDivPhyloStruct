@@ -2,6 +2,7 @@
 ## Represent average community phylogenetic structure across percentiles of         ##
 ## differences in mean annual temperature, difference in mean annual precipitation, ##
 ## and net diversification rates                                                    ##
+######################################################################################
 
 # Code Author: Pedro Henrique Pereira Braga
 
@@ -117,6 +118,8 @@ facet_labels <- quantile.nri.XY.all %>%
 facet_labels <- facet_labels %>%
   mutate(facet_labels = LETTERS[1:nrow(facet_labels)])
 
+# This is Figure 3
+
 (fig.quantile.SamplingPool.NRI.diffTemp.log.diffPrec.netDiv <- ggplot(
   quantile.nri.XY.all,
   aes(
@@ -163,15 +166,15 @@ facet_labels <- facet_labels %>%
               vjust = 1.5,
               inherit.aes = FALSE) +
     geom_hline(yintercept = 0, 
-               alpha = 0.25) +
-    geom_vline(xintercept = 0, 
-               alpha = 0.25) +
+               alpha = 0.4) +
     geom_hline(yintercept = 1.96,
                linetype='dotted',
-               alpha = 0.25) +
+               alpha = 0.4) +
     geom_hline(yintercept = -1.96,
                linetype='dotted',
-               alpha = 0.25) +
+               alpha = 0.4) +
+    geom_vline(xintercept = 0, 
+               alpha = 0.4) +
     # scale_y_continuous(
     #   breaks = pretty(c(quantile.nri.XY.all$mean.Y,
     #                     0), n = 6),
@@ -358,6 +361,9 @@ facet_labels <- quantile.nti.XY.all %>%
 facet_labels <- facet_labels %>%
   mutate(facet_labels = LETTERS[1:nrow(facet_labels)])
 
+
+# This is Figure 4
+
 (fig.quantile.SamplingPool.NTI.diffTemp.log.diffPrec.netDiv <- ggplot(
   quantile.nti.XY.all,
   aes(
@@ -403,15 +409,15 @@ facet_labels <- facet_labels %>%
               vjust = 1.5,
               inherit.aes = FALSE) +
     geom_hline(yintercept = 0, 
-               alpha = 0.25) +
+               alpha = 0.4) +
     geom_hline(yintercept = 1.96,
                linetype='dotted',
-               alpha = 0.25) +
+               alpha = 0.4) +
     geom_hline(yintercept = -1.96,
                linetype='dotted',
-               alpha = 0.25) +
+               alpha = 0.4) +
     geom_vline(xintercept = 0, 
-               alpha = 0.25) +
+               alpha = 0.4) +
     # scale_y_continuous(
     #   breaks = pretty(c(quantile.nti.XY.all$mean.Y,
     #                     0), n = 6),

@@ -1,5 +1,5 @@
 ######################################################################################
-#####             Climate dataset preparation and complementary analyses                      ######
+#####       Climate dataset preparation and complementary analyses              ######
 #                                                                                    #
 # Author: Pedro Henrique Pereira Braga                                               #
 # Last Update: "2019-01-28"                                                          #
