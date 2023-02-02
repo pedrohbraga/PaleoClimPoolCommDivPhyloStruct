@@ -57,35 +57,6 @@ MPD.MNTD.LatLong.AllScales <-  MPD.MNTD.LatLong.AllScales %>%
 )
 
 
-# Using poolr::stouffer()$p for NRI ----
-
-(stouffer.comb.p.val.nri <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
-   group_by(ID_Realm, SamplingPool) %>%
-   drop_na(mntd.obs.p.complement.neg,
-           mpd.obs.p.complement.neg,
-           ID_Realm) %>%
-   group_modify(~ {
-     poolr::stouffer(.x$mpd.obs.p.complement.neg)$p %>%
-       tibble::enframe(name = "mpd.name",
-                       value = "mpd.poolr.stouffer.comb.p.val")
-   }) %>%
-   as.data.frame()
-)
-
-# Using poolr::stouffer()$p for NTI ----
-
-(stouffer.comb.p.val.nti <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
-   group_by(ID_Realm, SamplingPool) %>%
-   drop_na(mntd.obs.p.complement.neg,
-           mpd.obs.p.complement.neg,
-           ID_Realm) %>%
-   group_modify(~ {
-     poolr::stouffer(.x$mntd.obs.p.complement.neg)$p %>%
-       tibble::enframe(name = "mntd.name",
-                       value = "mntd.poolr.stouffer.comb.p.val")
-   }) %>%
-   as.data.frame()
-)
 
 # Tabling results ----
 
@@ -153,8 +124,8 @@ left_join(stouffer.comb.p.val.nri,
          legend.spacing.x = unit(0.2, 'cm'),
          legend.key.width = unit(1.4, "line"), 
          legend.title.align = 0.5,
-         legend.margin = margin(t = 0.5, r = 0, b = 1, l = 0),
-         legend.box.margin = margin(-2, -2, -2, -2)
+         legend.margin = margin(t = 0.5, r = 0, b = 1, l = 1),
+         legend.box.margin = margin(-2, -2, 0, -2)
    ) +
    guides(fill = guide_legend(nrow = 1, 
                               byrow = TRUE,
@@ -213,7 +184,7 @@ left_join(stouffer.comb.p.val.nri,
           legend.key.width = unit(1.4, "line"), 
           legend.title.align = 0.5,
           legend.margin = margin(t = 0.5, r = 0, b = 1, l = 0),
-          legend.box.margin = margin(-2, -2, -2, -2)
+          legend.box.margin = margin(-2, -2, 0, -2)
     ) +
     guides(fill = guide_legend(nrow = 1, 
                                byrow = TRUE,
@@ -245,7 +216,10 @@ left_join(stouffer.comb.p.val.nri,
 # This is the Figure 2 in the manuscript
 
 ragg::agg_png("figures/fig.NRI.NTI.Realm.boxplot.png", 
-              width = 1548*8, height = 900*8, res = 650)
+              width = 1548*8, 
+              height = 900*8, 
+              res = 750, 
+              scaling = 1)
 
 fig.NRI.NTI.Realm.boxplot
 
@@ -257,11 +231,40 @@ ggsave(filename = "figures/fig.NRI.NTI.Realm.boxplot.png",
        units = "in")
 
 
-###
-
+### With the results from the rarefaction ----
 
 MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
   mutate(mntd.obs.p.complement.neg = ifelse(nti.rarefac.mean < 0, 1 - mntd.obs.p, mntd.obs.p),
          mpd.obs.p.complement.neg = ifelse(nri.rarefac.mean < 0, 1 - mpd.obs.p, mpd.obs.p)) 
 
 
+
+# Using poolr::stouffer()$p for NRI ----
+
+(stouffer.comb.p.val.nri <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+   group_by(ID_Realm, SamplingPool) %>%
+   drop_na(mntd.obs.p.complement.neg,
+           mpd.obs.p.complement.neg,
+           ID_Realm) %>%
+   group_modify(~ {
+     poolr::stouffer(.x$mpd.obs.p.complement.neg)$p %>%
+       tibble::enframe(name = "mpd.name",
+                       value = "mpd.poolr.stouffer.comb.p.val")
+   }) %>%
+   as.data.frame()
+)
+
+# Using poolr::stouffer()$p for NTI ----
+
+(stouffer.comb.p.val.nti <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+   group_by(ID_Realm, SamplingPool) %>%
+   drop_na(mntd.obs.p.complement.neg,
+           mpd.obs.p.complement.neg,
+           ID_Realm) %>%
+   group_modify(~ {
+     poolr::stouffer(.x$mntd.obs.p.complement.neg)$p %>%
+       tibble::enframe(name = "mntd.name",
+                       value = "mntd.poolr.stouffer.comb.p.val")
+   }) %>%
+   as.data.frame()
+)

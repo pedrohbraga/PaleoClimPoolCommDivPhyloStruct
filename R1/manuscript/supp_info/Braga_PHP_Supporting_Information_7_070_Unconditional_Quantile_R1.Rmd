@@ -51,16 +51,15 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.align = "center",
                       cache.lazy = TRUE)
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ses.opt.rarefaction.phylostr.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ses.opt.rarefaction.phylostr.R")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_bootstrap_logit_GLM_uncondition_quant.R")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ggplot_theme_map.R")
 
 
 glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075 <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075.RDS")
 glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075 <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075.RDS")
-
 
 glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.075 <- bind_rows(
   data.frame(glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075[, 2:5],
@@ -77,7 +76,6 @@ glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.075 <- bind_rows(
       variable.name = "variable",
       value.name = "estimate")
 )
-
 
 glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.075$SamplingPool <- factor(glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.075$SamplingPool,
                                                                             levels = c(
@@ -225,7 +223,7 @@ These results were highly qualitatively similar to the ones using the 90th perce
 \blandscape
 
 \noindent 
-**Table S7.1. ** Influence of climatic legacies and _in situ_ diversification rates on the phylogenetic structure of bat communities across different geographical extents. Regression coefficients (and ± 95% bootstrap-based confidence intervals) for the robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices of phylogenetic community relatedness ($Pr(\mathsf{NRI_{Q975}}=1)$) and $Pr(\mathsf{NTI_{Q75}}=1)$) as response variables (in separate models) and the standardized (mean zero and variance one) historical change in temperature, historical change in precipitation and _in situ_ net diversification rates as predictive variables. The phylogenetic structure of bat communities was measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. In situ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Historical change in climate for each bat community was obtained as the difference between the contemporary climate (either temperature or the logarithm of precipitation) from the estimated climate from the last glacial maximum (22,000 years ago).
+**Table S7.1. ** Influence of climatic legacies and _in situ_ diversification rates on the phylogenetic structure of bat communities across different geographical extents. Regression coefficients (and ± 95% bootstrap-based confidence intervals) for the robust logistic generalized linear models using binary outcomes (at the 90th percentile) for the indices of phylogenetic community relatedness ($Pr(\mathsf{NRI_{Q975}}=1)$) and $Pr(\mathsf{NTI_{Q75}}=1)$) as response variables (in separate models) and the standardized (mean zero and variance one) historical change in temperature, historical change in precipitation and _in situ_ net diversification rates as predictive variables. The phylogenetic structure of bat communities was measured through the net relatedness index (NRI) and the nearest taxon index (NTI) at each geographical extent. _In situ_ net diversification rates were obtained by subtracting the difference between community-weighted means weight-standardized for speciation and extinction rates. Historical change in climate for each bat community was obtained as the difference between the contemporary climate (either temperature or the logarithm of precipitation) from the estimated climate from the last glacial maximum (22,000 years ago).
 
 
 \captionsetup[table]{labelformat = empty}

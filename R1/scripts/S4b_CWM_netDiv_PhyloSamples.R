@@ -185,3 +185,111 @@ hist(netDiv.CWM.Chiroptera.mean$netDiv_CWM_std_tw_rs_1_mean)
 
 write.csv(netDiv.CWM.Chiroptera.mean,
           "data/matrices/netDiv.CWM.Chiroptera.mean.csv")
+
+# Merging data frames ####
+
+### Robustness to phylogenetic uncertainty ###
+
+netDiv.CWM.Chiroptera.rs_1.mean <- read.csv("data/matrices/netDiv.CWM.Chiroptera.rs_1.mean.csv", 
+                                            row.names = 1)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  left_join(netDiv.CWM.Chiroptera.rs_1.mean, 
+            by = "ID")
+
+
+netDiv.CWM.Chiroptera.rs_5.mean <- read.csv("data/matrices/netDiv.CWM.Chiroptera.rs_5.mean.csv", 
+                                            row.names = 1)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  left_join(netDiv.CWM.Chiroptera.rs_5.mean, 
+            by = "ID")
+
+
+# A few verifications
+
+left_join(
+  MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+    filter(SamplingPool == "Global sampling") %>%
+    dplyr::select(ID, netDiv_CWM_std_tw_rs_1) %>%
+    drop_na,
+  MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+    filter(SamplingPool == "Hemispheric sampling") %>%
+    dplyr::select(ID, netDiv_CWM_std_tw_rs_1_mean) %>%
+    drop_na,
+  by = "ID"
+)[1000:1600, ]
+
+head(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div)
+
+dim(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div)
+
+
+## Exploration
+
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  filter(SamplingPool == "Global sampling") %>%
+  filter(ntaxa > 2) %>%
+  dplyr::select(netDiv_CWM_std_tw_rs_1_mean, netDiv_CWM_std_tw_rs_5_mean) %>%
+  plot
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  filter(SamplingPool == "Global sampling") %>%
+  filter(ntaxa > 2) %>%
+  dplyr::select(netDiv_CWM_std_tw_rs_1, 
+                netDiv_CWM_std_tw_rs_1_mean) %>%
+  plot
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.rarefaction.relative %>%
+  filter(SamplingPool == "Global sampling") %>%
+  filter(ntaxa > 2) %>%
+  #  select(nri.sec) %>%
+  ggplot() +
+  geom_histogram(aes(x = nti.sec),
+                 bins  = 50)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.rarefaction.relative.sampling %>%
+  filter(SamplingPool == "Global sampling") %>%
+  filter(ntaxa > 2) %>%
+  #  select(nri.sec) %>%
+  ggplot() +
+  geom_histogram(aes(x = nti.sec),
+                 bins  = 50)
+
+
+
+# write.csv(netDiv.CWM.Chiroptera.Comm, "data/matrices/netDiv.CWM.Chiroptera.Comm.csv")
+
+# Explore units that have more than 2 co-occurring taxa.
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div %>%
+  filter(SamplingPool == "Global sampling") %>%
+  filter(ntaxa > 2)
+
+# write.csv(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div, "data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.sqrt.csv")
+
+
+# MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div <- read.csv("data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.csv", h = T)
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm <- factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$ID_Realm, 
+                                                                                  levels = c('Neotropical',
+                                                                                             'Nearctic',
+                                                                                             'Afrotropical',
+                                                                                             'Palearctic', 
+                                                                                             'Indomalay', 
+                                                                                             'Australasian'))
+
+MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool <-  factor(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool,  
+                                                                                       levels = c("Global sampling",
+                                                                                                  "Hemispheric sampling",
+                                                                                                  "Realm sampling",
+                                                                                                  "Plate sampling",
+                                                                                                  "Biome sampling",
+                                                                                                  "Ecoregion sampling"))
+
+
+saveRDS(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div,
+        "data/matrices/MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div.RDS")
+
+

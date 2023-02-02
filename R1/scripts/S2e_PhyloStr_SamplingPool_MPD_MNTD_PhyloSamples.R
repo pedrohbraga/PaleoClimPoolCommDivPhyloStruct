@@ -1,6 +1,7 @@
 ######################################################################################
 #### Code to apply a null-model framework to compute the phylogenetic structure   ####
-#### of communities across a gradient of restrictive sampling pools               ####
+#### of communities across a gradient of restrictive sampling pools to trees      ####
+#### randomly sampled from the phylogenetic hypothesis for the group              ####
 #                                                                                    #
 # This framework uses the mod.ses.mpd.query.sf() function, which modifies            #
 # picante::ses.mpd()  to allow for parallel computation using SNOW (snowfall).       #
@@ -12,7 +13,7 @@
 
 set.seed(15145562)
 
-phylo.sample.pool <- sample(1:1000, 100) # or 50
+phylo.sample.pool <- sample(1:1000, 50)
 
 starting.time <- Sys.time()
 

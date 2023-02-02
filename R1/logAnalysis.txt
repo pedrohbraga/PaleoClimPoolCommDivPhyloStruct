@@ -1,0 +1,192 @@
+starting worker for localhost:11331 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Library PhyloMeasures loaded.
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Library base loaded.
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Registered S3 method overwritten by 'mosaic':
+  method                           from   
+  fortify.SpatialPolygonsDataFrame ggplot2
+
+The 'mosaic' package masks several functions from core packages in order to add 
+additional features.  The original behavior of these functions should not be affected by this.
+
+Attaching package: ‘mosaic’
+
+The following objects are masked from ‘package:dplyr’:
+
+    count, do, tally
+
+The following object is masked from ‘package:Matrix’:
+
+    mean
+
+The following object is masked from ‘package:ggplot2’:
+
+    stat
+
+The following objects are masked from ‘package:stats’:
+
+    binom.test, cor, cor.test, cov, fivenum, IQR, median, prop.test,
+    quantile, sd, t.test, var
+
+The following objects are masked from ‘package:base’:
+
+    max, mean, min, prod, range, sample, sum
+
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Library mosaic loaded.
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Library snowfall loaded.
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Loading required package: ape
+Loading required package: vegan
+Loading required package: permute
+
+Attaching package: ‘permute’
+
+The following object is masked from ‘package:mosaic’:
+
+    shuffle
+
+This is vegan 2.5-7
+Loading required package: nlme
+
+Attaching package: ‘nlme’
+
+The following object is masked from ‘package:dplyr’:
+
+    collapse
+
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Library picante loaded.
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Type: EXEC 
+Computing mntd for: Western Java rain forests.
+RegComputing mntd Computing mntd for: Guianan piedmont and lowland moist forests.
+Region 242 from 699.
+
+Computing mntd for: Guianan savanna.
+Region 243 from 699.
+
+Computing mntd for: Guinean forest-savanna mosaic.
+Region 244 from 699.
+
+Computing mntd for: Guinean mangroves.
+Region 245 from 699.
+
+Computing mntd for: Guinean montane forests.
+Region 246 from 699.
+
+Computing mntd for: Guizhou Plateau broadleaf and mixed forests.
+Region 247 from 699.
+
+Computing mntd for: Gulf of California xeric scrub.
+Region 248 from 699.
+
+Computing mntd for: Gulf of Oman desert and semi-desert.
+Region 249 from 699.
+
+Computing mntd for: Gulf of St. Lawrence lowland forests.
+Region 250 from Computing mntd for: Changbai Mountains mixed forests.
+Region 131 from 699.
+
+Computing mntd for: Changjiang Plain evergreen forests.
+Region 132 from 699.
+
+Computing mntd for: Chao Phraya freshwater swamp forests.
+Region 133 from 699.
+
+Computing mntd for: Chao Phraya lowland moist deciduous forests.
+Region 134 from 699.
+
+Computing mntd for: Cherskii-Kolyma mountain tundra.
+Region 135 from 699.
+
+Computing mntd for: Chhota-Nagpur dry deciduous forests.
+Region 136 from 699.
+
+Computing mntd for: Chiapas Depression dry forests.
+Region 137 from 699.
+
+Computing mntd for: Chiapas montane forests.
+Region 1Type: DONE 
+
+
+Computing mntd for: ChihuaType: DONE 
+
+RegioType: DOType: DONE 
+ DONType: DONE 
+ Type: DONE 
+
+E 
+ DONE 
+n TyType: DONE 
+:TyType: DONE 
+eTType: DONE 
+
+e rain forType: DONE 
+ype: DOType: DONType: DONE 
+pType: DONE 
+9 from 699.
+
+TypeType: DONE 
+on 599 from 699.
+
+Type: DONE 
+ion 439 from 699.
+
+Type: DONE 
