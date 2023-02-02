@@ -26,7 +26,7 @@ Worldwide, across restrictive spatial extents: global, east-west hemispheres, bi
 
 ### Time period
 
-Last Glacial Maximum (~22,000 years ago) to present.
+Last Glacial Maximum (\~22,000 years ago) to present.
 
 ### Major taxa studied
 
@@ -48,7 +48,7 @@ We show that the worldwide phylogenetic structure of bat assemblages varies as a
 
 ## Data availability
 
-A stable data set containing the estimates for bat community phylogenetic structure, diversification rates and climatic stability will be included within the OSF repository related to this manuscript.
+A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials will be included within the Dryad repository related to this study.
 
 # Description of this research compendium
 
@@ -56,16 +56,39 @@ A stable data set containing the estimates for bat community phylogenetic struct
 
 <summary><code> scripts/ </code></summary>
 
-1.  `S0_REnvironmentPreparation.R`
-2.  `SX_fun_brokenStick.selection.R`
-3.  `SX_fun_CommWeightedMeans.R`
-4.  `SX_fun_ggplot_theme_map.R`
-5.  `SX_fun_make_grid_sf.R`
-6.  `SX_fun_match_phylo_comm.R`
-7.  `SX_fun_ses.opt.rarefaction.phylostr.R`
-8.  `S1_50KM_DatasetPreparation.R`
-9.  `S1_ClimateDatasetPreparation_PhyloStr_Figures.R`
-10. `S2_PhyloStr_SamplingPool_MPD_MNTD_Relative_Min_Size_Rarefaction.R`
+-   `S0_fun_BAMM.diversification.rate.estimation.R`: Function to configure BAMM diversification rate estimation files;
+-   `S0_fun_bootstrap_logit_GLM_uncondition_quant.R`: Functions to compute and extract logistic regression coefficients;
+-   `S0_fun_CommWeightedMeans.R`: Function to compute community weighted means;
+-   `S0_fun_ggplot_theme_map.R`: Function to define `ggplot` theme for Figure 1;
+-   `S0_fun_make_grid_sf.R`: Function to create a cell-grid over a shapefile of the world containing polygon layers;
+-   `S0_fun_match_phylo_comm.R`: Function to match the species tips of a phylogenetic tree to a community matrix containing species occurrences across sites;
+-   `S0_fun_ses.opt.rarefaction.phylostr.R`: Functions to compute the phylogenetic relatedness of communities using the traditional and a rarefaction approach based on the standardized effect sizes of mean phylogenetic pairwise and mean nearest taxon distances;
+-   `S0_fun_ses.phylostr_non_parallelized_alternatives.R`: Function that implements expanded grids to calculate the standardized effect size for mean phylogenetic pairwise distances and mean nearest taxon distances (based on `PhyloMeasures::mpd.query()` and `PhyloMeasures::mntd.query()`);
+-   `S0_fun_ses.phylostr.query.sf.R`: Functions that implements `PhyloMeasures::mpd.query()` and `PhyloMeasures::mntd.query()` within the framework of `picante::ses.mpd()` and `picante::ses.mntd()` to allow for faster parallel computation using SNOW/snowfall;
+-   `S0_fun_sf.ses.phylostr.R`: Functions that modify `picante::ses.mpd()` and `picante::ses.mntd()` to allow for parallel computation using SNOW/snowfall;
+-   `S0_HypothesesRepresentationFigures.R`: Routine to simulate and generate the figures that represent the hypotheses being tested and that are inserted within Table 1;
+-   `S00_REnvironmentPreparation.R`: Routine to prepare (install and load packages) the R environment for analysis and reanalysis of the data in this study;
+-   `S1a_50KM_DatasetPreparation.R`: Routine to prepare the geographical data set for this study;
+-   `S1b_Chiroptera_Comm_Phylo_DatasetPreparation.R`: Routine to prepare the community presence absence data, the phylogenetic relationship hypothesis and the maximum crade credibility tree used in our study;
+-   `S1c_Climate_Contemp_LGM_DatasetPreparation.R`: Routine to prepare the contemporary climatic, paleoclimatic data, and climatic legacies;
+-   `S2a_PhyloStr_SamplingPool_MPD_MNTD_mod.ses.mpd.query.sf.R`: Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents;  
+-   `S2b_Summary_Statistics_NRI_NTI_Table_S2.1.R`: Code to summarise statistics for the phylogenetic structure of communities, and to create Table S2.1;
+-   `S2c_mergePhyloStructure_rmanova_rmmcp_Table_S2.2.R`: Code to merge data on community phylogenetic structure, perform robust repeated measurement analyses of variance, and create Table S2.2.;
+-   `S2d_PhyloStr_SamplingPool_MPD_MNTD_P_Z_Combining_Figure_2.R`: Code to perform Stouffer’s meta-analytic probability combination tests on the probabilities from the computations of indices for community phylogenetic relatedness;
+-   `S2e_PhyloStr_SamplingPool_MPD_MNTD_PhyloSamples.R`:  Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees randomly sampled from the phylogenetic relationship hypothesis used in this study;
+-   `S2f_PhyloStr_SamplingPool_MPD_MNTD_Fixed_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. This code allows for the selection of fixed species richness across all communities;
+-   `S2g_PhyloStr_SamplingPool_MPD_MNTD_Relative_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. This routine allows for the selection of relative species richness across all communities;
+-   `S2h_PhyloStr_SamplingPool_MPD_MNTD_Relative_Min_Size_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. Here, the bias is adjusted by repeatedly randomly subsampling (rarefying) any given local community matrix to have the same number of species as the immediately inferior nested geographical extent;
+-   `S2i_PhyloStr_SamplingPool_Representation_Map_Figure_1.R`: Code to represent community phylogenetic structure calculated for several geographical scales into maps, creating Figure 1;
+-   `S3a_BAMM_netDiv_rate_estimation.R`: Code to generate the control file, assess and estimate net diversification rates for each species using Bayesian Analyses for Macroevolutionary Mixtures using the maximum crade credibility tree computed from the phylogenetic hypothesis used here;
+-   `S3b_BAMM_netDiv_rate_estimation_PhyloSamples.R`: Code to generate the control file, assess and estimate net diversification rates for each species using Bayesian Analyses for Macroevolutionary Mixtures for phylogenetic trees randomly sampled from the phylogenetic hypothesis used in this study; 
+-   `S3c_samplingProbabilities_Table_S2.3.R`: Code to compute sampling probabilities within the phylogenetic hypothesis used in this study, and to create Table S2.3;
+-   `S4a_CWM_netDiv.R`: Code to compute weighted means for diversification rates across all communities; 
+-   `S4b_CWM_netDiv_PhyloSamples.R`: Code to compute average weighted means for diversification rates across all communities that were obtained for each phylogenetic tree randomly sampled for the phylogenetic hypothesis used in this study;
+-   `S5_PhyloStr_Descriptive_Quantiles_Figures_3_4.R`: Code to plot the mean phylogenetic relatedness of bat communities (for both NRI and NTI) across each percentile of the predictor variables of interest (i.e., historical change in temperature, historical change in precipitation and in situ net diversification rates), and generate Figures 3 and 4;
+-   `S6_PhyloStr_Logistic_Bootstrap_Quantiles_Figure_5_Table_2.R`: Code to applu conditionally unbiased bounded influence robust logistic regressions to test how changes in historical climatic stability and in situ diversification rates independently increased (or decreased) the likelihood of a community being composed of highly phylogenetically related species. This code creates Figure 5 and Table 2;
+-   `S7a_CHELSA_TraCE21k_download.R`: Code to download and decompress climatic data from CHELSA covering the current period until 22,000 years ago, in intervals of 500 years;
+-   `S7b_CHELSA_TraCE21k_VoCC_extract.R`: Code to calculate gradient-based change velocities in temperature and in precipitation from the LGM to the contemporary period and assessed how they influenced the phylogenetic relatedness of bat communities across geographical scales.
 
 </details>
 

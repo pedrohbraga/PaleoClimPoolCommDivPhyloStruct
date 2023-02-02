@@ -57,8 +57,8 @@ source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_bootstrap_lo
 
 source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ggplot_theme_map.R")
 
-
 glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075 <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075.RDS")
+
 glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075 <- readRDS("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075.RDS")
 
 glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.075 <- bind_rows(

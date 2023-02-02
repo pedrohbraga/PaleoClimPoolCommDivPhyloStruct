@@ -21,14 +21,14 @@ for(SamplingPool_i in levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.d
     )
     
     quantile.nri.XY.all <- rbind(quantile.nri.XY.all, 
-                             quantile.XY.i)
+                                 quantile.XY.i)
   }
 }
 
 # as.factor(quantile.nri.XY.all$SamplingPool)
 
 quantile.nri.XY.all$SamplingPool <- factor(quantile.nri.XY.all$SamplingPool, 
-                                       levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool))
+                                           levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool))
 
 # quantile.nri.XY.all$x.lab <- factor(quantile.nri.XY.all$x.lab , 
 #                                 levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
@@ -36,40 +36,40 @@ quantile.nri.XY.all$SamplingPool <- factor(quantile.nri.XY.all$SamplingPool,
 quantile.nri.XY.all$x.lab. <- quantile.nri.XY.all$x.lab 
 
 quantile.nri.XY.all$x.lab <- factor(quantile.nri.XY.all$x.lab., 
-                                levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
-                                labels = c(
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Historical Change in Temperature) (°C)",
-                                    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                  ))),
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Historical Change in Precipitation)",
-                                    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))))),
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Local Net Diversification Rate)",
-                                    lambda[CWM[tw]] - mu[CWM[tw]])))
-                                )
+                                    levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
+                                    labels = c(
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Historical Change in Temperature) (°C)",
+                                        scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+                                      ))),
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Historical Change in Precipitation)",
+                                        scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))))),
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Local Net Diversification Rate)",
+                                        lambda[CWM[tw]] - mu[CWM[tw]])))
+                                    )
 )
 # 
 
 
 quantile.nri.XY.all$x.lab <- factor(quantile.nri.XY.all$x.lab., 
-                                levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
-                                labels = c(
-                                  c(expression(
-                                    atop(
-                                      "Historical Change in Temperature °C",
-                                      scriptstyle("MAT"[Contemporary] ~ "\U2212" ~ "MAT"[LGM])
+                                    levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
+                                    labels = c(
+                                      c(expression(
+                                        atop(
+                                          "Historical Change in Temperature °C",
+                                          scriptstyle("MAT"[Contemporary] ~ "\U2212" ~ "MAT"[LGM])
+                                        )
+                                      )
+                                      ),
+                                      c(expression(atop(
+                                        "Historical Change in Precipitation",
+                                        scriptstyle(log("MAP"[Contemporary]) ~ "\U2212" ~ log("MAP"[LGM]))))),
+                                      c(expression(atop(
+                                        "Local Net Diversification Rate",
+                                        "\U03BB"[CWM[tw]] ~ "\U2212" ~ "\U03BC"[CWM[tw]])))
                                     )
-                                  )
-                                  ),
-                                  c(expression(atop(
-                                    "Historical Change in Precipitation",
-                                    scriptstyle(log("MAP"[Contemporary]) ~ "\U2212" ~ log("MAP"[LGM]))))),
-                                  c(expression(atop(
-                                    "Local Net Diversification Rate",
-                                    "\U03BB"[CWM[tw]] ~ "\U2212" ~ "\U03BC"[CWM[tw]])))
-                                )
 )
 # 
 
@@ -129,8 +129,8 @@ facet_labels <- facet_labels %>%
 ) +
     geom_errorbar(
       aes(ymin = mean.Y - 1.96*se.Y,
-                      ymax = mean.Y + 1.96*se.Y),
-                  cex = 0.1) +
+          ymax = mean.Y + 1.96*se.Y),
+      cex = 0.1) +
     # geom_errorbarh(aes(xmin = min.X,
     #                    xmax = max.X),
     #                cex = 1,
@@ -262,14 +262,14 @@ for(SamplingPool_i in levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.d
     )
     
     quantile.nti.XY.all <- rbind(quantile.nti.XY.all, 
-                             quantile.nti.XY.i)
+                                 quantile.nti.XY.i)
   }
 }
 
 # as.factor(quantile.nti.XY.all$SamplingPool)
 
 quantile.nti.XY.all$SamplingPool <- factor(quantile.nti.XY.all$SamplingPool, 
-                                       levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool))
+                                           levels(MPD.MNTD.LatLong.AllScales.raref.rel.worldClimate.diff.CWM.Div$SamplingPool))
 
 # quantile.nti.XY.all$x.lab <- factor(quantile.nti.XY.all$x.lab , 
 #                                 levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
@@ -277,44 +277,44 @@ quantile.nti.XY.all$SamplingPool <- factor(quantile.nti.XY.all$SamplingPool,
 quantile.nti.XY.all$x.lab. <- quantile.nti.XY.all$x.lab 
 
 quantile.nti.XY.all$x.lab <- factor(quantile.nti.XY.all$x.lab., 
-                                levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
-                                labels = c(
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Historical Change in Temperature) (°C)",
-                                    scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
-                                  ))),
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Historical Change in Precipitation)",
-                                    scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))))),
-                                  c(expression(atop(
-                                    ~italic(Q)*"(Local Net Diversification Rate)",
-                                    lambda[CWM[tw]] - mu[CWM[tw]])))
-                                )
+                                    levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
+                                    labels = c(
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Historical Change in Temperature) (°C)",
+                                        scriptstyle("MAT"[Contemporary] - "MAT"[LGM])
+                                      ))),
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Historical Change in Precipitation)",
+                                        scriptstyle(log("MAP"[Contemporary]) - log("MAP"[LGM]))))),
+                                      c(expression(atop(
+                                        ~italic(Q)*"(Local Net Diversification Rate)",
+                                        lambda[CWM[tw]] - mu[CWM[tw]])))
+                                    )
 )
 # 
 
 
 quantile.nti.XY.all$x.lab <- factor(quantile.nti.XY.all$x.lab., 
-                                levels = c("diff.AnnTemp.LGM_cur",
-                                           "diff.log.AnnPrec.log.LGM_cur",
-                                           "netDiv_CWM_std_tw_rs_1"),
-                                labels = c(
-                                  c(expression(
-                                    atop(
-                                      "Historical Change in Temperature °C",
-                                      scriptstyle("MAT"[Contemporary] ~ "\U2212" ~ "MAT"[LGM])
+                                    levels = c("diff.AnnTemp.LGM_cur",
+                                               "diff.log.AnnPrec.log.LGM_cur",
+                                               "netDiv_CWM_std_tw_rs_1"),
+                                    labels = c(
+                                      c(expression(
+                                        atop(
+                                          "Historical Change in Temperature °C",
+                                          scriptstyle("MAT"[Contemporary] ~ "\U2212" ~ "MAT"[LGM])
+                                        )
+                                      )
+                                      ),
+                                      c(expression(atop(
+                                        "Historical Change in Precipitation",
+                                        scriptstyle(log("MAP"[Contemporary]) ~ "\U2212" ~ log("MAP"[LGM]))))),
+                                      c(expression(atop(
+                                        "Local Net Diversification Rate",
+                                        "\U03BB"[CWM[tw]] ~ "\U2212" ~ "\U03BC"[CWM[tw]])))
                                     )
-                                  )
-                                  ),
-                                  c(expression(atop(
-                                    "Historical Change in Precipitation",
-                                    scriptstyle(log("MAP"[Contemporary]) ~ "\U2212" ~ log("MAP"[LGM]))))),
-                                  c(expression(atop(
-                                    "Local Net Diversification Rate",
-                                    "\U03BB"[CWM[tw]] ~ "\U2212" ~ "\U03BC"[CWM[tw]])))
-                                )
 )
- 
+
 
 # quantile.nti.XY.all$x.lab <- factor(quantile.nti.XY.all$x.lab., 
 #                                 levels = c("diff.AnnTemp.LGM_cur", "diff.log.AnnPrec.log.LGM_cur", "netDiv_CWM_std_tw_rs_1"),
