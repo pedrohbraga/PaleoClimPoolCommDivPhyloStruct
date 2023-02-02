@@ -1,10 +1,16 @@
-# Spatial restriction, climatic legacies, diversification, and historical contingencies drive global phylogenetic structure -- the case of bat communities
+# The historical and contemporary processes driving global phylogenetic structure – the case of bat communities
 
 Authors: Pedro Henrique Pereira Braga, Steven Kembel, Pedro Peres-Neto
 
-This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information.
+This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information. This repository is directly linked to the Open Science Framework project for this study.
 
-The data used by these scripts and that could not be included here due to file size limits are available within the Dryad repository (doi: XXXXXXXXXX).
+[![](https://img.shields.io/badge/OSF-10.17605%252FOSF.IO%252FAMVP5-blue?style=for-the-badge&logo=osf.svg){width="209"}](https://osf.io/amvp5/)
+
+## Data availability
+
+A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials is available within the Dryad repository related to this study.
+
+![](https://img.shields.io/badge/Dryad-10.5061%252Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge&logo=dryad.svg){width="239"}(https://doi.org/10.5061/dryad.rjdfn2zgj)
 
 ## Keywords
 
@@ -46,11 +52,7 @@ We show that the worldwide phylogenetic structure of bat assemblages varies as a
 
 </details>
 
-## Data availability
-
-A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials will be included within the Dryad repository related to this study.
-
-# Description of this research compendium
+## Description of this research compendium
 
 <details>
 
@@ -71,24 +73,30 @@ A stable data set containing all data required for analysis, reanalysis, and rep
 -   `S1a_50KM_DatasetPreparation.R`: Routine to prepare the geographical data set for this study;
 -   `S1b_Chiroptera_Comm_Phylo_DatasetPreparation.R`: Routine to prepare the community presence absence data, the phylogenetic relationship hypothesis and the maximum crade credibility tree used in our study;
 -   `S1c_Climate_Contemp_LGM_DatasetPreparation.R`: Routine to prepare the contemporary climatic, paleoclimatic data, and climatic legacies;
--   `S2a_PhyloStr_SamplingPool_MPD_MNTD_mod.ses.mpd.query.sf.R`: Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents;  
+-   `S2a_PhyloStr_SamplingPool_MPD_MNTD_mod.ses.mpd.query.sf.R`: Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents;\
 -   `S2b_Summary_Statistics_NRI_NTI_Table_S2.1.R`: Code to summarise statistics for the phylogenetic structure of communities, and to create Table S2.1;
 -   `S2c_mergePhyloStructure_rmanova_rmmcp_Table_S2.2.R`: Code to merge data on community phylogenetic structure, perform robust repeated measurement analyses of variance, and create Table S2.2.;
--   `S2d_PhyloStr_SamplingPool_MPD_MNTD_P_Z_Combining_Figure_2.R`: Code to perform Stouffer’s meta-analytic probability combination tests on the probabilities from the computations of indices for community phylogenetic relatedness;
--   `S2e_PhyloStr_SamplingPool_MPD_MNTD_PhyloSamples.R`:  Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees randomly sampled from the phylogenetic relationship hypothesis used in this study;
+-   `S2d_PhyloStr_SamplingPool_MPD_MNTD_P_Z_Combining_Figure_2.R`: Code to perform Stouffer's meta-analytic probability combination tests on the probabilities from the computations of indices for community phylogenetic relatedness;
+-   `S2e_PhyloStr_SamplingPool_MPD_MNTD_PhyloSamples.R`: Routine to apply a null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees randomly sampled from the phylogenetic relationship hypothesis used in this study;
 -   `S2f_PhyloStr_SamplingPool_MPD_MNTD_Fixed_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. This code allows for the selection of fixed species richness across all communities;
 -   `S2g_PhyloStr_SamplingPool_MPD_MNTD_Relative_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. This routine allows for the selection of relative species richness across all communities;
 -   `S2h_PhyloStr_SamplingPool_MPD_MNTD_Relative_Min_Size_Rarefaction.R`: Routine to perform a rarefaction-based adjustment for biases introduced by differences in sizes of species richness under the null-model framework to compute the phylogenetic structure of communities across a gradient of restrictive geographical extents across phylogenetic trees. Here, the bias is adjusted by repeatedly randomly subsampling (rarefying) any given local community matrix to have the same number of species as the immediately inferior nested geographical extent;
 -   `S2i_PhyloStr_SamplingPool_Representation_Map_Figure_1.R`: Code to represent community phylogenetic structure calculated for several geographical scales into maps, creating Figure 1;
 -   `S3a_BAMM_netDiv_rate_estimation.R`: Code to generate the control file, assess and estimate net diversification rates for each species using Bayesian Analyses for Macroevolutionary Mixtures using the maximum crade credibility tree computed from the phylogenetic hypothesis used here;
--   `S3b_BAMM_netDiv_rate_estimation_PhyloSamples.R`: Code to generate the control file, assess and estimate net diversification rates for each species using Bayesian Analyses for Macroevolutionary Mixtures for phylogenetic trees randomly sampled from the phylogenetic hypothesis used in this study; 
+-   `S3b_BAMM_netDiv_rate_estimation_PhyloSamples.R`: Code to generate the control file, assess and estimate net diversification rates for each species using Bayesian Analyses for Macroevolutionary Mixtures for phylogenetic trees randomly sampled from the phylogenetic hypothesis used in this study;
 -   `S3c_samplingProbabilities_Table_S2.3.R`: Code to compute sampling probabilities within the phylogenetic hypothesis used in this study, and to create Table S2.3;
--   `S4a_CWM_netDiv.R`: Code to compute weighted means for diversification rates across all communities; 
+-   `S4a_CWM_netDiv.R`: Code to compute weighted means for diversification rates across all communities;
 -   `S4b_CWM_netDiv_PhyloSamples.R`: Code to compute average weighted means for diversification rates across all communities that were obtained for each phylogenetic tree randomly sampled for the phylogenetic hypothesis used in this study;
 -   `S5_PhyloStr_Descriptive_Quantiles_Figures_3_4.R`: Code to plot the mean phylogenetic relatedness of bat communities (for both NRI and NTI) across each percentile of the predictor variables of interest (i.e., historical change in temperature, historical change in precipitation and in situ net diversification rates), and generate Figures 3 and 4;
 -   `S6_PhyloStr_Logistic_Bootstrap_Quantiles_Figure_5_Table_2.R`: Code to applu conditionally unbiased bounded influence robust logistic regressions to test how changes in historical climatic stability and in situ diversification rates independently increased (or decreased) the likelihood of a community being composed of highly phylogenetically related species. This code creates Figure 5 and Table 2;
 -   `S7a_CHELSA_TraCE21k_download.R`: Code to download and decompress climatic data from CHELSA covering the current period until 22,000 years ago, in intervals of 500 years;
 -   `S7b_CHELSA_TraCE21k_VoCC_extract.R`: Code to calculate gradient-based change velocities in temperature and in precipitation from the LGM to the contemporary period and assessed how they influenced the phylogenetic relatedness of bat communities across geographical scales.
+
+</details>
+
+<details>
+
+<summary><code> manuscript/supp_info/ </code></summary>
 
 </details>
 

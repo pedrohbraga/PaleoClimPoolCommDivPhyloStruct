@@ -280,20 +280,28 @@ glm.boot.AllScales.NRI.ClimStab.Div.quantiles.09 <- bind_rows(
              SamplingPool = "Ecoregion sampling")
 ) 
 
+saveRDS(glm.boot.AllScales.NRI.ClimStab.Div.quantiles.09,
+        "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NRI.ClimStab.Div.quantiles.09.RDS")
+
+
 glm.boot.AllScales.NTI.ClimStab.Div.quantiles.09 <- bind_rows(
-  data.frame(glm.boot.Global.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Global.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Global sampling"),
-  data.frame(glm.boot.Hemispheric.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Hemispheric.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Hemispheric sampling"),
-  data.frame(glm.boot.Realm.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Realm.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Realm sampling"),
-  data.frame(glm.boot.Plate.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Plate.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Plate sampling"),
-  data.frame(glm.boot.Biome.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Biome.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Biome sampling"),
-  data.frame(glm.boot.Ecoregion.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Ecoregion.NTI.ClimStab.Div.quantiles$boot.coefs[[6]],
              SamplingPool = "Ecoregion sampling")
 ) 
+
+saveRDS(glm.boot.AllScales.NTI.ClimStab.Div.quantiles.09,
+        "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NTI.ClimStab.Div.quantiles.09.RDS")
+
 
 
 glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.09 <- bind_rows(
@@ -404,7 +412,8 @@ levels(glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.09$PhyloStructure) <- c
       strip.text.y = element_text(margin = margin(t = 0, 
                                                   r = 2, 
                                                   b = 0, 
-                                                  l = 2, "mm")),
+                                                  l = 2, "mm"),
+                                  size = 17),
       strip.text.x = element_text(margin = margin(t = 0, 
                                                   r = 0, 
                                                   b = 2, 
@@ -418,8 +427,10 @@ levels(glm.boot.AllScales.NRI.NTI.ClimStab.Div.quantiles.09$PhyloStructure) <- c
         face = "bold"),
       axis.text.y = ggtext::element_markdown( 
         size = 15,
-        hjust = 1),
-      axis.title = element_text(size = 16),
+        hjust = 1,
+        face = "bold"),
+      axis.title = element_text(size = 17,
+                                face = "bold"),
       legend.position = "none"
       
     )
@@ -433,10 +444,10 @@ as.character(TeX('$Pr(NRI_{Q_{90}}=1)$')) %>%
 # Export
 
 ragg::agg_png("figures/fig.wrap.boot.AllScales.NRI.NTI.ClimStab.Div.quantile.09.h.png", 
-              width = 4*6, 
-              height = 4, 
+              width = 5*6, 
+              height = 5, 
               units = "in", 
-              res = 250,
+              res = 750,
               scaling = 1)
 
 fig.wrap.boot.AllScales.NRI.NTI.ClimStab.Div.quantile.09
@@ -464,22 +475,22 @@ glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075 <- bind_rows(
 saveRDS(glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075, 
         "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075.RDS")
 
-glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075 <- bind_rows(
-  data.frame(glm.boot.Global.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075 <- bind_rows(
+  data.frame(glm.boot.Global.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Global sampling"),
-  data.frame(glm.boot.Hemispheric.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Hemispheric.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Hemispheric sampling"),
-  data.frame(glm.boot.Realm.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Realm.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Realm sampling"),
-  data.frame(glm.boot.Plate.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Plate.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Plate sampling"),
-  data.frame(glm.boot.Biome.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Biome.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Biome sampling"),
-  data.frame(glm.boot.Ecoregion.NTI.ClimStab.Div.quantiles$boot.coefs[[2]],
+  data.frame(glm.boot.Ecoregion.NTI.ClimStab.Div.quantiles$boot.coefs[[5]],
              SamplingPool = "Ecoregion sampling")
 ) 
 
-saveRDS(glm.boot.AllScales.NRI.ClimStab.Div.quantiles.075,
+saveRDS(glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075,
         "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/data/matrices/glm.boot.AllScales.NTI.ClimStab.Div.quantiles.075.RDS")
 
 
