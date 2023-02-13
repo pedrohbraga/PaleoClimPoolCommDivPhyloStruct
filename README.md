@@ -1,16 +1,16 @@
-# The historical and contemporary processes driving global phylogenetic structure – the case of bat communities
+# Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities
 
 Authors: Pedro Henrique Pereira Braga, Steven Kembel, Pedro Peres-Neto
 
 This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information. This repository is directly linked to the Open Science Framework project for this study.
 
-[![](https://img.shields.io/badge/OSF-10.17605%252FOSF.IO%252FAMVP5-blue?style=for-the-badge&logo=osf.svg){width="209"}](https://osf.io/amvp5/)
+[[](https://img.shields.io/badge/Data%20at%20Dryad-10.5061%2Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge](https://osf.io/amvp5/)
 
 ## Data availability
 
 A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials is available within the Dryad repository related to this study.
 
-![](https://img.shields.io/badge/Dryad-10.5061%252Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge&logo=dryad.svg){width="239"}(https://doi.org/10.5061/dryad.rjdfn2zgj)
+![](https://img.shields.io/badge/Dryad-10.5061%252Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge&logo=dryad.svg){width="239"}(<https://doi.org/10.5061/dryad.rjdfn2zgj>)
 
 ## Keywords
 

@@ -57,7 +57,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 ## Study
 
-## The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities\
+## Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities\
 
 
 ## Supplementary Information 3

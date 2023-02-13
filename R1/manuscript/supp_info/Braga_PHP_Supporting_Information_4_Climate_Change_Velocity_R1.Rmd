@@ -51,9 +51,9 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 5,
                       fig.align = "center")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_bootstrap_logit_GLM_uncondition_quant.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_bootstrap_logit_GLM_uncondition_quant.R")
 
-source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/SX_fun_ggplot_theme_map.R")
+source("~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/scripts/S0_fun_ggplot_theme_map.R")
 
 
 projectDir <- "~/chapter-PaleoClimPoolCommDivPhyloStruct/R1/"
@@ -117,7 +117,7 @@ cor_gVoCC_inv_voccMag_log_bio_12_diff.AnnPrec.LGM_cur <- MPD.MNTD.LatLong.AllSca
 
 ## Study
 
-### The historical and contemporary processes driving global phylogenetic structure -- the case of bat communities\
+### Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities\
 
 ### Supplementary Information 4
 

@@ -65,7 +65,7 @@ netDiv.CWM.Chiroptera.rs_1.mean <- read.csv("~/chapter-PaleoClimPoolCommDivPhylo
 
 ## Study
 
-## The historical and contemporary processes driving global phylogenetic structure – the case of bat communities\
+## Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities\
 
 ## Supplementary Information 5
 
