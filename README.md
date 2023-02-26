@@ -1,16 +1,14 @@
 # Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities
 
+[![badge](https://img.shields.io/static/v1?style=for-the-badge&label=PUBLICATION&message=Open&color=BF616A)](https://doi.org/10.1111/geb.13650) [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=DATA%20at%20DRYAD&message=01&color=B48EAD)](https://doi.org/10.5061/dryad.rjdfn2zgj) [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=CODE%20at%20OSF&message=01&color=8FBCBB)](https://osf.io/amvp5/)
+
 Authors: Pedro Henrique Pereira Braga, Steven Kembel, Pedro Peres-Neto
 
 This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information. This repository is directly linked to the Open Science Framework project for this study.
 
-[[](https://img.shields.io/badge/Data%20at%20Dryad-10.5061%2Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge](https://osf.io/amvp5/)
-
 ## Data availability
 
-A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials is available within the Dryad repository related to this study.
-
-![](https://img.shields.io/badge/Dryad-10.5061%252Fdryad.rjdfn2zgj-yellowgreen?style=for-the-badge&logo=dryad.svg){width="239"}(<https://doi.org/10.5061/dryad.rjdfn2zgj>)
+A stable data set containing all data required for analysis, reanalysis, and reproduction of figures and materials is available within the Dryad repository (accessible at https://doi.org/10.5061/dryad.rjdfn2zgj) related to this study.
 
 ## Keywords
 
