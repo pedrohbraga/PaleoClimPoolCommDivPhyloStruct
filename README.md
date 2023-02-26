@@ -1,10 +1,10 @@
 # Historical and contemporary processes drive global phylogenetic structure across geographical scales: insights from bat communities
 
-[![badge](https://img.shields.io/static/v1?style=for-the-badge&label=PUBLICATION&message=Open&color=BF616A)](https://doi.org/10.1111/geb.13650) [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=DATA%20at%20DRYAD&message=01&color=B48EAD)](https://doi.org/10.5061/dryad.rjdfn2zgj) [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=CODE%20at%20OSF&message=01&color=8FBCBB)](https://osf.io/amvp5/)
+[![badge](https://img.shields.io/static/v1?style=for-the-badge&label=OPEN%20PUBLICATION%20at&message=GLOBAL%20ECOLOGY%20AND%20BIOGEOGRAPHY&color=BF616A)](https://doi.org/10.1111/geb.13650)   [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=DATA%20at&message=DRYAD&color=B48EAD)](https://doi.org/10.5061/dryad.rjdfn2zgj)   [![badge](https://img.shields.io/static/v1?style=for-the-badge&label=CODE%20at&message=OSF&color=8FBCBB)](https://osf.io/amvp5/)
 
 Authors: Pedro Henrique Pereira Braga, Steven Kembel, Pedro Peres-Neto
 
-This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information. This repository is directly linked to the Open Science Framework project for this study.
+This repository contains code to reproduce all figures, tables and analyses included in the manuscript and in its supplementary information. This repository is directly linked to the Open Science Framework project (accessible at https://osf.io/amvp5/) for this study.
 
 ## Data availability
 
@@ -96,15 +96,24 @@ We show that the worldwide phylogenetic structure of bat assemblages varies as a
 
 <summary><code> manuscript/supp_info/ </code></summary>
 
+The RMarkdown documents below used the data and code used in the main study to perfom additional analyses, generate figures, and output the documents submitted and published as supplementary information for our study. Filenames are informative, and the order of supplementary information is the same as the one published: 
+  
+- `Braga_PHP_Supporting_Information_3_Pool_Size_Correction_Rarefaction_Sqrt_R1.Rmd`;
+- `Braga_PHP_Supporting_Information_4_Climate_Change_Velocity_R1.Rmd`;
+- `Braga_PHP_Supporting_Information_5_Robustness_to_Phylogenetic_Uncertainty_R1.Rmd`;
+- `Braga_PHP_Supporting_Information_6_Raw_Data_Figures.Rmd`;
+- `Braga_PHP_Supporting_Information_7_075_Unconditional_Quantile_R1.Rmd`.
+  
 </details>
 
 <details>
 
 <summary><code> data/ </code></summary>
 
+The data for our study can be accessed and downloaded from the Dryad repository for this study (accessible at https://doi.org/10.5061/dryad.rjdfn2zgj).
+  
 </details>
 
-*Will be included soon.*
 
 ## Citing
 
